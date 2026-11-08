@@ -12,6 +12,12 @@
       -webkit-touch-callout: none;
       touch-action: manipulation;
     }
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+    }
     html, body {
       height: 100vh;
       height: 100dvh;
@@ -20,36 +26,45 @@
       background: #090d16;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
     }
+    .safe-top { padding-top: max(12px, var(--sat)); }
+    .safe-bottom { padding-bottom: max(12px, var(--sab)); }
+
+    /* 按鈕點擊與回饋特效 (適合 iPad 觸控與電腦滑鼠) */
     .touch-btn {
-      min-height: 76px;
+      min-height: 60px;
       transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
-      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4);
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.45);
+    }
+    @media (min-height: 700px) {
+      .touch-btn {
+        min-height: 72px;
+      }
     }
     .touch-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
     }
     .touch-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.55;
       transform: none;
       box-shadow: none;
       cursor: not-allowed;
     }
     @keyframes pulse-glow {
       0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
-      50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.9); }
+      50% { box-shadow: 0 0 28px rgba(245, 158, 11, 0.9); }
     }
     .glow-gold {
-      animation: pulse-glow 1.6s infinite;
+      animation: pulse-glow 1.5s infinite;
     }
     .card-selected {
       outline: 4px solid #f59e0b;
-      transform: scale(1.03);
+      transform: scale(1.02);
     }
     .card-matched {
-      opacity: 0.18;
+      opacity: 0.22;
       pointer-events: none;
-      transform: scale(0.94);
+      transform: scale(0.96);
       filter: grayscale(100%);
     }
     .timer-danger {
@@ -64,71 +79,70 @@
 <body class="flex flex-col text-white select-none h-screen w-screen overflow-hidden" oncontextmenu="return false;">
 
   <!-- ================= 全螢幕開場封面 ================= -->
-  <div id="cover-screen" class="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-between p-6 sm:p-10 text-center overflow-y-auto">
+  <div id="cover-screen" class="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-between p-4 sm:p-8 text-center overflow-y-auto safe-top safe-bottom">
     <div class="absolute -top-32 -left-32 w-96 h-96 bg-amber-600/20 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="relative z-10 max-w-3xl mt-4">
-      <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-slate-800/90 border border-amber-500/50 text-amber-400 font-extrabold text-sm sm:text-base tracking-widest uppercase shadow-lg glow-gold">
+    <div class="relative z-10 max-w-3xl my-auto">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/90 border border-amber-500/50 text-amber-400 font-extrabold text-xs sm:text-sm tracking-widest uppercase shadow-lg glow-gold mb-3">
         <span>📖 康軒五上國語 · 第七課</span>
         <span>•</span>
         <span>為生命找出口</span>
       </div>
-      <h1 class="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-rose-300 to-cyan-300 mt-4 tracking-tight drop-shadow-lg">
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-rose-300 to-cyan-300 tracking-tight drop-shadow-lg">
         單人闖關挑戰王
       </h1>
-      <p class="text-slate-300 text-base sm:text-lg font-medium mt-3">
+      <p class="text-slate-300 text-sm sm:text-base font-medium mt-2">
         生字筆畫 · 形近音異 · 成語語境 · 30關全能試煉
       </p>
-    </div>
 
-    <!-- 賽程節奏圖 -->
-    <div class="relative z-10 w-full max-w-3xl bg-slate-900/90 border border-slate-700/80 rounded-2xl p-5 shadow-2xl my-4">
-      <div class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-center gap-2">
-        <span>🎯 賽程節奏圖（剛好 30 關 · 每 10 題穿插 1 個純娛樂派對）</span>
+      <!-- 賽程節奏圖 (適配 iPad 4:3 寬度與電腦版) -->
+      <div class="w-full bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-2xl my-5 text-left sm:text-center">
+        <div class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-center gap-2">
+          <span>🎯 賽程節奏（30 關全自動進關 · 每 10 題穿插 1 個純娛樂派對）</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-bold">
+          <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700">
+            <div class="text-emerald-400 font-black text-sm">第 1~10 關</div>
+            <div class="text-slate-200 mt-1">是非判斷題 (10題)</div>
+            <div class="text-emerald-400 text-xs mt-2 font-mono bg-slate-950/60 py-1 rounded text-center">➔ 🐍 遊戲① 極速貪吃蛇</div>
+          </div>
+          <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700">
+            <div class="text-cyan-400 font-black text-sm">第 11~20 關</div>
+            <div class="text-slate-200 mt-1">三選一選擇題 (10題)</div>
+            <div class="text-cyan-400 text-xs mt-2 font-mono bg-slate-950/60 py-1 rounded text-center">➔ 🏰 遊戲② 堡壘射擊戰</div>
+          </div>
+          <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700">
+            <div class="text-purple-400 font-black text-sm">第 21~30 關</div>
+            <div class="text-slate-200 mt-1">連連看消除 (10題)</div>
+            <div class="text-pink-400 text-xs mt-2 font-mono bg-slate-950/60 py-1 rounded text-center">➔ 🚀 遊戲③ 星際極速衝刺</div>
+          </div>
+        </div>
       </div>
-      <div class="grid grid-cols-3 gap-3 text-xs sm:text-sm font-bold">
-        <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700">
-          <div class="text-emerald-400 font-black text-sm">第 1~10 關</div>
-          <div class="text-slate-200 mt-1">是非判斷題 (10題)</div>
-          <div class="text-emerald-400 text-xs mt-2 font-mono bg-slate-950/60 py-1 rounded">➔ 🐍 遊戲① 極速貪吃蛇</div>
-        </div>
-        <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700">
-          <div class="text-cyan-400 font-black text-sm">第 11~20 關</div>
-          <div class="text-slate-200 mt-1">三選一選擇題 (10題)</div>
-          <div class="text-cyan-400 text-xs mt-2 font-mono bg-slate-950/60 py-1 rounded">➔ 🏰 遊戲② 堡壘射擊戰</div>
-        </div>
-        <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700">
-          <div class="text-purple-400 font-black text-sm">第 21~30 關</div>
-          <div class="text-slate-200 mt-1">連連看消除 (10題)</div>
-          <div class="text-pink-400 text-xs mt-2 font-mono bg-slate-950/60 py-1 rounded">➔ 🚀 遊戲③ 星際極速衝刺</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 開戰按鈕 -->
-    <div class="relative z-10 flex flex-col items-center gap-3 mb-4">
-      <div class="text-xs text-slate-400 flex items-center gap-2">
-        <span>💻 支援 PC 鍵鼠 / 電子白板</span>
-        <span>•</span>
-        <span>📱 支援 iPad 蘋果平板觸控操作</span>
+      <div class="flex flex-col items-center gap-3">
+        <div class="text-xs text-slate-400 flex items-center gap-2">
+          <span>💻 支援 PC 鍵盤[1][2][3]與滑鼠</span>
+          <span>•</span>
+          <span>📱 專屬 Apple iPad 平板高感度觸控</span>
+        </div>
+        <button id="btn-start-game-cover" class="px-8 py-3.5 sm:px-12 sm:py-4 bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 active:scale-95 text-white font-black text-lg sm:text-2xl rounded-2xl shadow-2xl tracking-wider transition-all transform hover:scale-105 border border-white/30 flex items-center gap-3">
+          <span>🔥</span>
+          <span>開始單人挑戰 · 點擊啟動</span>
+          <span>🎮</span>
+        </button>
       </div>
-      <button id="btn-start-game-cover" class="px-10 py-4 sm:px-14 sm:py-5 bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 active:scale-95 text-white font-black text-xl sm:text-2xl rounded-2xl shadow-2xl tracking-wider transition-all transform hover:scale-105 border border-white/30 flex items-center gap-3">
-        <span>🔥</span>
-        <span>開始單人挑戰 · 點擊啟動</span>
-        <span>🎮</span>
-      </button>
     </div>
   </div>
 
-  <!-- ================= 頂部常駐控制面板 ================= -->
-  <header class="h-16 sm:h-20 bg-slate-900/95 border-b-2 border-slate-700 px-4 sm:px-8 flex items-center justify-between z-30 shrink-0 shadow-md">
-    <div class="flex items-center space-x-3">
+  <!-- ================= 頂部常駐控制面板 (適配平板與電腦比例) ================= -->
+  <header class="h-16 sm:h-20 bg-slate-900/95 border-b-2 border-slate-700 px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 shadow-md safe-top">
+    <div class="flex items-center space-x-2 sm:space-x-3">
       <div class="flex flex-col">
-        <span class="text-xs tracking-wider text-amber-400 font-bold hidden sm:inline">五上國語 · 第七課 為生命找出口</span>
-        <h1 class="text-base sm:text-xl font-extrabold text-white flex items-center gap-2">
+        <span class="text-[11px] sm:text-xs tracking-wider text-amber-400 font-bold hidden md:inline">五上國語 · 第七課 為生命找出口</span>
+        <h1 class="text-sm sm:text-lg font-extrabold text-white flex items-center gap-2">
           <span>單人挑戰</span>
-          <span id="stage-badge" class="text-xs sm:text-sm px-2.5 py-0.5 rounded-full bg-emerald-700 text-emerald-100 font-semibold">
+          <span id="stage-badge" class="text-xs sm:text-sm px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-700 text-emerald-100 font-semibold truncate max-w-[150px] sm:max-w-none">
             第 1 / 30 關
           </span>
         </h1>
@@ -136,76 +150,76 @@
     </div>
 
     <!-- 中央倒數計時器 -->
-    <div class="flex items-center gap-3 sm:gap-4 bg-slate-800/90 px-3 sm:px-5 py-1.5 sm:py-2 rounded-2xl border border-slate-600 shadow-inner">
+    <div class="flex items-center gap-2 sm:gap-3 bg-slate-800/90 px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-2xl border border-slate-600 shadow-inner">
       <div class="text-right">
-        <div class="text-[10px] sm:text-xs text-slate-400 font-medium">答題倒數</div>
-        <div id="timer-text" class="text-xl sm:text-2xl font-black font-mono tracking-tight text-emerald-400">20.0s</div>
+        <div class="text-[9px] sm:text-[11px] text-slate-400 font-medium">答題倒數</div>
+        <div id="timer-text" class="text-base sm:text-xl font-black font-mono tracking-tight text-emerald-400">20.0s</div>
       </div>
-      <div class="w-24 sm:w-36 bg-slate-700 h-3.5 sm:h-4 rounded-full overflow-hidden p-0.5 border border-slate-600">
+      <div class="w-16 sm:w-28 md:w-36 bg-slate-700 h-3 sm:h-4 rounded-full overflow-hidden p-0.5 border border-slate-600">
         <div id="timer-bar" class="h-full bg-emerald-400 rounded-full transition-all duration-100 ease-linear w-full"></div>
       </div>
     </div>
 
     <!-- 右側功能按鈕與個人計分 -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <!-- 即時統計答對題數 -->
-      <div class="bg-emerald-950/60 border border-emerald-600/70 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl text-center">
-        <div class="text-[10px] text-emerald-300 font-bold">答對題數</div>
-        <div id="correct-counter" class="text-base sm:text-xl font-black text-emerald-400 font-mono">0 / 30</div>
+    <div class="flex items-center gap-1.5 sm:gap-2.5">
+      <div class="bg-emerald-950/60 border border-emerald-600/70 px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl text-center">
+        <div class="text-[9px] sm:text-[10px] text-emerald-300 font-bold">答對題數</div>
+        <div id="correct-counter" class="text-sm sm:text-lg font-black text-emerald-400 font-mono">0 / 30</div>
       </div>
 
-      <div class="bg-amber-950/60 border border-amber-600/70 px-3 py-1 sm:px-4 sm:py-1.5 rounded-xl text-center">
-        <div class="text-[10px] text-amber-300 font-bold">挑戰總分</div>
-        <div id="score-player" class="text-xl sm:text-2xl font-black text-amber-400 font-mono">0</div>
+      <div class="bg-amber-950/60 border border-amber-600/70 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl text-center">
+        <div class="text-[9px] sm:text-[10px] text-amber-300 font-bold">總分</div>
+        <div id="score-player" class="text-sm sm:text-lg font-black text-amber-400 font-mono">0</div>
       </div>
 
-      <div class="flex items-center gap-1.5">
-        <button id="btn-sound" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-xs sm:text-sm font-semibold border border-slate-700" title="音效切換">
+      <div class="flex items-center gap-1">
+        <button id="btn-sound" class="p-1.5 sm:p-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-xs sm:text-sm font-semibold border border-slate-700" title="音效開關">
           <span id="sound-icon">🔊</span>
         </button>
-        <button id="btn-bgm" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-purple-700 hover:bg-purple-600 active:scale-95 text-xs sm:text-sm font-semibold border border-purple-500" title="音樂切換">
+        <button id="btn-bgm" class="p-1.5 sm:p-2 rounded-xl bg-purple-700 hover:bg-purple-600 active:scale-95 text-xs sm:text-sm font-semibold border border-purple-500" title="音樂開關">
           <span id="bgm-icon">🎵</span>
         </button>
-        <button id="btn-pause" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-xs sm:text-sm font-semibold" title="暫停/繼續">
+        <button id="btn-pause" class="p-1.5 sm:p-2 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-xs sm:text-sm font-semibold" title="暫停/繼續">
           <span id="pause-icon">⏸️</span>
         </button>
-        <button id="btn-next" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-xs sm:text-sm font-bold shadow-md">
+        <button id="btn-next" class="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-xs sm:text-sm font-bold shadow-md">
           ⏭️ 下關
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ================= 中間題目核心區 ================= -->
-  <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 relative overflow-y-auto">
-    <div class="w-full max-w-3xl flex-1 flex flex-col justify-between py-2 sm:py-4">
-      <div id="question-card-container" class="flex-1 flex flex-col justify-center"></div>
+  <!-- ================= 中間題目核心區 (iPad/電腦最佳可視高度調整) ================= -->
+  <main class="flex-1 flex flex-col items-center justify-center p-2.5 sm:p-6 relative overflow-hidden safe-bottom">
+    <div class="w-full max-w-4xl flex-1 flex flex-col justify-between py-1 sm:py-3 h-full">
+      <div id="question-card-container" class="flex-1 flex flex-col justify-center min-h-0"></div>
 
-      <div id="status-bar" class="h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-bold text-sm sm:text-base bg-slate-900/70 text-slate-300 border border-slate-700 shadow-md transition-all">
+      <!-- 狀態列 (具備即時提示與答對/答錯反饋) -->
+      <div id="status-bar" class="h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-slate-900/70 text-slate-300 border border-slate-700 shadow-md transition-all shrink-0">
         準備就緒，請點選答案！
       </div>
     </div>
   </main>
 
   <!-- ================= 中場純遊戲 1：極速霓虹貪吃蛇 ================= -->
-  <div id="snake-overlay" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-center p-3 sm:p-5">
+  <div id="snake-overlay" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-center p-3 sm:p-6 safe-top safe-bottom">
     <div class="text-center mb-1">
-      <span class="px-4 py-1 rounded-full bg-emerald-500 text-slate-950 text-xs font-black uppercase tracking-widest animate-bounce inline-block">
+      <span class="px-3 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-xs font-black uppercase tracking-widest inline-block">
         🕹️ 中場純娛樂派對 · GAME 1
       </span>
-      <h2 class="text-2xl sm:text-3xl font-black text-emerald-400 mt-1">🐍 霓虹極速貪吃蛇！</h2>
-      <p class="text-slate-300 text-xs sm:text-sm flex items-center justify-center gap-4 mt-0.5">
+      <h2 class="text-xl sm:text-3xl font-black text-emerald-400 mt-1">🐍 霓虹極速貪吃蛇！</h2>
+      <p class="text-slate-300 text-xs sm:text-sm flex items-center justify-center gap-3 sm:gap-4 mt-0.5">
         <span>🍎 能量果 <b class="text-emerald-400">+10分</b></span>
-        <span>⭐ 黃金之星 <b class="text-amber-400">+25分</b></span>
-        <span class="text-slate-400">電腦方向鍵 / 平板滑動或下方按鈕</span>
+        <span>⭐ 黃金星 <b class="text-amber-400">+25分</b></span>
       </p>
-      <div class="text-lg sm:text-xl font-mono font-black text-emerald-300 mt-0.5">衝刺剩餘時間：<span id="snake-timer">20</span> 秒</div>
+      <div class="text-base sm:text-lg font-mono font-black text-emerald-300">剩餘時間：<span id="snake-timer">20</span> 秒</div>
     </div>
 
     <div class="w-full max-w-md flex flex-col items-center bg-slate-900/90 border-2 border-emerald-500/70 rounded-2xl p-2 shadow-2xl">
-      <canvas id="snake-canvas" width="400" height="260" class="bg-slate-950 rounded-xl border border-emerald-950 w-full max-w-[380px] h-[200px] sm:h-[230px]"></canvas>
+      <canvas id="snake-canvas" width="400" height="260" class="bg-slate-950 rounded-xl border border-emerald-950 w-full max-w-[380px] h-[190px] sm:h-[230px]"></canvas>
       
-      <div class="grid grid-cols-3 gap-1.5 w-44 mt-2 sm:hidden">
+      <!-- 平板與手機方向按鈕 -->
+      <div class="grid grid-cols-3 gap-1.5 w-48 mt-2">
         <div></div>
         <button id="s-btn-up" class="h-10 bg-slate-800 active:bg-emerald-600 rounded-xl font-black text-lg border border-slate-600">⬆️</button>
         <div></div>
@@ -216,163 +230,158 @@
     </div>
 
     <div class="mt-2.5 flex gap-3">
-      <button id="btn-start-snake" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 active:scale-95 text-white font-black rounded-xl text-base sm:text-lg shadow-xl">
+      <button id="btn-start-snake" class="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 active:scale-95 text-white font-black rounded-xl text-base shadow-xl">
         開始出發！🐍
       </button>
-      <button id="btn-skip-snake" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm">
+      <button id="btn-skip-snake" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm">
         跳過進入第 11 關
       </button>
     </div>
   </div>
 
   <!-- ================= 中場純遊戲 2：堡壘守禦大砲戰 ================= -->
-  <div id="fortress-overlay" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-center p-3 sm:p-5">
+  <div id="fortress-overlay" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-center p-3 sm:p-6 safe-top safe-bottom">
     <div class="text-center mb-1">
-      <span class="px-4 py-1 rounded-full bg-cyan-400 text-slate-950 text-xs font-black uppercase tracking-widest animate-bounce inline-block">
+      <span class="px-3 py-0.5 rounded-full bg-cyan-400 text-slate-950 text-xs font-black uppercase tracking-widest inline-block">
         🚀 中場純娛樂派對 · GAME 2
       </span>
-      <h2 class="text-2xl sm:text-3xl font-black text-cyan-300 mt-1">🏰 堡壘防衛大砲戰！</h2>
-      <p class="text-slate-300 text-xs sm:text-sm flex items-center justify-center gap-4 mt-0.5">
-        <span>👾 外星無人機 <b class="text-cyan-400">+10分</b></span>
-        <span>☄️ 烈焰隕石 <b class="text-amber-400">+15分</b></span>
-        <span>🛸 巨型母艦 <b class="text-pink-400">+30分</b></span>
+      <h2 class="text-xl sm:text-3xl font-black text-cyan-300 mt-1">🏰 堡壘防衛大砲戰！</h2>
+      <p class="text-slate-300 text-xs sm:text-sm flex items-center justify-center gap-3 sm:gap-4 mt-0.5">
+        <span>👾 無人機 <b class="text-cyan-400">+10分</b></span>
+        <span>☄️ 隕石 <b class="text-amber-400">+15分</b></span>
+        <span>🛸 母艦 <b class="text-pink-400">+30分</b></span>
       </p>
-      <div class="text-xs text-slate-400 mt-0.5">直接點擊/觸控螢幕天空，火砲自動瞄準引爆範圍衝擊波！</div>
-      <div class="text-lg sm:text-xl font-mono font-black text-cyan-300 mt-0.5">要塞防衛倒數：<span id="fortress-timer">20</span> 秒</div>
+      <div class="text-xs text-slate-400">點擊天空直接開砲！防衛倒數：<span id="fortress-timer" class="text-cyan-300 font-mono font-bold">20</span> 秒</div>
     </div>
 
     <div class="w-full max-w-xl bg-slate-900/90 border-2 border-cyan-500/70 rounded-2xl p-2 shadow-2xl relative">
-      <canvas id="fortress-canvas" width="560" height="320" class="bg-slate-950 rounded-xl border border-cyan-950 w-full h-[220px] sm:h-[300px] cursor-crosshair"></canvas>
+      <canvas id="fortress-canvas" width="560" height="300" class="bg-slate-950 rounded-xl border border-cyan-950 w-full h-[200px] sm:h-[280px] cursor-crosshair"></canvas>
     </div>
 
     <div class="mt-2.5 flex gap-3">
-      <button id="btn-start-fortress" class="px-6 py-2.5 bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-300 active:scale-95 text-slate-950 font-black rounded-xl text-base sm:text-lg shadow-xl">
+      <button id="btn-start-fortress" class="px-6 py-2 bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-300 active:scale-95 text-slate-950 font-black rounded-xl text-base shadow-xl">
         啟動砲塔！⚡
       </button>
-      <button id="btn-skip-fortress" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm">
+      <button id="btn-skip-fortress" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm">
         跳過進入第 21 關
       </button>
     </div>
   </div>
 
   <!-- ================= 中場純遊戲 3：星際極速避障衝刺 ================= -->
-  <div id="runner-overlay" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-center p-3 sm:p-5">
+  <div id="runner-overlay" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-center p-3 sm:p-6 safe-top safe-bottom">
     <div class="text-center mb-1">
-      <span class="px-4 py-1 rounded-full bg-pink-500 text-slate-950 text-xs font-black uppercase tracking-widest animate-bounce inline-block">
+      <span class="px-3 py-0.5 rounded-full bg-pink-500 text-slate-950 text-xs font-black uppercase tracking-widest inline-block">
         🎈 中場純娛樂派對 · GAME 3
       </span>
-      <h2 class="text-2xl sm:text-3xl font-black text-pink-400 mt-1">🚀 星際極速衝刺戰！</h2>
-      <p class="text-slate-300 text-xs sm:text-sm flex items-center justify-center gap-4 mt-0.5">
-        <span>💎 能量水晶 <b class="text-cyan-400">+15分</b></span>
-        <span>⭐ 幸運勳章 <b class="text-amber-400">+25分</b></span>
-        <span>💥 暗黑隕石 <b class="text-rose-400">-15分</b></span>
+      <h2 class="text-xl sm:text-3xl font-black text-pink-400 mt-1">🚀 星際極速衝刺戰！</h2>
+      <p class="text-slate-300 text-xs sm:text-sm flex items-center justify-center gap-3 sm:gap-4 mt-0.5">
+        <span>💎 能量晶 <b class="text-cyan-400">+15分</b></span>
+        <span>⭐ 幸運星 <b class="text-amber-400">+25分</b></span>
+        <span>💥 暗隕石 <b class="text-rose-400">-15分</b></span>
       </p>
-      <div class="text-xs text-slate-400 mt-0.5">點擊左右半屏或按鍵盤 ← / → 切換飛行航道！</div>
-      <div class="text-lg sm:text-xl font-mono font-black text-pink-300 mt-0.5">衝刺剩餘時間：<span id="runner-timer">20</span> 秒</div>
+      <div class="text-base sm:text-lg font-mono font-black text-pink-300">衝刺剩餘時間：<span id="runner-timer">20</span> 秒</div>
     </div>
 
     <div class="w-full max-w-md flex flex-col items-center bg-slate-900/90 border-2 border-pink-500/70 rounded-2xl p-2 shadow-2xl">
-      <canvas id="runner-canvas" width="400" height="280" class="bg-slate-950 rounded-xl border border-pink-950 w-full max-w-[380px] h-[210px] sm:h-[240px]"></canvas>
+      <canvas id="runner-canvas" width="400" height="260" class="bg-slate-950 rounded-xl border border-pink-950 w-full max-w-[380px] h-[190px] sm:h-[220px]"></canvas>
       
-      <div class="flex gap-4 w-full justify-center mt-2 sm:hidden">
-        <button id="r-btn-left" class="flex-1 py-2 bg-slate-800 active:bg-pink-600 rounded-xl font-black text-lg border border-slate-600">⬅️ 左道</button>
-        <button id="r-btn-right" class="flex-1 py-2 bg-slate-800 active:bg-pink-600 rounded-xl font-black text-lg border border-slate-600">➡️ 右道</button>
+      <div class="flex gap-4 w-full justify-center mt-2">
+        <button id="r-btn-left" class="flex-1 py-2 bg-slate-800 active:bg-pink-600 rounded-xl font-black text-base border border-slate-600">⬅️ 左道</button>
+        <button id="r-btn-right" class="flex-1 py-2 bg-slate-800 active:bg-pink-600 rounded-xl font-black text-base border border-slate-600">➡️ 右道</button>
       </div>
     </div>
 
     <div class="mt-2.5 flex gap-3">
-      <button id="btn-start-runner" class="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 active:scale-95 text-white font-black rounded-xl text-base sm:text-lg shadow-xl">
+      <button id="btn-start-runner" class="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 active:scale-95 text-white font-black rounded-xl text-base shadow-xl">
         全速衝刺！🚀
       </button>
-      <button id="btn-skip-runner" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm">
-        跳過查看全場總成績
+      <button id="btn-skip-runner" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm">
+        跳過查看總成績
       </button>
     </div>
   </div>
 
   <!-- ================= 單關小遊戲戰報結算看板 ================= -->
-  <div id="round-result-modal" class="hidden absolute inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-6 text-center">
-    <div id="round-result-badge" class="px-6 py-2 rounded-full text-sm font-black uppercase tracking-wider mb-2 bg-amber-500 text-slate-950">
+  <div id="round-result-modal" class="hidden absolute inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 sm:p-6 text-center safe-top safe-bottom">
+    <div id="round-result-badge" class="px-5 py-1.5 rounded-full text-xs sm:text-sm font-black uppercase tracking-wider mb-2 bg-amber-500 text-slate-950">
       戰報結算
     </div>
-    <h2 id="round-result-title" class="text-3xl sm:text-4xl font-black text-amber-300 mb-2">
+    <h2 id="round-result-title" class="text-2xl sm:text-3xl font-black text-amber-300 mb-1">
       小遊戲結束！
     </h2>
-    <p class="text-slate-300 text-base mb-4">單局表現結算</p>
+    <p class="text-slate-300 text-sm mb-3">單局表現結算</p>
 
-    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-500/80 rounded-3xl p-6 shadow-2xl max-w-md w-full mb-6">
-      <div class="text-sm text-slate-400">本輪獲得分數</div>
-      <div id="round-score-display" class="text-5xl font-black text-amber-400 my-2">+0</div>
-      <div id="round-eval-display" class="text-base font-extrabold text-emerald-400">手速驚人！</div>
-      <div class="h-px bg-slate-800 my-3"></div>
-      <div class="text-sm text-slate-400">目前挑戰累計總分：<span id="round-cum-score" class="text-amber-300 font-bold text-lg">0</span> 分</div>
+    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-500/80 rounded-2xl p-5 shadow-2xl max-w-sm w-full mb-4">
+      <div class="text-xs text-slate-400">本輪獲得分數</div>
+      <div id="round-score-display" class="text-4xl font-black text-amber-400 my-1">+0</div>
+      <div id="round-eval-display" class="text-sm font-extrabold text-emerald-400">手速驚人！</div>
+      <div class="h-px bg-slate-800 my-2.5"></div>
+      <div class="text-xs text-slate-400">目前挑戰累計總分：<span id="round-cum-score" class="text-amber-300 font-bold text-base">0</span> 分</div>
     </div>
 
-    <button id="btn-round-continue" class="px-10 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl active:scale-95 transition-transform">
+    <button id="btn-round-continue" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-base sm:text-lg rounded-xl shadow-xl active:scale-95 transition-transform">
       繼續前進 ➔
     </button>
   </div>
 
-  <!-- ================= 終局成就大滿貫頒獎典禮 (含全對滿分判定看板) ================= -->
-  <div id="victory-modal" class="hidden absolute inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto">
-    <div class="text-5xl sm:text-6xl mb-1 animate-bounce">🏆</div>
-    <h2 class="text-3xl sm:text-4xl font-black text-amber-400 mb-1">挑戰圓滿成功！</h2>
-    <p class="text-sm sm:text-base text-slate-300 max-w-md mb-3">
+  <!-- ================= 終局成就大滿貫頒獎典禮 ================= -->
+  <div id="victory-modal" class="hidden absolute inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto safe-top safe-bottom">
+    <div class="text-4xl sm:text-5xl mb-1 animate-bounce">🏆</div>
+    <h2 class="text-2xl sm:text-4xl font-black text-amber-400 mb-1">挑戰圓滿成功！</h2>
+    <p class="text-xs sm:text-sm text-slate-300 max-w-md mb-2">
       康軒五上第七課《為生命找出口》成果戰報
     </p>
 
-    <!-- 「全部答對」尊榮金色橫幅 (若 30 題全對自動顯現) -->
-    <div id="perfect-banner" class="hidden max-w-md w-full mb-3 py-2.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-slate-950 font-black text-base sm:text-lg flex items-center justify-center gap-2 shadow-2xl glow-gold border border-white">
+    <!-- 「全部答對」尊榮金色橫幅 -->
+    <div id="perfect-banner" class="hidden max-w-md w-full mb-3 py-2 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-2xl glow-gold border border-white">
       <span>💯</span>
-      <span>恭喜 30 題全部答對！達成滿分神話！</span>
+      <span>恭喜 30 題全部答對！達成滿分成就！</span>
       <span>🌟</span>
     </div>
 
     <!-- 成績細部戰報卡片 -->
-    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-500/80 rounded-3xl p-4 sm:p-5 max-w-md w-full shadow-2xl mb-4 text-left">
-      <!-- 答對題數與答對率 -->
-      <div class="bg-slate-800/80 rounded-2xl p-3 border border-slate-700 mb-3 flex items-center justify-between">
+    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-500/80 rounded-2xl p-4 sm:p-5 max-w-md w-full shadow-2xl mb-3 text-left">
+      <div class="bg-slate-800/80 rounded-xl p-3 border border-slate-700 mb-2.5 flex items-center justify-between">
         <div>
-          <div class="text-xs text-slate-400">學科答對題數</div>
-          <div class="text-2xl font-black text-emerald-400" id="final-correct-ratio">30 / 30 題</div>
+          <div class="text-[11px] text-slate-400">學科答對題數</div>
+          <div class="text-xl sm:text-2xl font-black text-emerald-400" id="final-correct-ratio">30 / 30 題</div>
         </div>
         <div class="text-right">
-          <div class="text-xs text-slate-400">正確率</div>
-          <div class="text-2xl font-black text-cyan-400" id="final-accuracy-pct">100%</div>
+          <div class="text-[11px] text-slate-400">正確率</div>
+          <div class="text-xl sm:text-2xl font-black text-cyan-400" id="final-accuracy-pct">100%</div>
         </div>
       </div>
 
-      <!-- 分數組成細節 -->
-      <div class="grid grid-cols-2 gap-2 text-xs font-semibold mb-3">
-        <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
-          <div class="text-slate-400">📖 學科測驗得分</div>
-          <div id="final-academic-score" class="text-lg font-black text-amber-300 font-mono">+0 分</div>
+      <div class="grid grid-cols-2 gap-2 text-xs font-semibold mb-2.5">
+        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+          <div class="text-slate-400 text-[11px]">📖 學科測驗得分</div>
+          <div id="final-academic-score" class="text-base font-black text-amber-300 font-mono">+0 分</div>
         </div>
-        <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
-          <div class="text-slate-400">🕹️ 娛樂遊戲加分</div>
-          <div id="final-arcade-score" class="text-lg font-black text-pink-400 font-mono">+0 分</div>
+        <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800">
+          <div class="text-slate-400 text-[11px]">🕹️ 娛樂遊戲加分</div>
+          <div id="final-arcade-score" class="text-base font-black text-pink-400 font-mono">+0 分</div>
         </div>
       </div>
 
-      <!-- 總分與稱號 -->
       <div class="text-center pt-1 border-t border-slate-800">
-        <div class="text-xs text-slate-400">綜合挑戰總積分</div>
-        <div id="final-total-score" class="text-5xl font-black text-amber-400 my-1 font-mono">0</div>
-        <div id="final-rank-title" class="text-lg sm:text-xl font-black text-emerald-400 mt-1">👑 國語殿堂級宗師 👑</div>
-        <div class="flex justify-center gap-1.5 text-xl my-1" id="final-star-container">
+        <div class="text-[11px] text-slate-400">綜合挑戰總積分</div>
+        <div id="final-total-score" class="text-4xl font-black text-amber-400 my-1 font-mono">0</div>
+        <div id="final-rank-title" class="text-base sm:text-lg font-black text-emerald-400 mt-1">👑 國語殿堂級宗師 👑</div>
+        <div class="flex justify-center gap-1 text-lg my-1" id="final-star-container">
           ⭐⭐⭐⭐⭐
         </div>
       </div>
     </div>
 
-    <button id="btn-restart-game" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-lg sm:text-xl rounded-2xl shadow-xl active:scale-95">
+    <button id="btn-restart-game" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-base sm:text-lg rounded-xl shadow-xl active:scale-95">
       重新開局挑戰 🔁
     </button>
   </div>
 
   <script>
     /* ==========================================================================
-       1. 原生 Web Audio API 離線合成音效與緊張背景音樂
+       1. 原生 Web Audio API 合成音效與節奏背景音樂 (完全離線可用)
        ========================================================================== */
     class SoundEngine {
       constructor() {
@@ -382,8 +391,8 @@
         this.bgmPlaying = false;
         this.bgmUrgent = false;
 
-        this.tempo = 128;
-        this.urgentTempo = 152;
+        this.tempo = 126;
+        this.urgentTempo = 150;
         this.bgmGain = null;
         this.noiseBuffer = null;
         this.currentStep = 0;
@@ -409,7 +418,7 @@
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           this.ctx = new AudioContext();
           this.bgmGain = this.ctx.createGain();
-          this.bgmGain.gain.setValueAtTime(0.16, this.ctx.currentTime);
+          this.bgmGain.gain.setValueAtTime(0.15, this.ctx.currentTime);
           this.bgmGain.connect(this.ctx.destination);
           this.createNoiseBuffer();
         }
@@ -433,7 +442,7 @@
         const gain = this.ctx.createGain();
         osc.frequency.setValueAtTime(140, time);
         osc.frequency.exponentialRampToValueAtTime(36, time + 0.09);
-        gain.gain.setValueAtTime(0.3, time);
+        gain.gain.setValueAtTime(0.28, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
         osc.connect(gain);
         gain.connect(this.bgmGain);
@@ -450,7 +459,7 @@
         filter.frequency.setValueAtTime(this.bgmUrgent ? 8500 : 7000, time);
         const gain = this.ctx.createGain();
         const dur = isAccent ? 0.05 : 0.025;
-        gain.gain.setValueAtTime(isAccent ? 0.12 : 0.06, time);
+        gain.gain.setValueAtTime(isAccent ? 0.11 : 0.05, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
         source.connect(filter);
         filter.connect(gain);
@@ -467,10 +476,10 @@
         osc.frequency.setValueAtTime(freq, time);
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(this.bgmUrgent ? 1200 : 650, time);
-        filter.frequency.exponentialRampToValueAtTime(this.bgmUrgent ? 350 : 180, time + 0.14);
+        filter.frequency.setValueAtTime(this.bgmUrgent ? 1100 : 600, time);
+        filter.frequency.exponentialRampToValueAtTime(this.bgmUrgent ? 320 : 180, time + 0.14);
 
-        gain.gain.setValueAtTime(this.bgmUrgent ? 0.22 : 0.18, time);
+        gain.gain.setValueAtTime(this.bgmUrgent ? 0.2 : 0.16, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
 
         osc.connect(filter);
@@ -485,7 +494,7 @@
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(this.bgmUrgent ? 0.08 : 0.04, time);
+        gain.gain.setValueAtTime(this.bgmUrgent ? 0.07 : 0.035, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
         osc.connect(gain);
         gain.connect(this.bgmGain);
@@ -552,7 +561,7 @@
       setBGMUrgent(isUrgent) {
         this.bgmUrgent = isUrgent;
         if (this.bgmGain && this.ctx) {
-          this.bgmGain.gain.setValueAtTime(isUrgent ? 0.22 : 0.16, this.ctx.currentTime);
+          this.bgmGain.gain.setValueAtTime(isUrgent ? 0.2 : 0.15, this.ctx.currentTime);
         }
       }
 
@@ -570,7 +579,7 @@
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(isUrgent ? 880 : 440, this.ctx.currentTime);
-        gain.gain.setValueAtTime(isUrgent ? 0.25 : 0.12, this.ctx.currentTime);
+        gain.gain.setValueAtTime(isUrgent ? 0.22 : 0.1, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (isUrgent ? 0.08 : 0.05));
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -587,12 +596,12 @@
           const gain = this.ctx.createGain();
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.06);
-          gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.06);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.06 + 0.32);
+          gain.gain.setValueAtTime(0.24, this.ctx.currentTime + idx * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.06 + 0.3);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start(this.ctx.currentTime + idx * 0.06);
-          osc.stop(this.ctx.currentTime + idx * 0.06 + 0.35);
+          osc.stop(this.ctx.currentTime + idx * 0.06 + 0.32);
         });
       }
 
@@ -603,7 +612,7 @@
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(160, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.28);
+        osc.frequency.exponentialRampToValueAtTime(75, this.ctx.currentTime + 0.28);
         gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
         osc.connect(gain);
@@ -619,14 +628,14 @@
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'square';
-          osc.frequency.setValueAtTime(220, this.ctx.currentTime + i * 0.18);
-          osc.frequency.setValueAtTime(175, this.ctx.currentTime + i * 0.18 + 0.08);
-          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.18);
-          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.18 + 0.15);
+          osc.frequency.setValueAtTime(220, this.ctx.currentTime + i * 0.16);
+          osc.frequency.setValueAtTime(175, this.ctx.currentTime + i * 0.16 + 0.08);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.16);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.16 + 0.14);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
-          osc.start(this.ctx.currentTime + i * 0.18);
-          osc.stop(this.ctx.currentTime + i * 0.18 + 0.16);
+          osc.start(this.ctx.currentTime + i * 0.16);
+          osc.stop(this.ctx.currentTime + i * 0.16 + 0.15);
         }
       }
 
@@ -638,7 +647,7 @@
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(950, this.ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(180, this.ctx.currentTime + 0.12);
-        gain.gain.setValueAtTime(0.28, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.13);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -657,7 +666,7 @@
         filter.frequency.setValueAtTime(800, this.ctx.currentTime);
         filter.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.25);
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.26);
         source.connect(filter);
         filter.connect(gain);
@@ -674,7 +683,7 @@
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(520, this.ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(980, this.ctx.currentTime + 0.08);
-        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.28, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.09);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -690,7 +699,7 @@
         osc.type = 'sine';
         osc.frequency.setValueAtTime(880, this.ctx.currentTime);
         osc.frequency.setValueAtTime(1320, this.ctx.currentTime + 0.06);
-        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.22, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
@@ -707,7 +716,7 @@
           const gain = this.ctx.createGain();
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(f, this.ctx.currentTime + i * 0.1);
-          gain.gain.setValueAtTime(0.3, this.ctx.currentTime + i * 0.1);
+          gain.gain.setValueAtTime(0.28, this.ctx.currentTime + i * 0.1);
           gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.1 + 0.6);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
@@ -720,7 +729,7 @@
     const sound = new SoundEngine();
 
     /* ==========================================================================
-       2. 完整的 30 道國語教材題庫陣列 (康軒五上第七課《為生命找出口》)
+       2. 完整的 30 道國語教材題庫 (康軒五上第七課《為生命找出口》)
        ========================================================================== */
     const QUESTION_BANK = [
       // --------- 第 1 ~ 10 關：是非題 ---------
@@ -779,61 +788,61 @@
       {
         id: 11, type: 'choice', category: '多音字測驗',
         question: '下列哪一個詞語中的「噴」字，讀音為第四聲「ㄆㄣˋ」？',
-        options: ['A. 噴泉', 'B. 噴發', 'C. 噴香'],
+        options: ['噴泉', '噴發', '噴香'],
         answer: 2, explain: '「噴香」形容香氣撲鼻，讀作 ㄆㄣˋ。'
       },
       {
         id: 12, type: 'choice', category: '成語填空',
         question: '「這名選手在國際賽事中表現______，替學校贏得最高榮譽。」',
-        options: ['A. 可圈可點', 'B. 庸碌無能', 'C. 逆耳忠言'],
+        options: ['可圈可點', '庸碌無能', '逆耳忠言'],
         answer: 0, explain: '形容優異突出的表現應選「可圈可點」。'
       },
       {
         id: 13, type: 'choice', category: '形近字部首',
         question: '「鄰居」的「鄰」字，其正確的部首為下列何者？',
-        options: ['A. 邑部（右側 阝）', 'B. 阜部（左側 阝）', 'C. 米部'],
+        options: ['邑部（右側 阝）', '阜部（左側 阝）', '米部'],
         answer: 0, explain: '「鄰」右邊為邑部（邑在右為阝，阜在左為阝）。'
       },
       {
         id: 14, type: 'choice', category: '多音字辨識',
         question: '成語「含情______」中，描寫默默注視的情意，應讀作什麼？',
-        options: ['A. ㄇㄞˋ ㄇㄞˋ', 'B. ㄇㄛˋ ㄇㄛˋ', 'C. ㄇㄟˋ ㄇㄟˋ'],
+        options: ['ㄇㄞˋ ㄇㄞˋ', 'ㄇㄛˋ ㄇㄛˋ', 'ㄇㄟˋ ㄇㄟˋ'],
         answer: 1, explain: '脈脈含情讀作 ㄇㄛˋ ㄇㄛˋ。'
       },
       {
         id: 15, type: 'choice', category: '成語語境',
         question: '「水管漏水一定要徹底翻修，才能達到______的效果，不再提心吊膽。」',
-        options: ['A. 一勞永逸', 'B. 逆耳忠言', 'C. 物競天擇'],
+        options: ['一勞永逸', '逆耳忠言', '物競天擇'],
         answer: 0, explain: '徹底處理解決困難，獲取長久安逸稱作「一勞永逸」。'
       },
       {
         id: 16, type: 'choice', category: '成語理解',
         question: '「良藥苦口利於病，______利於行。」比喻正直勸告雖刺耳卻有益於人。',
-        options: ['A. 物競天擇', 'B. 逆耳忠言', 'C. 庸碌無能'],
+        options: ['物競天擇', '逆耳忠言', '庸碌無能'],
         answer: 1, explain: '勸告言語雖不中聽但能助長德行，稱作「逆耳忠言」。'
       },
       {
         id: 17, type: 'choice', category: '同音字辨別',
         question: '下列何者是用於形容「公務繁忙、奔波操勞」的「ㄌㄨˋ」字？',
-        options: ['A. 忙「碌」 (石部)', 'B. 紀「錄」 (金部)', 'C. 俸「祿」 (示部)'],
+        options: ['忙「碌」 (石部)', '紀「錄」 (金部)', '俸「祿」 (示部)'],
         answer: 0, explain: '忙碌為石部「碌」；錄為金部；祿為示部。'
       },
       {
         id: 18, type: 'choice', category: '成語填空',
         question: '「在殘酷的自然環境下，______是不變的規律，適者才能繁衍後代。」',
-        options: ['A. 物競天擇', 'B. 可圈可點', 'C. 逆耳忠言'],
+        options: ['物競天擇', '可圈可點', '逆耳忠言'],
         answer: 0, explain: '生物彼此競爭求生，適應環境者生存的規律。'
       },
       {
         id: 19, type: 'choice', category: '生字部首',
         question: '「高瞻遠矚」的「瞻」與「肝膽相照」的「膽」，部首分別是？',
-        options: ['A. 目部 / 肉部', 'B. 言部 / 月部', 'C. 目部 / 骨部'],
+        options: ['目部 / 肉部', '言部 / 月部', '目部 / 骨部'],
         answer: 0, explain: '「瞻」為目部（看視之意）；「膽」為肉部（月字旁器官）。'
       },
       {
         id: 20, type: 'choice', category: '生字讀音',
         question: '課文中「紡織技術」的「織」字，正確注音為下列何者？',
-        options: ['A. ㄓ', 'B. ㄓˊ', 'C. ㄓˋ'],
+        options: ['ㄓ', 'ㄓˊ', 'ㄓˋ'],
         answer: 0, explain: '「織」讀第一聲 ㄓ（織布、組織）。'
       },
 
@@ -921,18 +930,19 @@
     ];
 
     /* ==========================================================================
-       3. 核心遊戲狀態機 (包含全對判定與學科統計)
+       3. 核心狀態機與流程控制
        ========================================================================== */
     const state = {
       currentIndex: 0,
       timerSeconds: 20.0,
       maxSeconds: 20.0,
       timerId: null,
+      autoAdvanceTimeout: null,
       isPaused: false,
       totalScore: 0,
       locked: false,
 
-      // ★ 學科專用答對統計
+      // 學科統計
       academicCorrect: 0,
       academicTotal: 30,
       academicScore: 0,
@@ -964,7 +974,7 @@
     const pauseIcon = document.getElementById('pause-icon');
     const btnNext = document.getElementById('btn-next');
 
-    // 娛樂遊戲
+    // 娛樂遊戲元素
     const snakeOverlay = document.getElementById('snake-overlay');
     const btnStartSnake = document.getElementById('btn-start-snake');
     const btnSkipSnake = document.getElementById('btn-skip-snake');
@@ -1019,12 +1029,44 @@
       setTimeout(() => scorePlayerEl.classList.remove('scale-125', 'text-emerald-400', 'text-rose-500'), 300);
     }
 
+    function clearAutoAdvance() {
+      if (state.autoAdvanceTimeout) {
+        clearTimeout(state.autoAdvanceTimeout);
+        state.autoAdvanceTimeout = null;
+      }
+    }
+
+    // 自動進入下一關/中場遊戲核心分派
+    function advanceNextStage() {
+      clearAutoAdvance();
+
+      // 檢查是否該觸發中場派對
+      if (state.currentIndex === 9) {
+        triggerSnakeGame();
+        return;
+      }
+      if (state.currentIndex === 19) {
+        triggerFortressGame();
+        return;
+      }
+      if (state.currentIndex === 29) {
+        triggerRunnerGame();
+        return;
+      }
+
+      if (state.currentIndex < QUESTION_BANK.length - 1) {
+        loadStage(state.currentIndex + 1);
+      } else {
+        showVictoryModal();
+      }
+    }
+
     function showRoundResult(gameNumber, gameName, badgeColor, onContinue) {
       sound.setBGMUrgent(false);
       sound.playVictory();
 
       roundResultBadge.textContent = `🕹️ 中場純娛樂派對 · GAME ${gameNumber}`;
-      roundResultBadge.className = `px-6 py-2 rounded-full text-sm font-black uppercase tracking-wider mb-2 ${badgeColor} text-slate-950`;
+      roundResultBadge.className = `px-5 py-1.5 rounded-full text-xs sm:text-sm font-black uppercase tracking-wider mb-2 ${badgeColor} text-slate-950`;
       roundResultTitle.textContent = `${gameName} 結束！`;
 
       roundScoreDisplay.textContent = `+${state.roundScore}`;
@@ -1032,13 +1074,13 @@
 
       if (state.roundScore >= 120) {
         roundEvalDisplay.textContent = '🌟 神級手速！反應超凡！';
-        roundEvalDisplay.className = 'text-base font-extrabold text-amber-400';
+        roundEvalDisplay.className = 'text-sm font-extrabold text-amber-400';
       } else if (state.roundScore >= 60) {
         roundEvalDisplay.textContent = '👏 眼明手快！表現極佳！';
-        roundEvalDisplay.className = 'text-base font-extrabold text-emerald-400';
+        roundEvalDisplay.className = 'text-sm font-extrabold text-emerald-400';
       } else {
         roundEvalDisplay.textContent = '💪 順利通關！繼續保持！';
-        roundEvalDisplay.className = 'text-base font-extrabold text-cyan-400';
+        roundEvalDisplay.className = 'text-sm font-extrabold text-cyan-400';
       }
 
       state.onRoundContinue = onContinue;
@@ -1057,6 +1099,7 @@
        ========================================================================== */
     function startTimer() {
       clearInterval(state.timerId);
+      clearAutoAdvance();
       state.timerSeconds = state.maxSeconds;
       state.isPaused = false;
       sound.setBGMUrgent(false);
@@ -1093,10 +1136,10 @@
       timerBar.style.width = pct + '%';
 
       if (state.timerSeconds <= 5) {
-        timerText.className = 'text-xl sm:text-2xl font-black font-mono tracking-tight text-rose-500 timer-danger';
+        timerText.className = 'text-base sm:text-xl font-black font-mono tracking-tight text-rose-500 timer-danger';
         timerBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-100 ease-linear';
       } else {
-        timerText.className = 'text-xl sm:text-2xl font-black font-mono tracking-tight text-emerald-400';
+        timerText.className = 'text-base sm:text-xl font-black font-mono tracking-tight text-emerald-400';
         timerBar.className = 'h-full bg-emerald-400 rounded-full transition-all duration-100 ease-linear';
       }
     }
@@ -1106,18 +1149,35 @@
       sound.setBGMUrgent(false);
       state.locked = true;
 
-      statusBar.textContent = '⏰ 時間到超時！未在限時內完成';
-      statusBar.className = 'h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-bold text-sm sm:text-base bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md';
+      const q = QUESTION_BANK[state.currentIndex];
+      const explainText = q ? (q.explain || '') : '';
+
+      statusBar.innerHTML = `
+        <div class="flex items-center justify-between w-full px-3 sm:px-4">
+          <span class="text-xs sm:text-sm font-bold text-rose-300">⏰ 超時！${explainText}</span>
+          <button id="btn-quick-next" class="ml-2 px-3 py-1 bg-amber-600 hover:bg-amber-500 rounded-lg text-white font-bold text-xs shrink-0 shadow">下一題 ➔</button>
+        </div>
+      `;
+      statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md shrink-0';
+
+      const btnQuick = document.getElementById('btn-quick-next');
+      if (btnQuick) btnQuick.onclick = () => advanceNextStage();
 
       const buttons = questionCardContainer.querySelectorAll('button');
       buttons.forEach(b => b.disabled = true);
+
+      // 超時停留 2.6 秒後自動前進
+      state.autoAdvanceTimeout = setTimeout(() => {
+        advanceNextStage();
+      }, 2600);
     }
 
     /* ==========================================================================
-       5. 題目渲染與判定
+       5. 題目渲染與判定 (針對 iPad 與 PC 視窗高度做緊湊自適應)
        ========================================================================== */
     function loadStage(index) {
       if (index < 0 || index >= QUESTION_BANK.length) return;
+      clearAutoAdvance();
       state.currentIndex = index;
       const q = QUESTION_BANK[index];
 
@@ -1132,8 +1192,8 @@
       state.matchSelected = null;
       state.matchedCount = 0;
 
-      statusBar.textContent = '請點選答案！';
-      statusBar.className = 'h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-bold text-sm sm:text-base bg-slate-900/70 text-slate-300 border border-slate-700 shadow-md';
+      statusBar.textContent = '請點選答案！(支援鍵盤[1][2]與平板觸控)';
+      statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-slate-900/70 text-slate-300 border border-slate-700 shadow-md shrink-0';
 
       renderSinglePlayerQuestion(q);
       startTimer();
@@ -1144,20 +1204,22 @@
 
       if (q.type === 'tf') {
         const card = document.createElement('div');
-        card.className = 'flex flex-col h-full justify-between gap-4 py-2';
+        card.className = 'flex flex-col h-full justify-between gap-3 sm:gap-5 py-1 sm:py-2';
         card.innerHTML = `
-          <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-6 sm:p-8 text-center shadow-xl">
-            <span class="inline-block px-3.5 py-1 rounded-full bg-slate-800 text-xs text-amber-400 font-bold mb-3 border border-amber-500/30">📌 ${q.category}</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-white leading-relaxed tracking-wide">${q.question}</div>
+          <div class="bg-slate-900/90 border border-slate-700 rounded-2xl sm:rounded-3xl p-4 sm:p-7 text-center shadow-xl my-auto">
+            <span class="inline-block px-3 py-0.5 rounded-full bg-slate-800 text-[11px] sm:text-xs text-amber-400 font-bold mb-2 sm:mb-3 border border-amber-500/30">📌 ${q.category}</span>
+            <div class="text-xl sm:text-3xl font-extrabold text-white leading-relaxed tracking-wide">${q.question}</div>
           </div>
-          <div class="grid grid-cols-2 gap-4 sm:gap-6 my-auto">
-            <button id="btn-tf-true" class="touch-btn bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 text-white font-black text-4xl sm:text-5xl rounded-3xl flex items-center justify-center gap-3 border-2 border-emerald-300/40">
+          <div class="grid grid-cols-2 gap-3 sm:gap-6 my-auto">
+            <button id="btn-tf-true" class="touch-btn bg-gradient-to-b from-emerald-500 to-emerald-700 hover:from-emerald-400 text-white font-black text-3xl sm:text-5xl rounded-2xl sm:rounded-3xl flex items-center justify-center gap-2 sm:gap-3 border-2 border-emerald-300/40">
               <span>⭕</span>
-              <span class="text-2xl sm:text-3xl">正確</span>
+              <span class="text-xl sm:text-3xl">正確</span>
+              <span class="hidden md:inline-block text-xs bg-black/30 px-2 py-0.5 rounded text-emerald-200">[1]</span>
             </button>
-            <button id="btn-tf-false" class="touch-btn bg-gradient-to-b from-rose-500 to-rose-700 hover:from-rose-400 text-white font-black text-4xl sm:text-5xl rounded-3xl flex items-center justify-center gap-3 border-2 border-rose-300/40">
+            <button id="btn-tf-false" class="touch-btn bg-gradient-to-b from-rose-500 to-rose-700 hover:from-rose-400 text-white font-black text-3xl sm:text-5xl rounded-2xl sm:rounded-3xl flex items-center justify-center gap-2 sm:gap-3 border-2 border-rose-300/40">
               <span>❌</span>
-              <span class="text-2xl sm:text-3xl">錯誤</span>
+              <span class="text-xl sm:text-3xl">錯誤</span>
+              <span class="hidden md:inline-block text-xs bg-black/30 px-2 py-0.5 rounded text-rose-200">[2]</span>
             </button>
           </div>
         `;
@@ -1171,37 +1233,44 @@
 
       } else if (q.type === 'choice') {
         const card = document.createElement('div');
-        card.className = 'flex flex-col h-full justify-between gap-4 py-2';
+        card.className = 'flex flex-col h-full justify-between gap-3 sm:gap-4 py-1 sm:py-2';
         card.innerHTML = `
-          <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-6 sm:p-8 text-center shadow-xl">
-            <span class="inline-block px-3.5 py-1 rounded-full bg-slate-800 text-xs text-cyan-400 font-bold mb-3 border border-cyan-500/30">💡 ${q.category}</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-white leading-relaxed tracking-wide">${q.question}</div>
+          <div class="bg-slate-900/90 border border-slate-700 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center shadow-xl">
+            <span class="inline-block px-3 py-0.5 rounded-full bg-slate-800 text-[11px] sm:text-xs text-cyan-400 font-bold mb-1.5 sm:mb-2 border border-cyan-500/30">💡 ${q.category}</span>
+            <div class="text-lg sm:text-2xl md:text-3xl font-extrabold text-white leading-relaxed tracking-wide">${q.question}</div>
           </div>
-          <div class="flex flex-col gap-3 my-auto" id="choice-options"></div>
+          <div class="flex flex-col gap-2.5 sm:gap-3 my-auto" id="choice-options"></div>
         `;
         questionCardContainer.appendChild(card);
 
         const optsContainer = card.querySelector('#choice-options');
+        const labels = ['A', 'B', 'C'];
         q.options.forEach((optText, optIdx) => {
           const btn = document.createElement('button');
-          btn.className = `touch-btn w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:brightness-125 border-2 border-slate-700 hover:border-cyan-500 rounded-2xl py-4 px-6 text-left text-xl sm:text-2xl font-black text-white flex items-center justify-between shadow-lg`;
-          btn.innerHTML = `<span>${optText}</span><span class="text-slate-400 text-sm">點選作答 ➔</span>`;
+          btn.className = `touch-btn w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:brightness-125 border-2 border-slate-700 hover:border-cyan-500 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-left text-base sm:text-xl md:text-2xl font-black text-white flex items-center justify-between shadow-lg`;
+          btn.innerHTML = `
+            <div class="flex items-center gap-2 sm:gap-3">
+              <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-cyan-600/30 border border-cyan-400 text-cyan-300 flex items-center justify-center text-xs sm:text-sm font-mono font-bold">${labels[optIdx]}</span>
+              <span>${optText}</span>
+            </div>
+            <span class="text-slate-400 text-xs sm:text-sm hidden sm:inline">點選作答 [${optIdx + 1}] ➔</span>
+          `;
           btn.onclick = () => handleChoice(optIdx, btn, q);
           optsContainer.appendChild(btn);
         });
 
       } else if (q.type === 'match') {
         const card = document.createElement('div');
-        card.className = 'flex flex-col h-full justify-between gap-3 py-2';
+        card.className = 'flex flex-col h-full justify-between gap-2.5 sm:gap-4 py-1 sm:py-2';
         card.innerHTML = `
-          <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-4 sm:p-5 text-center shadow-lg">
-            <span class="inline-block px-3.5 py-1 rounded-full bg-slate-800 text-xs text-purple-400 font-bold mb-1 border border-purple-500/30">🔗 ${q.category}</span>
-            <div class="text-xl sm:text-2xl font-black text-amber-300">${q.title}</div>
-            <div class="text-xs text-slate-400 mt-1">規則：先點選左邊卡片，再點選右邊對應卡片消除！</div>
+          <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3 sm:p-5 text-center shadow-lg">
+            <span class="inline-block px-3 py-0.5 rounded-full bg-slate-800 text-[11px] sm:text-xs text-purple-400 font-bold mb-1 border border-purple-500/30">🔗 ${q.category}</span>
+            <div class="text-base sm:text-2xl font-black text-amber-300">${q.title}</div>
+            <div class="text-[11px] sm:text-xs text-slate-400 mt-0.5">配對成功後將自動跳下一題！請先點左邊，再點右邊。</div>
           </div>
-          <div class="grid grid-cols-2 gap-4 flex-1 items-center">
-            <div class="flex flex-col gap-3" id="match-left-col"></div>
-            <div class="flex flex-col gap-3" id="match-right-col"></div>
+          <div class="grid grid-cols-2 gap-3 sm:gap-5 flex-1 items-center my-auto">
+            <div class="flex flex-col gap-2.5 sm:gap-3.5" id="match-left-col"></div>
+            <div class="flex flex-col gap-2.5 sm:gap-3.5" id="match-right-col"></div>
           </div>
         `;
         questionCardContainer.appendChild(card);
@@ -1213,7 +1282,7 @@
 
         q.pairs.forEach((pair, idx) => {
           const btnL = document.createElement('button');
-          btnL.className = `touch-btn py-4 px-4 bg-slate-800 border-2 border-amber-500/70 hover:bg-slate-700 rounded-2xl text-lg sm:text-xl font-black text-amber-300 shadow-md text-center transition-all`;
+          btnL.className = `touch-btn py-3.5 sm:py-4 px-3 sm:px-4 bg-slate-800 border-2 border-amber-500/70 hover:bg-slate-700 rounded-2xl text-base sm:text-xl font-black text-amber-300 shadow-md text-center transition-all`;
           btnL.textContent = pair.left;
           btnL.onclick = () => handleMatchClick('left', idx, btnL, q);
           colLeft.appendChild(btnL);
@@ -1221,7 +1290,7 @@
 
         shuffledRight.forEach((pair) => {
           const btnR = document.createElement('button');
-          btnR.className = `touch-btn py-4 px-4 bg-slate-800 border-2 border-cyan-500/70 hover:bg-slate-700 rounded-2xl text-lg sm:text-xl font-black text-cyan-300 shadow-md text-center transition-all`;
+          btnR.className = `touch-btn py-3.5 sm:py-4 px-3 sm:px-4 bg-slate-800 border-2 border-cyan-500/70 hover:bg-slate-700 rounded-2xl text-base sm:text-xl font-black text-cyan-300 shadow-md text-center transition-all`;
           btnR.textContent = pair.right;
           btnR.onclick = () => handleMatchClick('right', pair.originalIdx, btnR, q);
           colRight.appendChild(btnR);
@@ -1229,6 +1298,7 @@
       }
     }
 
+    // ★ 是非題判斷與自動下一題
     function handleTF(userBool, btnEl, q) {
       if (state.locked) return;
       state.locked = true;
@@ -1244,16 +1314,37 @@
         addScore(10, false);
         updateCorrectCounterUI();
         btnEl.classList.add('glow-gold', 'ring-4', 'ring-emerald-400');
-        statusBar.textContent = '🎉 答對了！+10 分';
-        statusBar.className = 'h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-black text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md';
+
+        statusBar.innerHTML = `🎉 <span class="font-black text-emerald-300">答對了！+10 分</span> <span class="text-xs text-emerald-400/80 ml-2 animate-pulse">➔ 即將自動跳下一題...</span>`;
+        statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-black text-xs sm:text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md shrink-0';
+
+        // ★ 答對自動跳下一題 (約 0.85 秒緩衝)
+        state.autoAdvanceTimeout = setTimeout(() => {
+          advanceNextStage();
+        }, 850);
       } else {
         sound.playWrong();
         btnEl.classList.add('ring-4', 'ring-rose-500', 'bg-rose-900');
-        statusBar.textContent = `❌ 答錯了！${q.explain}`;
-        statusBar.className = 'h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-sm bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md';
+
+        statusBar.innerHTML = `
+          <div class="flex items-center justify-between w-full px-3 sm:px-4">
+            <span class="text-xs sm:text-sm font-bold text-rose-300">❌ 答錯了！${q.explain}</span>
+            <button id="btn-quick-next" class="ml-2 px-3 py-1 bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold text-xs shrink-0 shadow">下一題 ➔</button>
+          </div>
+        `;
+        statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md shrink-0';
+
+        const btnQuick = document.getElementById('btn-quick-next');
+        if (btnQuick) btnQuick.onclick = () => advanceNextStage();
+
+        // 答錯停留 2.6 秒後自動跳下一題
+        state.autoAdvanceTimeout = setTimeout(() => {
+          advanceNextStage();
+        }, 2600);
       }
     }
 
+    // ★ 選擇題判斷與自動下一題
     function handleChoice(selectedIdx, btnEl, q) {
       if (state.locked) return;
       state.locked = true;
@@ -1269,16 +1360,36 @@
         addScore(10, false);
         updateCorrectCounterUI();
         btnEl.classList.add('bg-emerald-700', 'border-emerald-400', 'glow-gold');
-        statusBar.textContent = '🎉 答對了！+10 分';
-        statusBar.className = 'h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-black text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md';
+
+        statusBar.innerHTML = `🎉 <span class="font-black text-emerald-300">答對了！+10 分</span> <span class="text-xs text-emerald-400/80 ml-2 animate-pulse">➔ 即將自動跳下一題...</span>`;
+        statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-black text-xs sm:text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md shrink-0';
+
+        // ★ 答對自動跳下一題
+        state.autoAdvanceTimeout = setTimeout(() => {
+          advanceNextStage();
+        }, 850);
       } else {
         sound.playWrong();
         btnEl.classList.add('bg-rose-800', 'border-rose-400');
-        statusBar.textContent = `❌ 答錯了！${q.explain}`;
-        statusBar.className = 'h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-sm bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md';
+
+        statusBar.innerHTML = `
+          <div class="flex items-center justify-between w-full px-3 sm:px-4">
+            <span class="text-xs sm:text-sm font-bold text-rose-300">❌ 答錯了！${q.explain}</span>
+            <button id="btn-quick-next" class="ml-2 px-3 py-1 bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold text-xs shrink-0 shadow">下一題 ➔</button>
+          </div>
+        `;
+        statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md shrink-0';
+
+        const btnQuick = document.getElementById('btn-quick-next');
+        if (btnQuick) btnQuick.onclick = () => advanceNextStage();
+
+        state.autoAdvanceTimeout = setTimeout(() => {
+          advanceNextStage();
+        }, 2600);
       }
     }
 
+    // ★ 連連看判斷與自動下一題
     function handleMatchClick(side, pairId, btnEl, q) {
       if (state.locked) return;
 
@@ -1312,8 +1423,14 @@
             state.academicCorrect++;
             addScore(15, false);
             updateCorrectCounterUI();
-            statusBar.textContent = '🏆 兩組全部配對完成！+15 分';
-            statusBar.className = 'h-11 sm:h-12 mt-3 rounded-2xl flex items-center justify-center font-black text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md';
+
+            statusBar.innerHTML = `🏆 <span class="font-black text-emerald-300">兩組全部配對完成！+15 分</span> <span class="text-xs text-emerald-400/80 ml-2 animate-pulse">➔ 即將自動跳下一題...</span>`;
+            statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-black text-xs sm:text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md shrink-0';
+
+            // ★ 連連看完全答對，自動跳下一關
+            state.autoAdvanceTimeout = setTimeout(() => {
+              advanceNextStage();
+            }, 900);
           } else {
             statusBar.textContent = '✨ 配對成功 1 組！請繼續完成下一組！';
           }
@@ -1332,7 +1449,7 @@
     }
 
     /* ==========================================================================
-       6. 中場娛樂遊戲 1：貪吃蛇
+       6. 中場娛樂遊戲 1：極速霓虹貪吃蛇
        ========================================================================== */
     let snakeGame = {
       timer: 20, timerId: null, loopId: null,
@@ -1343,6 +1460,7 @@
 
     function triggerSnakeGame() {
       clearInterval(state.timerId);
+      clearAutoAdvance();
       state.isPaused = true;
       sound.setBGMUrgent(true);
       sound.startBGM();
@@ -1393,7 +1511,7 @@
         const py = seg.y * snakeGame.gridSize;
         ctx.fillStyle = i === 0 ? '#34d399' : '#10b981';
         ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = i === 0 ? 10 : 3;
+        ctx.shadowBlur = i === 0 ? 8 : 2;
         ctx.fillRect(px + 1, py + 1, snakeGame.gridSize - 2, snakeGame.gridSize - 2);
       });
       ctx.shadowBlur = 0;
@@ -1468,7 +1586,7 @@
         if (snakeGame.timer <= 0) {
           clearInterval(snakeGame.timerId);
           clearInterval(snakeGame.loopId);
-          setTimeout(() => endSnakeGame(), 400);
+          setTimeout(() => endSnakeGame(), 350);
         }
       }, 1000);
 
@@ -1489,6 +1607,7 @@
       });
     }
 
+    // 鍵盤操控支援
     window.addEventListener('keydown', (e) => {
       if (!snakeGame.active) return;
       if ((e.key === 'ArrowUp' || e.key === 'w') && snakeGame.dir.y === 0) snakeGame.nextDir = { x: 0, y: -1 };
@@ -1502,6 +1621,7 @@
     document.getElementById('s-btn-left').onclick = () => { if (snakeGame.dir.x === 0) snakeGame.nextDir = { x: -1, y: 0 }; };
     document.getElementById('s-btn-right').onclick = () => { if (snakeGame.dir.x === 0) snakeGame.nextDir = { x: 1, y: 0 }; };
 
+    // iPad 滑動手勢操控
     let touchStartX = 0, touchStartY = 0;
     snakeCanvas.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
@@ -1522,7 +1642,7 @@
 
     /* ==========================================================================
        7. 中場娛樂遊戲 2：堡壘守禦大砲戰
-       ========================================================================= */
+       ========================================================================== */
     let fortressGame = {
       active: false, timer: 20, timerId: null, animId: null, spawnId: null,
       enemies: [], blasts: [], cannonAngle: -Math.PI / 2
@@ -1530,6 +1650,7 @@
 
     function triggerFortressGame() {
       clearInterval(state.timerId);
+      clearAutoAdvance();
       state.isPaused = true;
       sound.setBGMUrgent(true);
       sound.startBGM();
@@ -1548,14 +1669,14 @@
 
       ctx.fillStyle = '#0284c7';
       ctx.shadowColor = '#38bdf8';
-      ctx.shadowBlur = 12;
+      ctx.shadowBlur = 10;
       ctx.fillRect(0, fortressCanvas.height - 18, fortressCanvas.width, 18);
       ctx.shadowBlur = 0;
 
       const cx = fortressCanvas.width / 2;
       const cy = fortressCanvas.height - 18;
       ctx.beginPath();
-      ctx.arc(cx, cy, 26, Math.PI, 0, false);
+      ctx.arc(cx, cy, 24, Math.PI, 0, false);
       ctx.fillStyle = '#0369a1';
       ctx.fill();
 
@@ -1563,7 +1684,7 @@
       ctx.translate(cx, cy);
       ctx.rotate(fortressGame.cannonAngle);
       ctx.fillStyle = '#38bdf8';
-      ctx.fillRect(0, -6, 38, 12);
+      ctx.fillRect(0, -5, 36, 10);
       ctx.restore();
     }
 
@@ -1582,7 +1703,7 @@
           clearInterval(fortressGame.timerId);
           clearInterval(fortressGame.spawnId);
           cancelAnimationFrame(fortressGame.animId);
-          setTimeout(() => endFortressGame(), 400);
+          setTimeout(() => endFortressGame(), 350);
         }
       }, 1000);
 
@@ -1605,9 +1726,9 @@
       };
 
       if (randType > 0.75) {
-        enemy = { ...enemy, emoji: '🛸', pts: 30, speed: 2.4, radius: 22 };
+        enemy = { ...enemy, emoji: '🛸', pts: 30, speed: 2.3, radius: 22 };
       } else if (randType > 0.45) {
-        enemy = { ...enemy, emoji: '☄️', pts: 15, speed: 2.0, radius: 18 };
+        enemy = { ...enemy, emoji: '☄️', pts: 15, speed: 1.9, radius: 18 };
       }
 
       fortressGame.enemies.push(enemy);
@@ -1638,7 +1759,7 @@
         const e = fortressGame.enemies[i];
         e.y += e.speed;
 
-        if (e.y >= fortressCanvas.height - 25) {
+        if (e.y >= fortressCanvas.height - 24) {
           sound.playWrong();
           addScore(-10, true);
           state.roundScore -= 10;
@@ -1665,7 +1786,7 @@
       sound.playLaser();
       fortressGame.blasts.push({ x: targetX, y: targetY, r: 10, alpha: 1.0 });
 
-      const blastRadius = 42;
+      const blastRadius = 40;
       for (let i = fortressGame.enemies.length - 1; i >= 0; i--) {
         const e = fortressGame.enemies[i];
         const dist = Math.hypot(e.x - targetX, e.y - targetY);
@@ -1718,6 +1839,7 @@
 
     function triggerRunnerGame() {
       clearInterval(state.timerId);
+      clearAutoAdvance();
       state.isPaused = true;
       sound.setBGMUrgent(true);
       sound.startBGM();
@@ -1743,8 +1865,8 @@
       ctx.setLineDash([]);
 
       const px = runnerGame.lanesX[runnerGame.currentLane];
-      const py = runnerCanvas.height - 45;
-      ctx.font = '28px serif';
+      const py = runnerCanvas.height - 40;
+      ctx.font = '26px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('🚀', px, py);
@@ -1765,7 +1887,7 @@
           clearInterval(runnerGame.timerId);
           clearInterval(runnerGame.spawnId);
           cancelAnimationFrame(runnerGame.animId);
-          setTimeout(() => endRunnerGame(), 400);
+          setTimeout(() => endRunnerGame(), 350);
         }
       }, 1000);
 
@@ -1795,7 +1917,7 @@
       const ctx = runnerCanvas.getContext('2d');
       drawRunnerScene();
 
-      const py = runnerCanvas.height - 45;
+      const py = runnerCanvas.height - 40;
       for (let i = runnerGame.items.length - 1; i >= 0; i--) {
         const it = runnerGame.items[i];
         it.y += 4.5;
@@ -1880,10 +2002,10 @@
        ========================================================================== */
     function showVictoryModal() {
       clearInterval(state.timerId);
+      clearAutoAdvance();
       sound.stopBGM();
       sound.playVictory();
 
-      // 計算學科答對率
       const accuracyPct = Math.round((state.academicCorrect / state.academicTotal) * 100);
       finalCorrectRatio.textContent = `${state.academicCorrect} / ${state.academicTotal} 題`;
       finalAccuracyPct.textContent = `${accuracyPct}%`;
@@ -1891,7 +2013,6 @@
       finalArcadeScore.textContent = `+${state.arcadeScore} 分`;
       finalTotalScore.textContent = state.totalScore;
 
-      // ★ 判斷是否 30 題完全答對！
       if (state.academicCorrect === state.academicTotal) {
         perfectBanner.classList.remove('hidden');
         finalRankTitle.textContent = '👑 殿堂級大滿貫宗師 👑';
@@ -1911,7 +2032,31 @@
     }
 
     /* ==========================================================================
-       10. 頂部控制器與事件監聽
+       10. 鍵盤快速鍵支援 (電腦遊玩免滑鼠)
+       ========================================================================== */
+    window.addEventListener('keydown', (e) => {
+      if (state.locked || state.isPaused) return;
+      const q = QUESTION_BANK[state.currentIndex];
+      if (!q) return;
+
+      if (q.type === 'tf') {
+        const btnT = document.getElementById('btn-tf-true');
+        const btnF = document.getElementById('btn-tf-false');
+        if ((e.key === '1' || e.key.toLowerCase() === 't' || e.key === 'ArrowLeft') && btnT) {
+          handleTF(true, btnT, q);
+        } else if ((e.key === '2' || e.key.toLowerCase() === 'f' || e.key === 'ArrowRight') && btnF) {
+          handleTF(false, btnF, q);
+        }
+      } else if (q.type === 'choice') {
+        const buttons = questionCardContainer.querySelectorAll('#choice-options button');
+        if (e.key === '1' && buttons[0]) handleChoice(0, buttons[0], q);
+        if (e.key === '2' && buttons[1]) handleChoice(1, buttons[1], q);
+        if (e.key === '3' && buttons[2]) handleChoice(2, buttons[2], q);
+      }
+    });
+
+    /* ==========================================================================
+       11. 頂部控制器與按鈕事件
        ========================================================================== */
     btnSound.addEventListener('click', () => {
       sound.enabled = !sound.enabled;
@@ -1936,22 +2081,7 @@
     });
 
     btnNext.addEventListener('click', () => {
-      if (state.currentIndex === 9) {
-        triggerSnakeGame();
-        return;
-      }
-      if (state.currentIndex === 19) {
-        triggerFortressGame();
-        return;
-      }
-      if (state.currentIndex === 29) {
-        triggerRunnerGame();
-        return;
-      }
-
-      if (state.currentIndex < QUESTION_BANK.length - 1) {
-        loadStage(state.currentIndex + 1);
-      }
+      advanceNextStage();
     });
 
     btnRestartGame.addEventListener('click', () => {
