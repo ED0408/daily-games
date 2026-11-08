@@ -90,7 +90,8 @@
       background: transparent;
       color: #334155;
       text-align: left;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
@@ -104,11 +105,12 @@
       font-weight: 700;
     }
     .tag-badge {
-      font-size: 0.7rem;
-      padding: 2px 6px;
+      font-size: 0.75rem;
+      padding: 2px 8px;
       border-radius: 6px;
       background: #e2e8f0;
       color: #475569;
+      font-weight: normal;
     }
     .game-btn.active .tag-badge { background: #bfdbfe; color: #1d4ed8; }
 
@@ -200,14 +202,14 @@
 
   <script>
     // ---------------- 遊戲與單元清單資料庫 ----------------
-    // 未來要新增任何單元或題目，只需在此清單中增加一行即可
+    // 名稱已全數改為原本的 ch7a、m6a、m6b
     const menuData = [
       {
         category: "國語科 互動闖關",
         icon: "📖",
         isOpen: true,
         items: [
-          { title: "第七課：為生命找出路", file: "./ch7a.html", tag: "30關挑戰" }
+          { title: "ch7a", file: "./ch7a.html", tag: "國語" }
         ]
       },
       {
@@ -215,80 +217,11 @@
         icon: "📐",
         isOpen: true,
         items: [
-          { title: "第十單元：異分母加減大冒險", file: "./m6a.html", tag: "觀念與計算" },
-          { title: "數學單元延伸：進階通分闖關", file: "./m6b.html", tag: "綜合挑戰" }
+          { title: "m6a", file: "./m6a.html", tag: "數學" },
+          { title: "m6b", file: "./m6b.html", tag: "數學" }
         ]
       }
     ];
 
     // 初始化渲染側邊欄
     function initMenu() {
-      const container = document.getElementById('menu-container');
-      container.innerHTML = '';
-      let isFirstItem = true;
-
-      menuData.forEach((group, groupIdx) => {
-        const groupEl = document.createElement('div');
-        groupEl.className = `category-group ${group.isOpen ? 'open' : ''}`;
-        
-        const headerEl = document.createElement('div');
-        headerEl.className = 'category-header';
-        headerEl.innerHTML = `
-          <div class="category-title">
-            <span>${group.icon}</span>
-            <span>${group.category}</span>
-          </div>
-          <span class="arrow">▼</span>
-        `;
-        headerEl.onclick = () => groupEl.classList.toggle('open');
-
-        const itemsEl = document.createElement('div');
-        itemsEl.className = 'category-items';
-
-        group.items.forEach(item => {
-          const btn = document.createElement('button');
-          btn.className = 'game-btn';
-          btn.innerHTML = `
-            <span>${item.title}</span>
-            <span class="tag-badge">${item.tag}</span>
-          `;
-          btn.onclick = () => selectGame(btn, item.file, item.title);
-
-          itemsEl.appendChild(btn);
-
-          // 預設載入第一個遊戲
-          if (isFirstItem) {
-            btn.classList.add('active');
-            loadIframe(item.file, item.title);
-            isFirstItem = false;
-          }
-        });
-
-        groupEl.appendChild(headerEl);
-        groupEl.appendChild(itemsEl);
-        container.appendChild(groupEl);
-      });
-    }
-
-    // 切換顯示遊戲
-    function selectGame(button, fileUrl, title) {
-      document.querySelectorAll('.game-btn').forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-      loadIframe(fileUrl, title);
-    }
-
-    function loadIframe(fileUrl, title) {
-      document.getElementById('game-frame').src = fileUrl;
-      document.getElementById('display-title').textContent = title;
-      document.getElementById('btn-fullscreen').href = fileUrl;
-    }
-
-    // iPad 側邊欄隱藏/展開切換
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('collapsed');
-    }
-
-    initMenu();
-  </script>
-</body>
-</html>
