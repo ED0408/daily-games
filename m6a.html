@@ -44,7 +44,6 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* 針對 iPad (橫/直向) 與電腦螢幕調配的通用主容器 */
         #game-container {
             width: 95vw;
             max-width: 920px;
@@ -118,7 +117,6 @@
             font-weight: 500;
         }
 
-        /* 特色功能卡片網格 */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -156,7 +154,6 @@
             line-height: 1.3;
         }
 
-        /* 封面按鈕區 */
         .cover-actions {
             display: flex;
             align-items: center;
@@ -211,7 +208,7 @@
         #header {
             background-color: #ffffff;
             padding: 12px 24px;
-            display: none; /* 初始隱藏，點擊開始後展示 */
+            display: none;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #edf2f4;
@@ -236,7 +233,6 @@
             font-weight: 800;
         }
 
-        /* 倒數計時與進度條 */
         #timer-wrap {
             display: flex;
             align-items: center;
@@ -278,7 +274,7 @@
         #main-stage {
             flex: 1;
             padding: clamp(14px, 3vh, 32px) clamp(16px, 4vw, 40px);
-            display: none; /* 初始隱藏 */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -311,7 +307,6 @@
             flex-wrap: wrap;
         }
 
-        /* 數學垂直分數排版 */
         .frac {
             display: inline-flex;
             flex-direction: column;
@@ -324,7 +319,6 @@
         .frac .num { border-bottom: 3px solid currentColor; padding: 0 4px; }
         .frac .den { padding: 0 4px; }
 
-        /* 選項按鈕排版 (適配 iPad 觸控大小) */
         .options-grid {
             display: grid;
             gap: 16px;
@@ -369,7 +363,6 @@
             box-shadow: none;
         }
 
-        /* 連連看網格 */
         .match-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -407,7 +400,6 @@
             pointer-events: none;
         }
 
-        /* 即時答題回饋浮層 */
         .feedback-overlay {
             position: absolute;
             font-size: clamp(3.2rem, 8vw, 5.2rem);
@@ -503,7 +495,6 @@
         }
         .btn-restart:active { transform: translateY(6px); box-shadow: none; }
 
-        /* ---------------- 針對平板直向與手機尺寸的微調 ---------------- */
         @media (max-width: 768px) {
             #game-container {
                 width: 96vw;
@@ -543,10 +534,8 @@
 <body>
 
     <div id="game-container">
-        <!-- 頂部進度條 -->
         <div id="progress-bar"></div>
 
-        <!-- 封面畫面 (Cover Screen) -->
         <div id="cover-screen">
             <div class="cover-badge-row">
                 <span class="cover-tag">📐 國小數學第十單元</span>
@@ -594,7 +583,6 @@
             </div>
         </div>
 
-        <!-- 頂部儀表板 (進入題目後顯示) -->
         <div id="header">
             <div class="stat-badge">
                 <span>關卡</span>
@@ -615,7 +603,6 @@
             </div>
         </div>
 
-        <!-- 答題核心舞台 -->
         <div id="main-stage">
             <div class="stage-type-tag" id="type-tag">暖身是非題</div>
             <div class="question-box" id="question-text">載入題目中...</div>
@@ -624,7 +611,6 @@
             <div id="feedback-layer" class="feedback-overlay"></div>
         </div>
 
-        <!-- 結算畫面 -->
         <div id="summary-screen">
             <div class="final-badge" id="rank-icon">🏆</div>
             <div class="final-title" id="rank-title">太棒了！通分大師</div>
@@ -653,12 +639,10 @@
     </div>
 
     <script>
-        // 數學垂直分數排版輔助函式
         const f = (n, d) => `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
 
-        // ------------------ 完整 30 道題庫 ------------------
         const database = [
-            // [1~10] 是非題：建立概念
+            // [1~10] 是非題
             { type: 'tf', tag: '概念是非', q: `${f(1,3)} + ${f(1,4)} 通分時，公分母可以化為 12 嗎？`, ans: 'O' },
             { type: 'tf', tag: '概念是非', q: `${f(2,5)} + ${f(3,10)} 可以直接把分子跟分母相加變成 ${f(5,15)} 嗎？`, ans: 'X' },
             { type: 'tf', tag: '概念是非', q: `異分母分數相加減前，必須先進行「通分」化為同分母？`, ans: 'O' },
@@ -670,7 +654,7 @@
             { type: 'tf', tag: '概念是非', q: `${f(1,12)} + ${f(5,6)} 的相加結果是 ${f(6,18)} 嗎？`, ans: 'X' },
             { type: 'tf', tag: '概念是非', q: `同分母分數相加時，分母保持不變，只將分子相加？`, ans: 'O' },
 
-            // [11~26] 選擇題：實戰計算
+            // [11~26] 選擇題
             { type: 'mc', tag: '運算選擇', q: `${f(1,3)} + ${f(1,4)} = ？`, options: [f(7,12), f(2,7), f(5,12)], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(2,5)} + ${f(3,10)} = ？`, options: [f(5,10), f(7,10), f(5,15)], ans: 1 },
             { type: 'mc', tag: '運算選擇', q: `${f(1,2)} + ${f(2,5)} = ？`, options: [f(9,10), f(3,7), f(7,10)], ans: 0 },
@@ -688,7 +672,7 @@
             { type: 'mc', tag: '運算選擇', q: `${f(25,20)} + ${f(21,12)} = ？`, options: ['3', f(46,32), `2${f(1,2)}`], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(15,6)} + ${f(35,10)} = ？`, options: ['6', '5', f(50,16)], ans: 0 },
 
-            // [27~30] 連連看：綜合配對挑戰
+            // [27~30] 連連看
             {
                 type: 'match',
                 tag: '速算連連看',
@@ -735,9 +719,8 @@
             }
         ];
 
-        // ------------------ 狀態管理 ------------------
-        const TOTAL_QUESTIONS = database.length; // 30 題
-        const TIME_LIMIT = 25; // 每題 25 秒
+        const TOTAL_QUESTIONS = database.length;
+        const TIME_LIMIT = 25;
         let currentIndex = 0;
         let score = 0;
         let correctCount = 0;
@@ -747,7 +730,6 @@
         let timerId = null;
         let isAnswered = false;
 
-        // ------------------ Web Audio API 離線合成音效 ------------------
         let audioCtx = null;
         let isAudioMuted = false;
 
@@ -838,9 +820,8 @@
             } catch(e) {}
         }
 
-        // ------------------ 遊戲流程控制 ------------------
         function startGame() {
-            getAudioContext(); // 用戶互動時初始化 AudioContext (符合 iPad Safari 策略)
+            getAudioContext();
             document.getElementById('cover-screen').style.display = 'none';
             document.getElementById('header').style.display = 'flex';
             document.getElementById('progress-bar').style.display = 'block';
@@ -872,7 +853,6 @@
             renderCurrentQuestion();
         }
 
-        // ------------------ 計時器機制 ------------------
         function startTimer() {
             clearInterval(timerId);
             timeLeft = TIME_LIMIT;
@@ -917,7 +897,6 @@
             setTimeout(nextQuestion, 1400);
         }
 
-        // ------------------ 答題與渲染核心 ------------------
         function renderCurrentQuestion() {
             if (currentIndex >= TOTAL_QUESTIONS) {
                 showSummary();
@@ -927,7 +906,6 @@
             isAnswered = false;
             const data = database[currentIndex];
 
-            // 更新頂部資訊
             document.getElementById('level-indicator').innerText = `${currentIndex + 1} / ${TOTAL_QUESTIONS}`;
             document.getElementById('progress-bar').style.width = `${(currentIndex / TOTAL_QUESTIONS) * 100}%`;
             document.getElementById('type-tag').innerText = data.tag;
@@ -981,7 +959,6 @@
             setTimeout(nextQuestion, 1200);
         }
 
-        // 連連看配對控制
         let matchSelected = null;
         let matchPairsLeft = 0;
 
@@ -1049,7 +1026,6 @@
             renderCurrentQuestion();
         }
 
-        // ------------------ 結算畫面展示 ------------------
         function showSummary() {
             clearInterval(timerId);
             document.getElementById('progress-bar').style.width = '100%';
