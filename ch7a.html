@@ -1154,8 +1154,8 @@
 
       statusBar.innerHTML = `
         <div class="flex items-center justify-between w-full px-3 sm:px-4">
-          <span class="text-xs sm:text-sm font-bold text-rose-300">⏰ 超時！${explainText}</span>
-          <button id="btn-quick-next" class="ml-2 px-3 py-1 bg-amber-600 hover:bg-amber-500 rounded-lg text-white font-bold text-xs shrink-0 shadow">下一題 ➔</button>
+          <span class="text-xs sm:text-sm font-bold text-rose-300 truncate sm:overflow-visible">⏰ 超時！${explainText}</span>
+          <button id="btn-quick-next" class="ml-2 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 active:scale-95 rounded-xl text-slate-950 font-black text-xs sm:text-sm shrink-0 shadow-lg border border-amber-300 animate-pulse">下一題 ➔</button>
         </div>
       `;
       statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md shrink-0';
@@ -1166,10 +1166,7 @@
       const buttons = questionCardContainer.querySelectorAll('button');
       buttons.forEach(b => b.disabled = true);
 
-      // 超時停留 2.6 秒後自動前進
-      state.autoAdvanceTimeout = setTimeout(() => {
-        advanceNextStage();
-      }, 2600);
+      // ★ 超時不自動跳題，保留時間讓學生閱讀解析，點擊「下一題 ➔」後再前進
     }
 
     /* ==========================================================================
@@ -1318,7 +1315,7 @@
         statusBar.innerHTML = `🎉 <span class="font-black text-emerald-300">答對了！+10 分</span> <span class="text-xs text-emerald-400/80 ml-2 animate-pulse">➔ 即將自動跳下一題...</span>`;
         statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-black text-xs sm:text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md shrink-0';
 
-        // ★ 答對自動跳下一題 (約 0.85 秒緩衝)
+        // ★ 答對維持自動跳下一題 (約 0.85 秒緩衝)
         state.autoAdvanceTimeout = setTimeout(() => {
           advanceNextStage();
         }, 850);
@@ -1328,8 +1325,8 @@
 
         statusBar.innerHTML = `
           <div class="flex items-center justify-between w-full px-3 sm:px-4">
-            <span class="text-xs sm:text-sm font-bold text-rose-300">❌ 答錯了！${q.explain}</span>
-            <button id="btn-quick-next" class="ml-2 px-3 py-1 bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold text-xs shrink-0 shadow">下一題 ➔</button>
+            <span class="text-xs sm:text-sm font-bold text-rose-300 truncate sm:overflow-visible">❌ 答錯了！${q.explain}</span>
+            <button id="btn-quick-next" class="ml-2 px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 active:scale-95 rounded-xl text-white font-black text-xs sm:text-sm shrink-0 shadow-lg border border-rose-400 animate-pulse">下一題 ➔</button>
           </div>
         `;
         statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md shrink-0';
@@ -1337,10 +1334,7 @@
         const btnQuick = document.getElementById('btn-quick-next');
         if (btnQuick) btnQuick.onclick = () => advanceNextStage();
 
-        // 答錯停留 2.6 秒後自動跳下一題
-        state.autoAdvanceTimeout = setTimeout(() => {
-          advanceNextStage();
-        }, 2600);
+        // ★ 答錯不自動跳題，等待學生理解解析並點擊「下一題 ➔」
       }
     }
 
@@ -1364,7 +1358,7 @@
         statusBar.innerHTML = `🎉 <span class="font-black text-emerald-300">答對了！+10 分</span> <span class="text-xs text-emerald-400/80 ml-2 animate-pulse">➔ 即將自動跳下一題...</span>`;
         statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-black text-xs sm:text-base bg-emerald-950/80 text-emerald-300 border border-emerald-500 shadow-md shrink-0';
 
-        // ★ 答對自動跳下一題
+        // ★ 答對維持自動跳下一題
         state.autoAdvanceTimeout = setTimeout(() => {
           advanceNextStage();
         }, 850);
@@ -1374,8 +1368,8 @@
 
         statusBar.innerHTML = `
           <div class="flex items-center justify-between w-full px-3 sm:px-4">
-            <span class="text-xs sm:text-sm font-bold text-rose-300">❌ 答錯了！${q.explain}</span>
-            <button id="btn-quick-next" class="ml-2 px-3 py-1 bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold text-xs shrink-0 shadow">下一題 ➔</button>
+            <span class="text-xs sm:text-sm font-bold text-rose-300 truncate sm:overflow-visible">❌ 答錯了！${q.explain}</span>
+            <button id="btn-quick-next" class="ml-2 px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 active:scale-95 rounded-xl text-white font-black text-xs sm:text-sm shrink-0 shadow-lg border border-rose-400 animate-pulse">下一題 ➔</button>
           </div>
         `;
         statusBar.className = 'h-10 sm:h-12 mt-2 sm:mt-3 rounded-2xl flex items-center justify-center font-bold text-xs sm:text-base bg-rose-950/80 text-rose-300 border border-rose-500 shadow-md shrink-0';
@@ -1383,9 +1377,7 @@
         const btnQuick = document.getElementById('btn-quick-next');
         if (btnQuick) btnQuick.onclick = () => advanceNextStage();
 
-        state.autoAdvanceTimeout = setTimeout(() => {
-          advanceNextStage();
-        }, 2600);
+        // ★ 答錯不自動跳題，等待學生理解解析並點擊「下一題 ➔」
       }
     }
 
@@ -2035,7 +2027,17 @@
        10. 鍵盤快速鍵支援 (電腦遊玩免滑鼠)
        ========================================================================== */
     window.addEventListener('keydown', (e) => {
-      if (state.locked || state.isPaused) return;
+      // 若處於答錯或超時鎖定狀態，按 Enter、空白鍵或右方向鍵可快速切換下一題
+      if (state.locked) {
+        const btnQuick = document.getElementById('btn-quick-next');
+        if (btnQuick && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight')) {
+          e.preventDefault();
+          advanceNextStage();
+        }
+        return;
+      }
+
+      if (state.isPaused) return;
       const q = QUESTION_BANK[state.currentIndex];
       if (!q) return;
 
