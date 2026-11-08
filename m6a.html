@@ -2,70 +2,227 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>異分母加減大冒險 - 平板單人闖關 30 題</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>異分母加減大冒險 - 電腦與平板闖關 30 題</title>
     <style>
         :root {
             --primary: #4361ee;
             --primary-dark: #3a0ca3;
+            --primary-light: #eef2ff;
             --accent: #4cc9f0;
             --success: #2ec4b6;
             --danger: #e71d36;
             --warning: #ff9f1c;
-            --bg: #f8f9fa;
+            --bg-start: #1e1e2f;
+            --bg-end: #2a2b4a;
             --card-bg: #ffffff;
             --text-main: #2b2d42;
+            --text-sub: #64748b;
+            --border-color: #cbd5e1;
         }
 
         * {
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "微軟正黑體", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", "微軟正黑體", sans-serif;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
 
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #1e1e2f 0%, #2a2b4a 100%);
-            height: 100vh;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* 平板專用主視窗容器 */
+        /* 針對 iPad (橫/直向) 與電腦螢幕調配的通用主容器 */
         #game-container {
-            width: 94vw;
-            max-width: 860px;
-            height: 92vh;
-            max-height: 720px;
+            width: 95vw;
+            max-width: 920px;
+            height: 94vh;
+            height: 94dvh;
+            max-height: 760px;
             background-color: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
         }
 
-        /* 頂部儀表板 */
+        /* ---------------- 封面畫面 (Cover Screen) ---------------- */
+        #cover-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(20px, 4vh, 44px) clamp(20px, 4vw, 48px);
+            text-align: center;
+            background: radial-gradient(circle at 50% 20%, #f0f7ff 0%, #ffffff 70%);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .cover-badge-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cover-tag {
+            background: #e0f2fe;
+            color: #0284c7;
+            font-size: clamp(0.85rem, 1.6vw, 1rem);
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 999px;
+            letter-spacing: 0.5px;
+        }
+
+        .cover-title {
+            font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+            font-weight: 900;
+            color: #1e293b;
+            margin: 6px 0 10px 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 8px rgba(67, 97, 238, 0.15);
+        }
+
+        .cover-title span {
+            background: linear-gradient(135deg, var(--primary) 0%, #7209b7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-desc {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-sub);
+            max-width: 620px;
+            line-height: 1.6;
+            margin: 0 0 26px 0;
+            font-weight: 500;
+        }
+
+        /* 特色功能卡片網格 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 28px;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s ease;
+        }
+
+        .feature-icon {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+        }
+
+        .feature-title {
+            font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .feature-text {
+            font-size: clamp(0.75rem, 1.4vw, 0.88rem);
+            color: var(--text-sub);
+            line-height: 1.3;
+        }
+
+        /* 封面按鈕區 */
+        .cover-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--primary) 0%, #3a0ca3 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            padding: clamp(14px, 2.2vh, 18px) clamp(36px, 6vw, 54px);
+            font-size: clamp(1.3rem, 2.5vw, 1.65rem);
+            font-weight: 900;
+            box-shadow: 0 8px 0 #2b087a, 0 16px 25px rgba(67, 97, 238, 0.4);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-start:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #2b087a, 0 8px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #cbd5e1;
+            border-radius: 18px;
+            padding: clamp(12px, 1.8vh, 16px) 24px;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #cbd5e1;
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* ---------------- 遊戲主畫面 Header ---------------- */
         #header {
             background-color: #ffffff;
             padding: 12px 24px;
-            display: flex;
+            display: none; /* 初始隱藏，點擊開始後展示 */
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #edf2f4;
+            flex-shrink: 0;
         }
 
         .stat-badge {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 1.15rem;
+            font-size: clamp(1rem, 2vw, 1.2rem);
             font-weight: 700;
             color: var(--text-main);
         }
@@ -75,7 +232,7 @@
             color: #0369a1;
             padding: 6px 16px;
             border-radius: 20px;
-            font-size: 1.3rem;
+            font-size: clamp(1.1rem, 2.2vw, 1.35rem);
             font-weight: 800;
         }
 
@@ -83,19 +240,19 @@
         #timer-wrap {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         #timer-text {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 2.4vw, 1.55rem);
             font-weight: 900;
             color: var(--primary);
-            min-width: 40px;
+            min-width: 36px;
             text-align: center;
         }
 
         .bar-container {
-            width: 140px;
+            width: clamp(100px, 18vw, 160px);
             height: 12px;
             background: #e2e8f0;
             border-radius: 6px;
@@ -114,40 +271,44 @@
             width: 0%;
             background: linear-gradient(90deg, var(--accent), var(--primary));
             transition: width 0.3s ease;
+            display: none;
         }
 
-        /* 題目主視覺卡片 */
+        /* ---------------- 答題主舞台 ---------------- */
         #main-stage {
             flex: 1;
-            padding: 20px 30px;
-            display: flex;
+            padding: clamp(14px, 3vh, 32px) clamp(16px, 4vw, 40px);
+            display: none; /* 初始隱藏 */
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             position: relative;
+            overflow-y: auto;
         }
 
         .stage-type-tag {
-            background: #eef2ff;
+            background: var(--primary-light);
             color: var(--primary);
-            padding: 4px 14px;
+            padding: 5px 16px;
             border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            margin-bottom: 12px;
+            font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+            font-weight: 800;
+            margin-bottom: 14px;
+            display: inline-block;
         }
 
         .question-box {
-            font-size: 2.1rem;
+            font-size: clamp(1.7rem, 3.8vw, 2.35rem);
             font-weight: 800;
             color: var(--text-main);
             margin-bottom: 24px;
-            min-height: 90px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1.4;
+            line-height: 1.45;
+            flex-wrap: wrap;
         }
 
         /* 數學垂直分數排版 */
@@ -156,30 +317,35 @@
             flex-direction: column;
             align-items: center;
             vertical-align: middle;
-            font-size: 1.15em;
+            font-size: 1.1em;
             line-height: 1;
             margin: 0 4px;
         }
         .frac .num { border-bottom: 3px solid currentColor; padding: 0 4px; }
         .frac .den { padding: 0 4px; }
 
-        /* 選項按鈕排版 (適合手指點擊) */
+        /* 選項按鈕排版 (適配 iPad 觸控大小) */
         .options-grid {
             display: grid;
             gap: 16px;
             width: 100%;
-            max-width: 600px;
+            max-width: 640px;
         }
 
-        .options-grid.tf { grid-template-columns: repeat(2, 1fr); }
-        .options-grid.mc { grid-template-columns: repeat(3, 1fr); }
+        .options-grid.tf {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .options-grid.mc {
+            grid-template-columns: repeat(3, 1fr);
+        }
 
         .btn-option {
             background: #ffffff;
-            border: 3px solid #cbd5e1;
-            border-radius: 16px;
-            padding: 16px 20px;
-            font-size: 1.8rem;
+            border: 3px solid var(--border-color);
+            border-radius: 18px;
+            padding: clamp(12px, 2vh, 18px) 14px;
+            font-size: clamp(1.4rem, 3vw, 1.85rem);
             font-weight: bold;
             color: var(--text-main);
             box-shadow: 0 6px 0 #94a3b8;
@@ -188,7 +354,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 80px;
+            min-height: clamp(68px, 10vh, 88px);
         }
 
         .btn-option:active {
@@ -209,18 +375,18 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 14px;
             width: 100%;
-            max-width: 620px;
+            max-width: 640px;
         }
 
         .match-card {
             background: white;
             border: 3px solid #94a3b8;
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 12px;
-            font-size: 1.7rem;
+            font-size: clamp(1.3rem, 2.8vw, 1.75rem);
             font-weight: bold;
             color: var(--text-main);
-            min-height: 80px;
+            min-height: clamp(66px, 9.5vh, 84px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -241,67 +407,87 @@
             pointer-events: none;
         }
 
-        /* 即時回饋浮層 */
+        /* 即時答題回饋浮層 */
         .feedback-overlay {
             position: absolute;
-            font-size: 5.5rem;
+            font-size: clamp(3.2rem, 8vw, 5.2rem);
             font-weight: 900;
             z-index: 50;
             opacity: 0;
             pointer-events: none;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.6);
+            white-space: nowrap;
         }
 
         .feedback-overlay.show {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1.1);
+            transform: translate(-50%, -50%) scale(1.05);
         }
-        .fb-correct { color: var(--success); text-shadow: 0 0 20px white; }
-        .fb-wrong { color: var(--danger); text-shadow: 0 0 20px white; }
-        .fb-timeout { color: var(--warning); font-size: 4rem; text-shadow: 0 0 20px white; }
+        .fb-correct { color: var(--success); text-shadow: 0 0 25px rgba(255,255,255,0.95); }
+        .fb-wrong { color: var(--danger); text-shadow: 0 0 25px rgba(255,255,255,0.95); }
+        .fb-timeout { color: var(--warning); font-size: clamp(2.6rem, 6vw, 4rem); text-shadow: 0 0 25px rgba(255,255,255,0.95); }
 
-        /* 結算畫面 */
+        /* ---------------- 結算畫面 (Summary Screen) ---------------- */
         #summary-screen {
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100%;
-            padding: 30px;
+            padding: clamp(20px, 4vh, 40px) 24px;
             text-align: center;
+            overflow-y: auto;
         }
 
         .final-badge {
-            font-size: 4.5rem;
-            margin-bottom: 10px;
+            font-size: clamp(3.8rem, 8vw, 5rem);
+            margin-bottom: 8px;
+            animation: bounce 1s infinite alternate ease-in-out;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-8px); }
         }
 
         .final-title {
-            font-size: 2.3rem;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
             font-weight: 900;
             color: var(--text-main);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .final-stat-box {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .stat-item {
             background: #f1f5f9;
-            padding: 15px 25px;
-            border-radius: 16px;
+            padding: 14px 22px;
+            border-radius: 18px;
+            min-width: 120px;
         }
 
         .stat-item-val {
-            font-size: 2.2rem;
+            font-size: clamp(1.8rem, 3.5vw, 2.3rem);
             font-weight: 900;
             color: var(--primary);
+            margin-top: 4px;
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
         }
 
         .btn-restart {
@@ -309,14 +495,49 @@
             color: white;
             border: none;
             border-radius: 16px;
-            padding: 16px 36px;
-            font-size: 1.4rem;
+            padding: 14px 34px;
+            font-size: clamp(1.15rem, 2.2vw, 1.35rem);
             font-weight: bold;
             box-shadow: 0 6px 0 var(--primary-dark);
             cursor: pointer;
-            margin-top: 10px;
         }
         .btn-restart:active { transform: translateY(6px); box-shadow: none; }
+
+        /* ---------------- 針對平板直向與手機尺寸的微調 ---------------- */
+        @media (max-width: 768px) {
+            #game-container {
+                width: 96vw;
+                height: 96vh;
+                height: 96dvh;
+                border-radius: 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .feature-card {
+                flex-direction: row;
+                text-align: left;
+                padding: 10px 16px;
+                gap: 14px;
+            }
+
+            .options-grid.mc {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .match-grid {
+                gap: 10px;
+            }
+
+            #header {
+                padding: 10px 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -325,7 +546,55 @@
         <!-- 頂部進度條 -->
         <div id="progress-bar"></div>
 
-        <!-- 頂部儀表板 -->
+        <!-- 封面畫面 (Cover Screen) -->
+        <div id="cover-screen">
+            <div class="cover-badge-row">
+                <span class="cover-tag">📐 國小數學第十單元</span>
+                <span class="cover-tag">🚀 平板＆電腦互動闖關</span>
+            </div>
+
+            <h1 class="cover-title">異分母加減<span>大冒險</span></h1>
+            <p class="cover-desc">
+                精準通分、快速約分！挑戰你的分數運算敏銳度，在限時內解開 30 道異分母分數關卡，爭奪全能神算家榮譽！
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <div>
+                        <div class="feature-title">觀念建立</div>
+                        <div class="feature-text">10 題核心觀念是非題</div>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div>
+                        <div class="feature-title">實戰計算</div>
+                        <div class="feature-text">16 題快速通分選擇題</div>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧩</div>
+                    <div>
+                        <div class="feature-title">極速連連看</div>
+                        <div class="feature-text">4 關終極約分快速配對</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cover-actions">
+                <button class="btn-start" onclick="startGame()">
+                    <span>開始挑戰冒險</span>
+                    <span>➔</span>
+                </button>
+                <button class="btn-secondary" id="cover-sound-btn" onclick="toggleAudio()">
+                    <span id="cover-sound-icon">🔊</span>
+                    <span>音效已開啟</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 頂部儀表板 (進入題目後顯示) -->
         <div id="header">
             <div class="stat-badge">
                 <span>關卡</span>
@@ -341,7 +610,7 @@
             </div>
 
             <div style="display:flex; align-items:center; gap:12px;">
-                <button id="sound-btn" onclick="toggleAudio()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">🔊</button>
+                <button id="sound-btn" onclick="toggleAudio()" style="background:none; border:none; font-size:1.35rem; cursor:pointer; padding:4px;" title="切換靜音">🔊</button>
                 <div class="score-pill" id="score-text">0 分</div>
             </div>
         </div>
@@ -359,24 +628,27 @@
         <div id="summary-screen">
             <div class="final-badge" id="rank-icon">🏆</div>
             <div class="final-title" id="rank-title">太棒了！通分大師</div>
-            <p style="color:#64748b; font-size:1.2rem; margin:0;">你已完成全數 30 道異分母分數加減挑戰！</p>
+            <p style="color:var(--text-sub); font-size:1.15rem; margin:0;">你已完成全數 30 道異分母分數加減挑戰！</p>
             
             <div class="final-stat-box">
                 <div class="stat-item">
-                    <div style="color:#64748b; font-size:0.95rem; font-weight:bold;">最終得分</div>
+                    <div style="color:var(--text-sub); font-size:0.95rem; font-weight:bold;">最終得分</div>
                     <div class="stat-item-val" id="final-score">0</div>
                 </div>
                 <div class="stat-item">
-                    <div style="color:#64748b; font-size:0.95rem; font-weight:bold;">答對題數</div>
+                    <div style="color:var(--text-sub); font-size:0.95rem; font-weight:bold;">答對題數</div>
                     <div class="stat-item-val" id="final-correct">0 / 30</div>
                 </div>
                 <div class="stat-item">
-                    <div style="color:#64748b; font-size:0.95rem; font-weight:bold;">最高連擊</div>
+                    <div style="color:var(--text-sub); font-size:0.95rem; font-weight:bold;">最高連擊</div>
                     <div class="stat-item-val" id="final-combo">0</div>
                 </div>
             </div>
 
-            <button class="btn-restart" onclick="restartGame()">再挑戰一次</button>
+            <div class="summary-actions">
+                <button class="btn-restart" onclick="restartGame()">再挑戰一次 🔄</button>
+                <button class="btn-secondary" onclick="returnToCover()">返回封面 🏠</button>
+            </div>
         </div>
     </div>
 
@@ -387,34 +659,34 @@
         // ------------------ 完整 30 道題庫 ------------------
         const database = [
             // [1~10] 是非題：建立概念
-            { type: 'tf', tag: '概念是非', q: `${f(1,3)} + ${f(1,4)} 通分時，分母可以化為 12 嗎？`, ans: 'O' }, // cite: 1, 2
-            { type: 'tf', tag: '概念是非', q: `${f(2,5)} + ${f(3,10)} 可以直接把分子跟分母相加變成 ${f(5,15)} 嗎？`, ans: 'X' }, // cite: 1
-            { type: 'tf', tag: '概念是非', q: `異分母分數相加減前，必須先進行「通分」化為同分母？`, ans: 'O' }, // cite: 1, 2
-            { type: 'tf', tag: '概念是非', q: `計算 ${f(3,4)} + ${f(5,6)} 時，4 和 6 的最小公倍數是 12？`, ans: 'O' }, // cite: 1, 2
-            { type: 'tf', tag: '概念是非', q: `${f(25,20)} + ${f(21,12)} 先約分再計算，結果依然會完全相同？`, ans: 'O' }, // cite: 1, 2
+            { type: 'tf', tag: '概念是非', q: `${f(1,3)} + ${f(1,4)} 通分時，公分母可以化為 12 嗎？`, ans: 'O' },
+            { type: 'tf', tag: '概念是非', q: `${f(2,5)} + ${f(3,10)} 可以直接把分子跟分母相加變成 ${f(5,15)} 嗎？`, ans: 'X' },
+            { type: 'tf', tag: '概念是非', q: `異分母分數相加減前，必須先進行「通分」化為同分母？`, ans: 'O' },
+            { type: 'tf', tag: '概念是非', q: `計算 ${f(3,4)} + ${f(5,6)} 時，4 和 6 的最小公倍數是 12？`, ans: 'O' },
+            { type: 'tf', tag: '概念是非', q: `${f(25,20)} + ${f(21,12)} 先約分再計算，結果依然會完全相同？`, ans: 'O' },
             { type: 'tf', tag: '概念是非', q: `${f(5,6)} - ${f(1,3)} 是異分母，分子可以直接相減變成 ${f(4,3)}？`, ans: 'X' },
-            { type: 'tf', tag: '概念是非', q: `帶分數相加，可先把「整數與整數相加，分數與分數相加」？`, ans: 'O' }, // cite: 2
-            { type: 'tf', tag: '概念是非', q: `假分數 ${f(15,6)} 約分成最簡分數後是 ${f(5,2)} 嗎？`, ans: 'O' }, // cite: 1
-            { type: 'tf', tag: '概念是非', q: `${f(1,12)} + ${f(5,6)} 的相加結果是 ${f(6,18)} 嗎？`, ans: 'X' }, // cite: 1
+            { type: 'tf', tag: '概念是非', q: `帶分數相加，可先把「整數與整數相加，分數與分數相加」？`, ans: 'O' },
+            { type: 'tf', tag: '概念是非', q: `假分數 ${f(15,6)} 約分成最簡分數後是 ${f(5,2)} 嗎？`, ans: 'O' },
+            { type: 'tf', tag: '概念是非', q: `${f(1,12)} + ${f(5,6)} 的相加結果是 ${f(6,18)} 嗎？`, ans: 'X' },
             { type: 'tf', tag: '概念是非', q: `同分母分數相加時，分母保持不變，只將分子相加？`, ans: 'O' },
 
             // [11~26] 選擇題：實戰計算
-            { type: 'mc', tag: '運算選擇', q: `${f(1,3)} + ${f(1,4)} = ？`, options: [f(7,12), f(2,7), f(5,12)], ans: 0 }, // cite: 1, 2
-            { type: 'mc', tag: '運算選擇', q: `${f(2,5)} + ${f(3,10)} = ？`, options: [f(5,10), f(7,10), f(5,15)], ans: 1 }, // cite: 1
-            { type: 'mc', tag: '運算選擇', q: `${f(1,2)} + ${f(2,5)} = ？`, options: [f(9,10), f(3,7), f(7,10)], ans: 0 }, // cite: 1
-            { type: 'mc', tag: '運算選擇', q: `${f(1,12)} + ${f(5,6)} = ？`, options: [f(6,18), f(11,12), f(7,12)], ans: 1 }, // cite: 1
+            { type: 'mc', tag: '運算選擇', q: `${f(1,3)} + ${f(1,4)} = ？`, options: [f(7,12), f(2,7), f(5,12)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(2,5)} + ${f(3,10)} = ？`, options: [f(5,10), f(7,10), f(5,15)], ans: 1 },
+            { type: 'mc', tag: '運算選擇', q: `${f(1,2)} + ${f(2,5)} = ？`, options: [f(9,10), f(3,7), f(7,10)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(1,12)} + ${f(5,6)} = ？`, options: [f(6,18), f(11,12), f(7,12)], ans: 1 },
             { type: 'mc', tag: '運算選擇', q: `${f(3,4)} - ${f(1,2)} = ？`, options: [f(1,4), f(2,2), f(1,2)], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(5,6)} - ${f(2,3)} = ？`, options: [f(3,3), f(1,6), f(3,6)], ans: 1 },
-            { type: 'mc', tag: '運算選擇', q: `${f(7,8)} + ${f(5,6)} = ？`, options: [f(41,24), f(12,14), f(35,24)], ans: 0 }, // cite: 1
-            { type: 'mc', tag: '運算選擇', q: `${f(3,5)} + ${f(11,20)} = ？`, options: [f(23,20), f(14,25), f(17,20)], ans: 0 }, // cite: 2
-            { type: 'mc', tag: '運算選擇', q: `${f(5,6)} + ${f(4,9)} = ？`, options: [f(23,18), f(9,15), f(19,18)], ans: 0 }, // cite: 2
+            { type: 'mc', tag: '運算選擇', q: `${f(7,8)} + ${f(5,6)} = ？`, options: [f(41,24), f(12,14), f(35,24)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(3,5)} + ${f(11,20)} = ？`, options: [f(23,20), f(14,25), f(17,20)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(5,6)} + ${f(4,9)} = ？`, options: [f(23,18), f(9,15), f(19,18)], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(4,5)} - ${f(1,2)} = ？`, options: [f(3,10), f(3,3), f(5,10)], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(7,10)} - ${f(2,5)} = ？`, options: [f(3,10), f(5,5), f(1,2)], ans: 0 },
-            { type: 'mc', tag: '運算選擇', q: `${f(2,3)} + ${f(5,7)} = ？`, options: [f(29,21), f(7,10), f(27,21)], ans: 0 }, // cite: 2
-            { type: 'mc', tag: '運算選擇', q: `${f(3,4)} + ${f(8,9)} = ？`, options: [f(59,36), f(11,13), f(45,36)], ans: 0 }, // cite: 2
+            { type: 'mc', tag: '運算選擇', q: `${f(2,3)} + ${f(5,7)} = ？`, options: [f(29,21), f(7,10), f(27,21)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(3,4)} + ${f(8,9)} = ？`, options: [f(59,36), f(11,13), f(45,36)], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(11,12)} - ${f(3,4)} = ？`, options: [f(1,6), f(8,8), f(1,4)], ans: 0 },
-            { type: 'mc', tag: '運算選擇', q: `${f(25,20)} + ${f(21,12)} = ？`, options: ['3', f(46,32), `2${f(1,2)}`], ans: 0 }, // cite: 1, 2
-            { type: 'mc', tag: '運算選擇', q: `${f(15,6)} + ${f(35,10)} = ？`, options: ['6', '5', f(50,16)], ans: 0 }, // cite: 1
+            { type: 'mc', tag: '運算選擇', q: `${f(25,20)} + ${f(21,12)} = ？`, options: ['3', f(46,32), `2${f(1,2)}`], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(15,6)} + ${f(35,10)} = ？`, options: ['6', '5', f(50,16)], ans: 0 },
 
             // [27~30] 連連看：綜合配對挑戰
             {
@@ -433,9 +705,9 @@
                 tag: '速算連連看',
                 q: '請配對算式與正確答案！',
                 items: [
-                    { text: `${f(3,4)} + ${f(5,6)}`, match: 'M3' }, // cite: 1, 2
+                    { text: `${f(3,4)} + ${f(5,6)}`, match: 'M3' },
                     { text: f(7,12), match: 'M4' },
-                    { text: f(19,12), match: 'M3' }, // cite: 1, 2
+                    { text: f(19,12), match: 'M3' },
                     { text: `${f(5,6)} - ${f(1,4)}`, match: 'M4' }
                 ]
             },
@@ -444,10 +716,10 @@
                 tag: '速算連連看',
                 q: '請配對約分後的正確答案！',
                 items: [
-                    { text: `${f(10,16)} + ${f(9,12)}`, match: 'M5' }, // cite: 2
-                    { text: f(21,10), match: 'M6' }, // cite: 2
-                    { text: f(11,8), match: 'M5' }, // cite: 2
-                    { text: `${f(27,45)} + ${f(36,24)}`, match: 'M6' } // cite: 2
+                    { text: `${f(10,16)} + ${f(9,12)}`, match: 'M5' },
+                    { text: f(21,10), match: 'M6' },
+                    { text: f(11,8), match: 'M5' },
+                    { text: `${f(27,45)} + ${f(36,24)}`, match: 'M6' }
                 ]
             },
             {
@@ -455,17 +727,17 @@
                 tag: '終極挑戰連連看',
                 q: '最後關卡：配對並完成通分！',
                 items: [
-                    { text: `${f(33,18)} + ${f(14,12)}`, match: 'M7' }, // cite: 2
-                    { text: f(19,12), match: 'M8' }, // cite: 2
-                    { text: '3', match: 'M7' }, // cite: 2
-                    { text: `${f(6,8)} + ${f(15,18)}`, match: 'M8' } // cite: 2
+                    { text: `${f(33,18)} + ${f(14,12)}`, match: 'M7' },
+                    { text: f(19,12), match: 'M8' },
+                    { text: '3', match: 'M7' },
+                    { text: `${f(6,8)} + ${f(15,18)}`, match: 'M8' }
                 ]
             }
         ];
 
         // ------------------ 狀態管理 ------------------
         const TOTAL_QUESTIONS = database.length; // 30 題
-        const TIME_LIMIT = 25; // 平板單人每題給予 25 秒
+        const TIME_LIMIT = 25; // 每題 25 秒
         let currentIndex = 0;
         let score = 0;
         let correctCount = 0;
@@ -480,62 +752,124 @@
         let isAudioMuted = false;
 
         function getAudioContext() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!audioCtx) {
+                const AudioClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioClass) audioCtx = new AudioClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
             return audioCtx;
         }
 
         function toggleAudio() {
             isAudioMuted = !isAudioMuted;
-            document.getElementById('sound-btn').innerText = isAudioMuted ? "🔇" : "🔊";
+            const icon = isAudioMuted ? "🔇" : "🔊";
+            const text = isAudioMuted ? "音效已靜音" : "音效已開啟";
+
+            const headerBtn = document.getElementById('sound-btn');
+            if (headerBtn) headerBtn.innerText = icon;
+
+            const coverIcon = document.getElementById('cover-sound-icon');
+            if (coverIcon) {
+                coverIcon.innerText = icon;
+                coverIcon.nextElementSibling.innerText = text;
+            }
+
+            if (!isAudioMuted) {
+                getAudioContext();
+            }
         }
 
         function playTick(urgent) {
             if (isAudioMuted) return;
-            const ctx = getAudioContext();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = urgent ? 'sawtooth' : 'sine';
-            osc.frequency.setValueAtTime(urgent ? 800 : 440, ctx.currentTime);
-            gain.gain.setValueAtTime(0.15, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.06);
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = urgent ? 'sawtooth' : 'sine';
+                osc.frequency.setValueAtTime(urgent ? 800 : 440, ctx.currentTime);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.06);
+            } catch(e) {}
         }
 
         function playCorrect() {
             if (isAudioMuted) return;
-            const ctx = getAudioContext();
-            [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.06);
-                gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.06);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 0.2);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start(ctx.currentTime + i * 0.06);
-                osc.stop(ctx.currentTime + i * 0.06 + 0.25);
-            });
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.06);
+                    gain.gain.setValueAtTime(0.18, ctx.currentTime + i * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 0.2);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + i * 0.06);
+                    osc.stop(ctx.currentTime + i * 0.06 + 0.25);
+                });
+            } catch(e) {}
         }
 
         function playWrong() {
             if (isAudioMuted) return;
-            const ctx = getAudioContext();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.26);
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(160, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(75, ctx.currentTime + 0.22);
+                gain.gain.setValueAtTime(0.18, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.26);
+            } catch(e) {}
+        }
+
+        // ------------------ 遊戲流程控制 ------------------
+        function startGame() {
+            getAudioContext(); // 用戶互動時初始化 AudioContext (符合 iPad Safari 策略)
+            document.getElementById('cover-screen').style.display = 'none';
+            document.getElementById('header').style.display = 'flex';
+            document.getElementById('progress-bar').style.display = 'block';
+            document.getElementById('main-stage').style.display = 'flex';
+            restartGame();
+        }
+
+        function returnToCover() {
+            clearInterval(timerId);
+            document.getElementById('summary-screen').style.display = 'none';
+            document.getElementById('header').style.display = 'none';
+            document.getElementById('progress-bar').style.display = 'none';
+            document.getElementById('main-stage').style.display = 'none';
+            document.getElementById('cover-screen').style.display = 'flex';
+        }
+
+        function restartGame() {
+            clearInterval(timerId);
+            currentIndex = 0;
+            score = 0;
+            correctCount = 0;
+            currentCombo = 0;
+            maxCombo = 0;
+            document.getElementById('score-text').innerText = "0 分";
+            document.getElementById('main-stage').style.display = 'flex';
+            document.getElementById('header').style.display = 'flex';
+            document.getElementById('progress-bar').style.display = 'block';
+            document.getElementById('summary-screen').style.display = 'none';
+            renderCurrentQuestion();
         }
 
         // ------------------ 計時器機制 ------------------
@@ -745,22 +1079,6 @@
                 title.innerText = "再接再厲！基礎穩紮穩打";
             }
         }
-
-        function restartGame() {
-            currentIndex = 0;
-            score = 0;
-            correctCount = 0;
-            currentCombo = 0;
-            maxCombo = 0;
-            document.getElementById('score-text').innerText = "0 分";
-            document.getElementById('main-stage').style.display = 'flex';
-            document.getElementById('header').style.display = 'flex';
-            document.getElementById('summary-screen').style.display = 'none';
-            renderCurrentQuestion();
-        }
-
-        // 啟動首題
-        renderCurrentQuestion();
     </script>
 </body>
 </html>

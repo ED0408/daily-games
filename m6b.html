@@ -2,133 +2,550 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>異分母分數對決：單人極限挑戰 30 關</title>
     <style>
-        * { box-sizing: border-box; font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif; }
-        html, body { 
-            margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; 
-            background-color: #0f172a; color: #fff;
-            -webkit-user-select: none; user-select: none; touch-action: manipulation;
+        :root {
+            --bg-dark: #090d16;
+            --panel-bg: #151e2e;
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --primary: #38bdf8;
+            --primary-dark: #0284c7;
+            --accent: #fbbf24;
+            --danger: #ef4444;
+            --success: #10b981;
+            --text-dark: #0f172a;
+            --text-sub: #94a3b8;
         }
-        
-        /* 頂部教師控制面板 */
-        #teacher-panel {
-            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
-            background: #1e293b; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 30px; z-index: 100; border-bottom: 4px solid #334155; box-shadow: 0 6px 15px rgba(0,0,0,0.6);
-        }
-        .panel-info { display: flex; align-items: center; gap: 30px; font-size: 1.8rem; font-weight: bold; }
-        .score-box { font-size: 2rem; color: #fbbf24; background: rgba(0,0,0,0.5); padding: 5px 25px; border-radius: 12px; border: 2px solid #fbbf24; }
-        .timer-box { font-size: 2.5rem; color: #10b981; background: #000; padding: 5px 30px; border-radius: 12px; border: 3px solid #10b981; min-width: 100px; text-align: center; }
-        .timer-box.danger { color: #ef4444; border-color: #ef4444; animation: flash 0.5s infinite; }
-        .panel-controls button {
-            min-height: 55px; font-size: 1.3rem; padding: 0 25px; margin-left: 15px;
-            border-radius: 10px; border: none; cursor: pointer; font-weight: bold; background: #475569; color: white; transition: 0.2s;
-        }
-        .panel-controls button:active { background: #64748b; }
-        .panel-controls button.highlight { background: #f59e0b; color: #000; animation: pop 0.8s infinite; }
 
-        /* 主作戰區 (單一置中版面) */
+        * { 
+            box-sizing: border-box; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100vw; 
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden; 
+            background: radial-gradient(circle at 50% 20%, #172554 0%, var(--bg-dark) 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* ---------------- 封面開始畫面 (Cover Screen) ---------------- */
+        #start-screen {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            height: 100dvh;
+            background: radial-gradient(circle at 50% 30%, rgba(30, 41, 59, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%);
+            z-index: 999; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: clamp(16px, 4vw, 40px);
+            overflow-y: auto;
+        }
+
+        .cover-badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 999px;
+            padding: 6px 18px;
+            font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        #start-screen h1 { 
+            font-size: clamp(2.3rem, 5.5vw, 4.4rem); 
+            color: #fff; 
+            text-shadow: 0 0 35px rgba(56, 189, 248, 0.6); 
+            margin: 0 0 14px 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        #start-screen h1 span {
+            color: var(--accent);
+            text-shadow: 0 0 35px rgba(251, 191, 36, 0.6);
+        }
+
+        #start-screen p { 
+            font-size: clamp(1.05rem, 2.2vw, 1.55rem); 
+            color: #94a3b8; 
+            margin: 0 0 30px 0; 
+            max-width: 760px; 
+            line-height: 1.6; 
+        }
+
+        .cover-rule-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            max-width: 780px;
+            width: 100%;
+            margin-bottom: 32px;
+        }
+
+        .rule-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: 16px 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .rule-card .rule-icon { font-size: clamp(1.6rem, 3.2vw, 2.4rem); margin-bottom: 6px; }
+        .rule-card .rule-title { font-size: clamp(1rem, 2vw, 1.2rem); font-weight: bold; color: #f8fafc; }
+        .rule-card .rule-detail { font-size: clamp(0.78rem, 1.5vw, 0.95rem); color: var(--text-sub); margin-top: 4px; }
+
+        .audio-indicator-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #334155;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: clamp(0.85rem, 1.7vw, 1.05rem);
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+
+        #start-btn {
+            font-size: clamp(1.6rem, 3.2vw, 2.4rem); 
+            padding: clamp(14px, 2.4vh, 20px) clamp(44px, 7vw, 75px); 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+            color: #fff; 
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px; 
+            cursor: pointer; 
+            font-weight: 900; 
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), 0 8px 0 #047857; 
+            transition: all 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #start-btn:active { 
+            transform: translateY(6px); 
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4), 0 2px 0 #047857; 
+        }
+
+        /* ---------------- 頂部儀表與控制面板 ---------------- */
+        #teacher-panel {
+            flex-shrink: 0;
+            width: 100%; 
+            min-height: clamp(62px, 9vh, 76px);
+            background: var(--panel-bg); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 6px clamp(12px, 3vw, 32px); 
+            z-index: 100; 
+            border-bottom: 3px solid #334155; 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .panel-info { 
+            display: flex; 
+            align-items: center; 
+            gap: clamp(10px, 2vw, 24px); 
+            font-size: clamp(1.1rem, 2.1vw, 1.45rem); 
+            font-weight: 800; 
+        }
+
+        .score-box { 
+            font-size: clamp(1.2rem, 2.2vw, 1.55rem); 
+            color: var(--accent); 
+            background: rgba(0,0,0,0.45); 
+            padding: 4px clamp(10px, 1.8vw, 18px); 
+            border-radius: 12px; 
+            border: 2px solid var(--accent); 
+        }
+
+        .timer-box { 
+            font-size: clamp(1.6rem, 3.2vw, 2.2rem); 
+            color: var(--success); 
+            background: #000; 
+            padding: 4px clamp(14px, 2vw, 24px); 
+            border-radius: 12px; 
+            border: 3px solid var(--success); 
+            min-width: clamp(75px, 10vw, 100px); 
+            text-align: center; 
+            font-weight: 900;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-box.danger { 
+            color: var(--danger); 
+            border-color: var(--danger); 
+            animation: pulse-danger 0.5s infinite; 
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+        }
+
+        .panel-controls {
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1.2vw, 12px);
+        }
+
+        .panel-controls button {
+            min-height: clamp(42px, 6vh, 50px); 
+            font-size: clamp(0.95rem, 1.6vw, 1.15rem); 
+            padding: 0 clamp(10px, 1.6vw, 18px); 
+            border-radius: 12px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 800; 
+            background: #334155; 
+            color: white; 
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .panel-controls button:active { 
+            background: #475569; 
+            transform: translateY(2px);
+        }
+
+        .panel-controls button.highlight { 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+            color: #000; 
+            box-shadow: 0 0 18px rgba(245, 158, 11, 0.8);
+            animation: pop-btn 0.9s infinite; 
+        }
+
+        /* ---------------- 主作戰區 (電腦與 iPad 響應適配) ---------------- */
         #game-container {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 100%; height: calc(100vh - 80px); margin-top: 80px; padding: 30px 50px;
-            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); position: relative;
+            flex: 1;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            width: 100%; 
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: clamp(10px, 2vh, 24px) clamp(14px, 3.5vw, 36px);
+            position: relative;
+            overflow: hidden;
         }
         
         .question-box {
-            width: 100%; max-width: 1000px; min-height: 250px;
-            display: flex; justify-content: center; align-items: center;
-            background: rgba(255,255,255,0.95); border-radius: 25px; padding: 30px; margin-bottom: 40px;
-            color: #0f172a; font-size: 5rem; font-weight: bold; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            flex-wrap: wrap; gap: 15px; border: 6px solid #e2e8f0;
+            width: 100%; 
+            min-height: clamp(90px, 16vh, 160px);
+            max-height: 32vh;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            background: var(--card-bg); 
+            border-radius: clamp(16px, 3vw, 24px); 
+            padding: clamp(12px, 2.2vh, 22px) clamp(16px, 3vw, 32px); 
+            margin-bottom: clamp(12px, 2.2vh, 24px);
+            color: var(--text-dark); 
+            font-size: clamp(2rem, 4.8vw, 3.8rem); 
+            font-weight: 900; 
+            text-align: center; 
+            box-shadow: 0 14px 35px rgba(0,0,0,0.5);
+            flex-wrap: wrap; 
+            gap: 12px; 
+            border: 4px solid #cbd5e1;
+            line-height: 1.35;
         }
 
+        /* 選項網格區 */
         .options-area { 
-            display: grid; gap: 25px; width: 100%; max-width: 1000px; 
+            display: grid; 
+            gap: clamp(12px, 2vh, 20px); 
+            width: 100%; 
+            flex: 1;
+            max-height: 52vh;
         }
+
         .options-area.tf-mode { grid-template-columns: 1fr 1fr; }
-        .options-area.mc-mode { grid-template-columns: 1fr 1fr; }
+        .options-area.mc-mode { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
         .options-area.match-mode { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 
         .btn-option {
-            min-height: 140px; font-size: 3.5rem; font-weight: bold; border-radius: 20px; cursor: pointer;
-            display: flex; justify-content: center; align-items: center; transition: transform 0.1s;
-            background: #e0f2fe; color: #0369a1; border: 5px solid #7dd3fc; box-shadow: 0 8px 0 #38bdf8;
+            min-height: clamp(62px, 10vh, 105px); 
+            font-size: clamp(1.6rem, 3.4vw, 2.8rem); 
+            font-weight: 900; 
+            border-radius: clamp(14px, 2.2vw, 20px); 
+            cursor: pointer;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            transition: transform 0.1s, box-shadow 0.1s;
+            background: #e0f2fe; 
+            color: #0369a1; 
+            border: 4px solid #7dd3fc; 
+            box-shadow: 0 6px 0 #38bdf8;
+            padding: 8px 14px;
         }
-        .btn-option:active { transform: translateY(8px); box-shadow: 0 0 0 #38bdf8; }
-        .btn-option:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .btn-option.selected { box-shadow: 0 0 30px 10px #fde047; transform: scale(1.05); z-index: 10; border-color: #facc15; }
-        .btn-option.matched { visibility: hidden; pointer-events: none; }
 
-        /* 分數垂直排版規範 */
-        .math-expr { display: inline-flex; align-items: center; vertical-align: middle; gap: 5px; margin: 0 8px; }
-        .whole { font-size: 5.5rem; line-height: 1; }
-        .frac { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; }
-        .num, .den { font-size: 2.8rem; line-height: 1.1; padding: 0 6px; }
-        .num { border-bottom: 5px solid currentColor; }
-        
-        .btn-option .whole { font-size: 4rem; }
-        .btn-option .num, .btn-option .den { font-size: 2.2rem; border-bottom-width: 4px; }
+        .btn-option:active { 
+            transform: translateY(6px); 
+            box-shadow: 0 0 0 #38bdf8; 
+        }
 
-        /* 鎖定遮罩層 */
+        .btn-option:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+        
+        .btn-option.selected { 
+            box-shadow: 0 0 25px 8px #fde047; 
+            transform: scale(1.03); 
+            z-index: 10; 
+            border-color: #facc15; 
+            background: #fffbeb;
+        }
+
+        .btn-option.matched { 
+            visibility: hidden; 
+            pointer-events: none; 
+        }
+
+        /* ---------------- 分數垂直排版規範 ---------------- */
+        .math-expr { 
+            display: inline-flex; 
+            align-items: center; 
+            vertical-align: middle; 
+            gap: 4px; 
+            margin: 0 6px; 
+        }
+
+        .whole { 
+            font-size: clamp(2.2rem, 5.2vw, 4.2rem); 
+            line-height: 1; 
+            font-weight: 900;
+        }
+
+        .frac { 
+            display: inline-flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        .num, .den { 
+            font-size: clamp(1.3rem, 2.7vw, 2.2rem); 
+            line-height: 1.15; 
+            padding: 0 4px; 
+            font-weight: 800;
+        }
+
+        .num { 
+            border-bottom: 4px solid currentColor; 
+        }
+        
+        .btn-option .whole { 
+            font-size: clamp(1.8rem, 3.8vw, 3.2rem); 
+        }
+
+        .btn-option .num, .btn-option .den { 
+            font-size: clamp(1.1rem, 2.3vw, 1.85rem); 
+            border-bottom-width: 3px; 
+        }
+
+        /* ---------------- 鎖定反饋遮罩層 ---------------- */
         .lock-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; justify-content: center; align-items: center; flex-direction: column;
-            font-size: 7rem; font-weight: bold; z-index: 50; text-align: center;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column;
+            font-size: clamp(3rem, 7vw, 5.5rem); 
+            font-weight: 900; 
+            z-index: 50; 
+            text-align: center;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
         }
-        .lock-overlay.correct { background: rgba(16, 185, 129, 0.85); color: #fff; text-shadow: 0 0 30px #047857; }
-        .lock-overlay.wrong { background: rgba(239, 68, 68, 0.85); color: #fff; text-shadow: 0 0 30px #b91c1c; }
-        .lock-overlay.timeout { background: rgba(71, 85, 105, 0.9); color: #fff; text-shadow: 0 0 20px #fff; }
 
-        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .lock-overlay.correct { 
+            background: rgba(16, 185, 129, 0.88); 
+            color: #fff; 
+            text-shadow: 0 0 35px #047857; 
+        }
 
-        /* 啟動頁面 */
-        #start-screen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(15, 23, 42, 0.98); z-index: 999; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center; padding: 20px;
+        .lock-overlay.wrong { 
+            background: rgba(239, 68, 68, 0.88); 
+            color: #fff; 
+            text-shadow: 0 0 35px #b91c1c; 
         }
-        #start-screen h1 { font-size: 5.5rem; color: #fff; text-shadow: 0 0 30px #38bdf8; margin-bottom: 20px;}
-        #start-screen p { font-size: 2.2rem; color: #94a3b8; margin-bottom: 50px; max-width: 800px; line-height: 1.6; }
-        #start-btn {
-            font-size: 3.5rem; padding: 20px 80px; background: #10b981; color: #fff; border: 6px solid #fff;
-            border-radius: 25px; cursor: pointer; font-weight: bold; box-shadow: 0 0 40px #10b981; transition: 0.2s;
+
+        .lock-overlay.timeout { 
+            background: rgba(51, 65, 85, 0.92); 
+            color: #fbbf24; 
+            text-shadow: 0 0 25px rgba(251, 191, 36, 0.7); 
         }
-        #start-btn:active { transform: scale(0.95); }
+
+        @keyframes pulse-danger { 0% { opacity: 1; } 50% { opacity: 0.35; } 100% { opacity: 1; } }
+        @keyframes pop-btn { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
+
+        /* ---------------- 結算彈窗 ---------------- */
+        #complete-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1e293b;
+            border: 4px solid var(--primary);
+            border-radius: 24px;
+            padding: clamp(20px, 4vh, 36px) clamp(24px, 5vw, 48px);
+            text-align: center;
+            z-index: 200;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #complete-modal h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin: 0 0 10px 0;
+            color: var(--accent);
+        }
+
+        #complete-modal p {
+            font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+            color: #cbd5e1;
+            margin: 0 0 24px 0;
+        }
+
+        /* 針對 iPad 直向 (Portrait) 與窄螢幕最佳化 */
+        @media (max-width: 768px) {
+            #teacher-panel {
+                padding: 6px 14px;
+            }
+            .panel-info {
+                font-size: 1.05rem;
+                gap: 10px;
+            }
+            .cover-rule-cards {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .rule-card {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-align: left;
+                padding: 10px 14px;
+            }
+            .rule-card .rule-icon { margin-bottom: 0; }
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
+    <!-- 封面開始畫面 -->
     <div id="start-screen">
-        <h1>分數計算極限挑戰：單人 30 關</h1>
-        <p>測試你的通分、借位與約分極限。<br>點擊下方按鈕啟動全螢幕與音效。</p>
-        <button id="start-btn" onclick="startGame()">▶ 開始挑戰</button>
+        <div class="cover-badge">⚡ 極限數學競技場</div>
+        <h1>異分母分數對決：<span>單人 30 關</span></h1>
+        <p>考驗你的快速通分、化簡與約分直覺！<br>自帶緊湊節奏音效，挑戰全神貫注的限時分數運算極限。</p>
+
+        <div class="cover-rule-cards">
+            <div class="rule-card">
+                <div class="rule-icon">💡</div>
+                <div>
+                    <div class="rule-title">1~10 關：是非極速判斷</div>
+                    <div class="rule-detail">直覺辨析通分與計算正誤</div>
+                </div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-icon">🎯</div>
+                <div>
+                    <div class="rule-title">11~20 關：四選一精準計算</div>
+                    <div class="rule-detail">帶分數與真分數的實戰加減</div>
+                </div>
+            </div>
+            <div class="rule-card">
+                <div class="rule-icon">🧩</div>
+                <div>
+                    <div class="rule-title">21~30 關：多重配對連連看</div>
+                    <div class="rule-detail">找出相同數值的算式與結果</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="audio-indicator-pill">
+            <span>🎵 內建緊湊節奏配樂</span>
+            <span>•</span>
+            <span>⏱️ 每題 20 秒倒數</span>
+        </div>
+
+        <button id="start-btn" onclick="startGame()">
+            <span>▶ 啟動極限挑戰</span>
+        </button>
     </div>
 
+    <!-- 頂部資訊與控制面板 -->
     <div id="teacher-panel">
         <div class="panel-info">
             <span>關卡：<span id="level-indicator">1 / 30</span></span>
-            <span id="level-type" style="color: #38bdf8;">【是非題】</span>
+            <span id="level-type" style="color: var(--primary);">【是非題】</span>
             <div class="score-box">分數: <span id="total-score">0</span></div>
         </div>
+
         <div class="timer-box" id="timer-display">20</div>
+
         <div class="panel-controls">
-            <button onclick="toggleSound()" id="sound-btn">🔊 音效: 開</button>
-            <button onclick="resetGame()">↺ 重新挑戰</button>
+            <button onclick="toggleMusic()" id="bgm-btn" title="切換背景音樂">🎵 音樂: 開</button>
+            <button onclick="toggleSound()" id="sound-btn" title="切換音效">🔊 音效: 開</button>
+            <button onclick="resetGame()">↺ 重置</button>
             <button onclick="nextLevel()" id="next-btn">下一關 ➔</button>
         </div>
     </div>
 
+    <!-- 主作戰區 -->
     <div id="game-container">
         <div class="question-box" id="question-display">載入中...</div>
         <div class="options-area" id="options-display"></div>
         <div class="lock-overlay" id="board-lock"></div>
+
+        <!-- 挑戰結算彈窗 -->
+        <div id="complete-modal">
+            <h2>🎉 挑戰全數通關！</h2>
+            <p>最終得分：<span id="modal-score" style="color:var(--accent); font-weight:900;">0</span> 分</p>
+            <button class="btn-option" style="width:100%; border-color:var(--primary); background:#0284c7; color:white;" onclick="resetGame()">
+                再挑戰一次 ↺
+            </button>
+        </div>
     </div>
 
     <script>
+        // ------------------ 數學垂直分數排版輔助 ------------------
         function F(w, n, d) {
             let html = '<span class="math-expr">';
             if (w !== '' && w !== undefined && w !== null) html += `<span class="whole">${w}</span>`;
@@ -137,6 +554,7 @@
             return html;
         }
 
+        // ------------------ 完整 30 關卡題庫 ------------------
         const levels = [
             // 1-10 關：是非題
             { type: 'tf', q: F('2',7,10) + ' + ' + F('',7,4) + ' = ' + F('4',9,20), ans: true },
@@ -175,45 +593,162 @@
             { type: 'match', pairs: [ { q: F('5',5,12)+' + '+F('2',7,16), a: F('7',41,48) }, { q: F('7',1,12)+' - '+F('3',9,16), a: F('3',25,48) } ] }
         ];
 
+        // ------------------ Web Audio API 離線合成音樂引擎 ------------------
         let audioCtx = null;
         let soundEnabled = true;
+        let musicEnabled = true;
+        let bgmIntervalId = null;
+        let bgmStep = 0;
+        let masterBgmGain = null;
 
         function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!audioCtx) {
+                const AudioClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioClass) {
+                    audioCtx = new AudioClass();
+                    // 建立 BGM 專用 GainNode
+                    masterBgmGain = audioCtx.createGain();
+                    masterBgmGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+                    masterBgmGain.connect(audioCtx.destination);
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
 
+        // 基礎單音合成 (用於音效)
         function playTone(freq, type, duration, vol) {
             if (!soundEnabled || !audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
         }
 
-        function playTick() { playTone(850, 'sine', 0.08, 0.1); }
-        function playHighTick() { playTone(1300, 'sine', 0.09, 0.3); }
+        function playTick() { playTone(900, 'sine', 0.05, 0.08); }
+        function playHighTick() { playTone(1400, 'sine', 0.08, 0.25); }
         function playCorrect() {
             if (!soundEnabled || !audioCtx) return;
-            playTone(523.25, 'sine', 0.15, 0.3);
-            setTimeout(() => playTone(659.25, 'sine', 0.15, 0.3), 100);
-            setTimeout(() => playTone(783.99, 'sine', 0.35, 0.3), 200);
+            playTone(523.25, 'sine', 0.12, 0.25);
+            setTimeout(() => playTone(659.25, 'sine', 0.12, 0.25), 90);
+            setTimeout(() => playTone(783.99, 'sine', 0.28, 0.25), 180);
         }
-        function playWrong() { playTone(140, 'sawtooth', 0.45, 0.4); }
+        function playWrong() { playTone(130, 'sawtooth', 0.35, 0.35); }
         function playAlarm() {
             if (!soundEnabled || !audioCtx) return;
             let count = 0;
             let interval = setInterval(() => {
-                playTone(count % 2 === 0 ? 650 : 450, 'square', 0.2, 0.4);
+                playTone(count % 2 === 0 ? 650 : 420, 'square', 0.18, 0.35);
                 count++;
                 if (count > 5) clearInterval(interval);
-            }, 250);
+            }, 220);
+        }
+
+        // ------------------ 緊張懸疑電子 BGM 合成器 ------------------
+        // D 小調電子懸疑 Bass 音符 (D2, F2, G2, A2)
+        const bassNotes = [
+            73.42, 73.42, 73.42, 73.42, // D2
+            87.31, 73.42, 98.00, 87.31, // F2, D2, G2, F2
+            73.42, 73.42, 73.42, 73.42, // D2
+            110.00, 98.00, 87.31, 65.41 // A2, G2, F2, C2
+        ];
+
+        function startBgmEngine() {
+            if (bgmIntervalId) clearInterval(bgmIntervalId);
+            bgmStep = 0;
+            // 16分音符間隔：125 BPM -> 每拍 0.48s -> 每16分音符 0.12s (120ms)
+            bgmIntervalId = setInterval(bgmTick, 125);
+        }
+
+        function stopBgmEngine() {
+            if (bgmIntervalId) {
+                clearInterval(bgmIntervalId);
+                bgmIntervalId = null;
+            }
+        }
+
+        function bgmTick() {
+            if (!musicEnabled || !audioCtx || !masterBgmGain) return;
+            const now = audioCtx.currentTime;
+            const step = bgmStep % 16;
+            const isDanger = (timer <= 5 && timer > 0);
+
+            // 1. 緊迫的低音脈衝 (Punchy Low-Pass Filtered Bass)
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            osc.type = isDanger ? 'sawtooth' : 'triangle';
+            let freq = bassNotes[step];
+            if (isDanger && step % 2 === 1) freq *= 1.5; // 倒數緊急時加劇音調張力
+            osc.frequency.setValueAtTime(freq, now);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(isDanger ? 600 : 380, now);
+            filter.Q.setValueAtTime(4, now);
+
+            const noteVol = (step % 4 === 0) ? 0.32 : 0.18;
+            gain.gain.setValueAtTime(noteVol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(masterBgmGain);
+
+            osc.start(now);
+            osc.stop(now + 0.12);
+
+            // 2. 懸疑金屬 Hi-Hat 脈衝 (每一拍的後半拍與弱拍)
+            if (step % 2 === 1 || isDanger) {
+                playMetallicHat(now, isDanger);
+            }
+
+            // 3. 重低音心跳 Kick (第 0, 6, 10 步)
+            if (step === 0 || step === 8) {
+                playSubPulse(now);
+            }
+
+            bgmStep++;
+        }
+
+        function playMetallicHat(now, urgent) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(urgent ? 2200 : 1600, now);
+                gain.gain.setValueAtTime(urgent ? 0.06 : 0.03, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                osc.connect(gain);
+                gain.connect(masterBgmGain);
+                osc.start(now);
+                osc.stop(now + 0.045);
+            } catch(e) {}
+        }
+
+        function playSubPulse(now) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.exponentialRampToValueAtTime(45, now + 0.15);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                osc.connect(gain);
+                gain.connect(masterBgmGain);
+                osc.start(now);
+                osc.stop(now + 0.19);
+            } catch(e) {}
         }
 
         function toggleSound() {
@@ -221,6 +756,18 @@
             document.getElementById('sound-btn').innerText = soundEnabled ? '🔊 音效: 開' : '🔇 音效: 關';
         }
 
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            document.getElementById('bgm-btn').innerText = musicEnabled ? '🎵 音樂: 開' : '🎵 音樂: 關';
+            if (musicEnabled) {
+                initAudio();
+                if (!bgmIntervalId) startBgmEngine();
+            } else {
+                stopBgmEngine();
+            }
+        }
+
+        // ------------------ 遊戲狀態與邏輯 ------------------
         let currentLevelIndex = 0;
         let score = 0;
         let state = { locked: false, selectedMatch: null, matchCount: 0 };
@@ -230,9 +777,7 @@
         function startGame() {
             initAudio();
             document.getElementById('start-screen').style.display = 'none';
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(()=>{});
-            }
+            if (musicEnabled) startBgmEngine();
             resetGame();
         }
 
@@ -240,6 +785,7 @@
             currentLevelIndex = 0;
             score = 0;
             updateScore();
+            document.getElementById('complete-modal').style.display = 'none';
             loadLevel();
         }
 
@@ -296,8 +842,8 @@
                 qBox.innerHTML = lvl.q;
                 if (lvl.type === 'tf') {
                     oBox.innerHTML = `
-                        <button class="btn-option" style="background:#dcfce7; color:#166534; border-color:#86efac" onclick="submitAnswer(true, ${lvl.ans === true})">⭕ 正確</button>
-                        <button class="btn-option" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5" onclick="submitAnswer(false, ${lvl.ans === false})">❌ 錯誤</button>
+                        <button class="btn-option" style="background:#dcfce7; color:#166534; border-color:#86efac; box-shadow:0 6px 0 #4ade80;" onclick="submitAnswer(true, ${lvl.ans === true})">⭕ 正確</button>
+                        <button class="btn-option" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5; box-shadow:0 6px 0 #f87171;" onclick="submitAnswer(false, ${lvl.ans === false})">❌ 錯誤</button>
                     `;
                 } else {
                     lvl.opts.forEach((opt, idx) => {
@@ -309,7 +855,7 @@
                     });
                 }
             } else if (lvl.type === 'match') {
-                qBox.innerHTML = "請點選算式與對應答案進行配對";
+                qBox.innerHTML = "請配對相同數值的算式與結果";
                 let cards = [];
                 lvl.pairs.forEach((pair, pIdx) => {
                     cards.push({ id: pIdx, type: 'q', html: pair.q });
@@ -341,7 +887,7 @@
                 score += 10;
                 updateScore();
                 lockDiv.className = 'lock-overlay correct';
-                lockDiv.innerHTML = "✔ 答對了！<br><span style='font-size:4rem'>+10 分</span>";
+                lockDiv.innerHTML = "✔ 答對了！<br><span style='font-size:clamp(2.2rem, 5vw, 3.8rem); margin-top:8px;'>+10 分</span>";
             } else {
                 playWrong();
                 lockDiv.className = 'lock-overlay wrong';
@@ -385,7 +931,7 @@
                     let lockDiv = document.getElementById('board-lock');
                     lockDiv.style.display = 'flex';
                     lockDiv.className = 'lock-overlay correct';
-                    lockDiv.innerHTML = "✔ 完美配對！<br><span style='font-size:4rem'>共得 10 分</span>";
+                    lockDiv.innerHTML = "✔ 完美配對！<br><span style='font-size:clamp(2.2rem, 5vw, 3.8rem); margin-top:8px;'>共得 10 分</span>";
                     document.getElementById('next-btn').classList.add('highlight');
                 }
             } else {
@@ -410,11 +956,9 @@
                 loadLevel();
             } else {
                 clearInterval(timerInterval);
-                document.getElementById('question-display').innerHTML = `🎉 恭喜完成 30 關挑戰！<br>總分：${score} 分`;
-                document.getElementById('options-display').innerHTML = '';
-                document.getElementById('board-lock').style.display = 'none';
+                document.getElementById('modal-score').innerText = score;
+                document.getElementById('complete-modal').style.display = 'block';
                 document.getElementById('next-btn').classList.remove('highlight');
-                document.getElementById('level-type').innerText = "【挑戰結束】";
             }
         }
     </script>
