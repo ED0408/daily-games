@@ -44,6 +44,7 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
+        /* 針對 iPad (橫/直向) 與電腦螢幕調配的通用主容器 */
         #game-container {
             width: 95vw;
             max-width: 920px;
@@ -117,6 +118,7 @@
             font-weight: 500;
         }
 
+        /* 特色功能卡片網格 */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -154,6 +156,7 @@
             line-height: 1.3;
         }
 
+        /* 封面按鈕區 */
         .cover-actions {
             display: flex;
             align-items: center;
@@ -208,7 +211,7 @@
         #header {
             background-color: #ffffff;
             padding: 12px 24px;
-            display: none;
+            display: none; /* 初始隱藏，點擊開始後展示 */
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #edf2f4;
@@ -233,6 +236,7 @@
             font-weight: 800;
         }
 
+        /* 倒數計時與進度條 */
         #timer-wrap {
             display: flex;
             align-items: center;
@@ -274,7 +278,7 @@
         #main-stage {
             flex: 1;
             padding: clamp(14px, 3vh, 32px) clamp(16px, 4vw, 40px);
-            display: none;
+            display: none; /* 初始隱藏 */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -307,6 +311,7 @@
             flex-wrap: wrap;
         }
 
+        /* 數學垂直分數排版 */
         .frac {
             display: inline-flex;
             flex-direction: column;
@@ -319,6 +324,7 @@
         .frac .num { border-bottom: 3px solid currentColor; padding: 0 4px; }
         .frac .den { padding: 0 4px; }
 
+        /* 選項按鈕排版 (適配 iPad 觸控大小) */
         .options-grid {
             display: grid;
             gap: 16px;
@@ -363,6 +369,7 @@
             box-shadow: none;
         }
 
+        /* 連連看網格 */
         .match-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -400,6 +407,7 @@
             pointer-events: none;
         }
 
+        /* 即時答題回饋浮層 */
         .feedback-overlay {
             position: absolute;
             font-size: clamp(3.2rem, 8vw, 5.2rem);
@@ -495,6 +503,7 @@
         }
         .btn-restart:active { transform: translateY(6px); box-shadow: none; }
 
+        /* ---------------- 針對平板直向與手機尺寸的微調 ---------------- */
         @media (max-width: 768px) {
             #game-container {
                 width: 96vw;
@@ -534,11 +543,13 @@
 <body>
 
     <div id="game-container">
+        <!-- 頂部進度條 -->
         <div id="progress-bar"></div>
 
+        <!-- 封面畫面 (Cover Screen) -->
         <div id="cover-screen">
             <div class="cover-badge-row">
-                <span class="cover-tag">📐 國小數學第十單元</span>
+                <span class="cover-tag">📐 國小數學第6單元</span>
                 <span class="cover-tag">🚀 平板＆電腦互動闖關</span>
             </div>
 
@@ -578,11 +589,12 @@
                 </button>
                 <button class="btn-secondary" id="cover-sound-btn" onclick="toggleAudio()">
                     <span id="cover-sound-icon">🔊</span>
-                    <span>音效已開啟</span>
+                    <span>音樂與音效：開啟</span>
                 </button>
             </div>
         </div>
 
+        <!-- 頂部儀表板 (進入題目後顯示) -->
         <div id="header">
             <div class="stat-badge">
                 <span>關卡</span>
@@ -603,6 +615,7 @@
             </div>
         </div>
 
+        <!-- 答題核心舞台 -->
         <div id="main-stage">
             <div class="stage-type-tag" id="type-tag">暖身是非題</div>
             <div class="question-box" id="question-text">載入題目中...</div>
@@ -611,6 +624,7 @@
             <div id="feedback-layer" class="feedback-overlay"></div>
         </div>
 
+        <!-- 結算畫面 -->
         <div id="summary-screen">
             <div class="final-badge" id="rank-icon">🏆</div>
             <div class="final-title" id="rank-title">太棒了！通分大師</div>
@@ -639,10 +653,12 @@
     </div>
 
     <script>
+        // 數學垂直分數排版輔助函式
         const f = (n, d) => `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
 
+        // ------------------ 完整 30 道題庫 ------------------
         const database = [
-            // [1~10] 是非題
+            // [1~10] 是非題：建立概念
             { type: 'tf', tag: '概念是非', q: `${f(1,3)} + ${f(1,4)} 通分時，公分母可以化為 12 嗎？`, ans: 'O' },
             { type: 'tf', tag: '概念是非', q: `${f(2,5)} + ${f(3,10)} 可以直接把分子跟分母相加變成 ${f(5,15)} 嗎？`, ans: 'X' },
             { type: 'tf', tag: '概念是非', q: `異分母分數相加減前，必須先進行「通分」化為同分母？`, ans: 'O' },
@@ -654,7 +670,7 @@
             { type: 'tf', tag: '概念是非', q: `${f(1,12)} + ${f(5,6)} 的相加結果是 ${f(6,18)} 嗎？`, ans: 'X' },
             { type: 'tf', tag: '概念是非', q: `同分母分數相加時，分母保持不變，只將分子相加？`, ans: 'O' },
 
-            // [11~26] 選擇題
+            // [11~26] 選擇題：實戰計算
             { type: 'mc', tag: '運算選擇', q: `${f(1,3)} + ${f(1,4)} = ？`, options: [f(7,12), f(2,7), f(5,12)], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(2,5)} + ${f(3,10)} = ？`, options: [f(5,10), f(7,10), f(5,15)], ans: 1 },
             { type: 'mc', tag: '運算選擇', q: `${f(1,2)} + ${f(2,5)} = ？`, options: [f(9,10), f(3,7), f(7,10)], ans: 0 },
@@ -672,7 +688,7 @@
             { type: 'mc', tag: '運算選擇', q: `${f(25,20)} + ${f(21,12)} = ？`, options: ['3', f(46,32), `2${f(1,2)}`], ans: 0 },
             { type: 'mc', tag: '運算選擇', q: `${f(15,6)} + ${f(35,10)} = ？`, options: ['6', '5', f(50,16)], ans: 0 },
 
-            // [27~30] 連連看
+            // [27~30] 連連看：綜合配對挑戰
             {
                 type: 'match',
                 tag: '速算連連看',
@@ -719,8 +735,9 @@
             }
         ];
 
-        const TOTAL_QUESTIONS = database.length;
-        const TIME_LIMIT = 25;
+        // ------------------ 狀態管理 ------------------
+        const TOTAL_QUESTIONS = database.length; // 30 題
+        const TIME_LIMIT = 25; // 每題 25 秒
         let currentIndex = 0;
         let score = 0;
         let correctCount = 0;
@@ -730,8 +747,33 @@
         let timerId = null;
         let isAnswered = false;
 
+        // ------------------ Web Audio API 離線合成音效 ------------------
         let audioCtx = null;
         let isAudioMuted = false;
+
+        // ------------------ 超刺激極速電音背景音樂 (Procedural Synth Engine) ------------------
+        let bgmMasterGain = null;
+        let isBgmRunning = false;
+        let bgmStep = 0;
+        let bgmNextTime = 0;
+        let bgmTimer = null;
+        const BGM_BPM = 142; // 超熱血極速節奏
+        const SEC_PER_BEAT = 60 / BGM_BPM;
+        const SEC_PER_STEP = SEC_PER_BEAT / 4; // 16 分音符步進
+
+        // 共享白噪音緩衝區 (供 Kick、Snare、Hi-hat 鼓組使用)
+        let noiseBuffer = null;
+        function getNoiseBuffer(ctx) {
+            if (!noiseBuffer) {
+                const bufferSize = ctx.sampleRate * 1.5;
+                noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+            }
+            return noiseBuffer;
+        }
 
         function getAudioContext() {
             if (!audioCtx) {
@@ -741,13 +783,199 @@
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
+            if (audioCtx && !bgmMasterGain) {
+                bgmMasterGain = audioCtx.createGain();
+                bgmMasterGain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+                bgmMasterGain.connect(audioCtx.destination);
+            }
             return audioCtx;
+        }
+
+        // 鼓組合成音效
+        function triggerKick(ctx, time) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.frequency.setValueAtTime(140, time);
+            osc.frequency.exponentialRampToValueAtTime(36, time + 0.09);
+            gain.gain.setValueAtTime(0.8, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+            osc.connect(gain);
+            gain.connect(bgmMasterGain);
+            osc.start(time);
+            osc.stop(time + 0.11);
+        }
+
+        function triggerSnare(ctx, time) {
+            // 噪音層
+            const nSource = ctx.createBufferSource();
+            nSource.buffer = getNoiseBuffer(ctx);
+            const nFilter = ctx.createBiquadFilter();
+            nFilter.type = 'highpass';
+            nFilter.frequency.setValueAtTime(1100, time);
+            const nGain = ctx.createGain();
+            nGain.gain.setValueAtTime(0.35, time);
+            nGain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+            nSource.connect(nFilter);
+            nFilter.connect(nGain);
+            nGain.connect(bgmMasterGain);
+            nSource.start(time);
+            nSource.stop(time + 0.13);
+
+            // 音調衝擊
+            const osc = ctx.createOscillator();
+            const oscGain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(180, time);
+            osc.frequency.exponentialRampToValueAtTime(80, time + 0.08);
+            oscGain.gain.setValueAtTime(0.3, time);
+            oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+            osc.connect(oscGain);
+            oscGain.connect(bgmMasterGain);
+            osc.start(time);
+            osc.stop(time + 0.09);
+        }
+
+        function triggerHiHat(ctx, time, accent) {
+            const source = ctx.createBufferSource();
+            source.buffer = getNoiseBuffer(ctx);
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(7500, time);
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(accent ? 0.22 : 0.1, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + (accent ? 0.06 : 0.035));
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(bgmMasterGain);
+            source.start(time);
+            source.stop(time + 0.07);
+        }
+
+        // 疾速電音貝斯 (Sawtooth Bass)
+        function triggerSynthBass(ctx, freq, time, dur) {
+            const osc = ctx.createOscillator();
+            const filter = ctx.createBiquadFilter();
+            const gain = ctx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, time);
+
+            filter.type = 'lowpass';
+            // 最後 5 秒緊急加壓：高頻濾波器全開增加刺激感
+            const cutoff = (timeLeft <= 5) ? 1400 : 750;
+            filter.frequency.setValueAtTime(cutoff, time);
+            filter.Q.setValueAtTime(4.5, time);
+
+            gain.gain.setValueAtTime(0.32, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.92);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(bgmMasterGain);
+
+            osc.start(time);
+            osc.stop(time + dur);
+        }
+
+        // 高能刺激琶音主音 (Arp Lead)
+        function triggerLeadArp(ctx, freq, time, dur) {
+            const osc = ctx.createOscillator();
+            const filter = ctx.createBiquadFilter();
+            const gain = ctx.createGain();
+
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, time);
+
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1900, time);
+            filter.Q.setValueAtTime(3, time);
+
+            gain.gain.setValueAtTime(0.12, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.85);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(bgmMasterGain);
+
+            osc.start(time);
+            osc.stop(time + dur);
+        }
+
+        // 旋律與和弦架構 (A小調戰鬥重節奏：A -> F -> G -> Em)
+        const BASS_PITCHES = [
+            110, 110, 130.81, 146.83, // A2, A2, C3, D3
+            87.31, 87.31, 103.83, 116.54, // F2, F2, G#2, Bb2
+            98.00, 98.00, 123.47, 130.81, // G2, G2, B2, C3
+            82.41, 82.41, 98.00, 110.00   // E2, E2, G2, A2
+        ];
+
+        const LEAD_ARPS = [
+            440, 523.25, 659.25, 880, 659.25, 523.25, 440, 659.25,
+            349.23, 440, 523.25, 698.46, 523.25, 440, 349.23, 523.25,
+            392.00, 493.88, 587.33, 783.99, 587.33, 493.88, 392, 587.33,
+            329.63, 392.00, 493.88, 659.25, 493.88, 392, 440, 493.88
+        ];
+
+        function scheduleBgmStep() {
+            if (!isBgmRunning || isAudioMuted) return;
+            const ctx = getAudioContext();
+            if (!ctx) return;
+
+            while (bgmNextTime < ctx.currentTime + 0.12) {
+                const s = bgmStep % 32;
+
+                // 1. 重擊鼓組 Kick (四拍強擊 + 搶拍)
+                if (s % 4 === 0 || (s === 14 || s === 30)) {
+                    triggerKick(ctx, bgmNextTime);
+                }
+
+                // 2. 爽快小鼓 Snare (第 2、4 拍重擊)
+                if (s % 8 === 4) {
+                    triggerSnare(ctx, bgmNextTime);
+                }
+
+                // 3. 疾速 Hi-hat (16 分音符不斷馳騁)
+                triggerHiHat(ctx, bgmNextTime, s % 2 === 0);
+
+                // 4. 跑動 Sawtooth 貝斯
+                const bassNote = BASS_PITCHES[Math.floor(s / 2) % BASS_PITCHES.length];
+                triggerSynthBass(ctx, bassNote, bgmNextTime, SEC_PER_STEP * 0.95);
+
+                // 5. 熱血琶音 Lead
+                const leadNote = LEAD_ARPS[s % LEAD_ARPS.length];
+                triggerLeadArp(ctx, leadNote, bgmNextTime, SEC_PER_STEP * 0.85);
+
+                bgmNextTime += SEC_PER_STEP;
+                bgmStep++;
+            }
+
+            bgmTimer = setTimeout(scheduleBgmStep, 25);
+        }
+
+        function startBgm() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            if (isBgmRunning) return;
+
+            isBgmRunning = true;
+            bgmStep = 0;
+            bgmNextTime = ctx.currentTime + 0.05;
+            scheduleBgmStep();
+        }
+
+        function stopBgm() {
+            isBgmRunning = false;
+            if (bgmTimer) {
+                clearTimeout(bgmTimer);
+                bgmTimer = null;
+            }
         }
 
         function toggleAudio() {
             isAudioMuted = !isAudioMuted;
             const icon = isAudioMuted ? "🔇" : "🔊";
-            const text = isAudioMuted ? "音效已靜音" : "音效已開啟";
+            const text = isAudioMuted ? "音樂已靜音" : "音樂與音效：開啟";
 
             const headerBtn = document.getElementById('sound-btn');
             if (headerBtn) headerBtn.innerText = icon;
@@ -758,8 +986,14 @@
                 coverIcon.nextElementSibling.innerText = text;
             }
 
-            if (!isAudioMuted) {
+            if (isAudioMuted) {
+                stopBgm();
+            } else {
                 getAudioContext();
+                // 若當前在答題舞台則立即啟動 BGM
+                if (document.getElementById('main-stage').style.display === 'flex') {
+                    startBgm();
+                }
             }
         }
 
@@ -820,17 +1054,20 @@
             } catch(e) {}
         }
 
+        // ------------------ 遊戲流程控制 ------------------
         function startGame() {
-            getAudioContext();
+            getAudioContext(); // 用戶互動時初始化 AudioContext (符合 iPad Safari 策略)
             document.getElementById('cover-screen').style.display = 'none';
             document.getElementById('header').style.display = 'flex';
             document.getElementById('progress-bar').style.display = 'block';
             document.getElementById('main-stage').style.display = 'flex';
             restartGame();
+            startBgm(); // 開始播放超刺激極速電音
         }
 
         function returnToCover() {
             clearInterval(timerId);
+            stopBgm(); // 返回封面停止音樂
             document.getElementById('summary-screen').style.display = 'none';
             document.getElementById('header').style.display = 'none';
             document.getElementById('progress-bar').style.display = 'none';
@@ -850,9 +1087,11 @@
             document.getElementById('header').style.display = 'flex';
             document.getElementById('progress-bar').style.display = 'block';
             document.getElementById('summary-screen').style.display = 'none';
+            startBgm();
             renderCurrentQuestion();
         }
 
+        // ------------------ 計時器機制 ------------------
         function startTimer() {
             clearInterval(timerId);
             timeLeft = TIME_LIMIT;
@@ -897,6 +1136,7 @@
             setTimeout(nextQuestion, 1400);
         }
 
+        // ------------------ 答題與渲染核心 ------------------
         function renderCurrentQuestion() {
             if (currentIndex >= TOTAL_QUESTIONS) {
                 showSummary();
@@ -906,6 +1146,7 @@
             isAnswered = false;
             const data = database[currentIndex];
 
+            // 更新頂部資訊
             document.getElementById('level-indicator').innerText = `${currentIndex + 1} / ${TOTAL_QUESTIONS}`;
             document.getElementById('progress-bar').style.width = `${(currentIndex / TOTAL_QUESTIONS) * 100}%`;
             document.getElementById('type-tag').innerText = data.tag;
@@ -959,6 +1200,7 @@
             setTimeout(nextQuestion, 1200);
         }
 
+        // 連連看配對控制
         let matchSelected = null;
         let matchPairsLeft = 0;
 
@@ -1026,8 +1268,10 @@
             renderCurrentQuestion();
         }
 
+        // ------------------ 結算畫面展示 ------------------
         function showSummary() {
             clearInterval(timerId);
+            stopBgm(); // 結算時停止緊張 BGM
             document.getElementById('progress-bar').style.width = '100%';
             document.getElementById('main-stage').style.display = 'none';
             document.getElementById('header').style.display = 'none';
