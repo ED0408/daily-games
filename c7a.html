@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>國語五上第七課《為生命找出口》- 30關知識挑戰賽</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* =========================================================
+       1. 全域觸控與自適應樣式 (相容平板 iPad、Android 與電腦)
+       ========================================================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    body, html {
+      width: 100vw;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", "微軟正黑體", sans-serif;
+      touch-action: manipulation;
+      color: #f8fafc;
+    }
+
+    /* 隱藏捲軸但允許內容在極小平板垂直自適應滑動 */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+
+    /* 連擊 Combo 特效文字 */
+    .combo-badge {
+      animation: bounce-combo 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    @keyframes bounce-combo {
+      0% { transform: scale(0.6); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* 卡片按鈕微動態 */
+    .btn-press {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-press:active {
+      transform: scale(0.97);
+    }
+
+    /* 連連看卡片樣式 */
+    .pair-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .pair-card.selected {
+      border-color: #f59e0b !important;
+      background-color: rgba(245, 158, 11, 0.2) !important;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+      transform: scale(1.02);
+    }
+    .pair-card.matched {
+      opacity: 0.2;
+      pointer-events: none;
+      transform: scale(0.95);
+      filter: grayscale(1);
+    }
+
+    /* 答題回饋動畫 */
+    .feedback-correct {
+      background: linear-gradient(135deg, #059669, #10b981) !important;
+      border-color: #6ee7b7 !important;
+      color: #ffffff !important;
+      animation: pulse-correct 0.5s ease;
+    }
+    .feedback-wrong {
+      background: linear-gradient(135deg, #b91c1c, #ef4444) !important;
+      border-color: #fca5a5 !important;
+      color: #ffffff !important;
+      animation: shake-wrong 0.4s ease;
+    }
+
+    @keyframes pulse-correct {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    @keyframes shake-wrong {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between p-3 md:p-6" oncontextmenu="return false;">
+
+  <!-- ================= 遊戲開始封面 (Start Cover Modal) ================= -->
+  <div id="start-cover" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-cyan-500/50 rounded-3xl p-6 md:p-10 max-w-2xl w-full text-center shadow-2xl relative overflow-hidden">
+      <!-- 背景光暈裝飾 -->
+      <div class="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- 標題徽章與主標題 -->
+      <div class="flex items-center justify-center gap-3 text-4xl md:text-5xl mb-3">
+        <span class="animate-bounce">🐟</span>
+        <span class="text-slate-600 text-2xl font-light">✕</span>
+        <span class="animate-pulse">✈️</span>
+      </div>
+      
+      <div class="inline-block text-xs md:text-sm font-semibold tracking-wider text-cyan-300 bg-cyan-950/70 border border-cyan-800/80 px-3 py-1 rounded-full mb-3">
+        國小五上國語・第七課
+      </div>
+      <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-300 tracking-wide mb-2">
+        為生命找出口
+      </h1>
+      <p class="text-slate-400 text-sm md:text-base font-medium mb-6">
+        改寫自劉俠《生之歌》・30 關全方位知識挑戰賽
+      </p>
+
+      <!-- 關卡階段結構說明卡片 -->
+      <div class="grid grid-cols-3 gap-2 md:gap-3 mb-6 text-left">
+        <div class="bg-slate-800/70 border border-slate-700/80 p-3 rounded-2xl text-center">
+          <div class="text-xl md:text-2xl mb-1">⭕❌</div>
+          <div class="text-xs text-slate-400 font-bold">第 1 ~ 10 關</div>
+          <div class="text-sm md:text-base font-black text-cyan-300">是非速決</div>
+        </div>
+        <div class="bg-slate-800/70 border border-slate-700/80 p-3 rounded-2xl text-center">
+          <div class="text-xl md:text-2xl mb-1">🔠</div>
+          <div class="text-xs text-slate-400 font-bold">第 11 ~ 20 關</div>
+          <div class="text-sm md:text-base font-black text-sky-300">關鍵選擇</div>
+        </div>
+        <div class="bg-slate-800/70 border border-slate-700/80 p-3 rounded-2xl text-center">
+          <div class="text-xl md:text-2xl mb-1">🔗</div>
+          <div class="text-xs text-slate-400 font-bold">第 21 ~ 30 關</div>
+          <div class="text-sm md:text-base font-black text-amber-300">配對消除</div>
+        </div>
+      </div>
+
+      <!-- 規則要點特色 -->
+      <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 text-xs md:text-sm text-slate-300 mb-6 text-left space-y-2">
+        <div class="flex items-center gap-2">
+          <span class="text-amber-400">⏱️</span>
+          <span><strong>15 秒限時作答</strong>：最後 5 秒升調倒數加壓，考驗專注與反應！</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-orange-400">🔥</span>
+          <span><strong>連對 Combo 機制</strong>：連續答對啟動倍數加分，挑戰最高分數！</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-emerald-400">💻📱</span>
+          <span><strong>跨裝置支援</strong>：平板大尺寸點擊不誤觸；電腦可用鍵盤快捷鍵作答。</span>
+        </div>
+      </div>
+
+      <!-- 開始遊戲按鈕 -->
+      <button onclick="startGame()" class="btn-press w-full bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-400 hover:from-cyan-400 hover:to-emerald-300 text-slate-950 font-black text-xl md:text-2xl py-4 rounded-2xl shadow-xl shadow-cyan-500/25 flex items-center justify-center gap-3">
+        <span>啟航出發・開始挑戰</span>
+        <span class="text-2xl">🚀</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 頂部控制面板與進度狀態 ================= -->
+  <header class="w-full max-w-4xl mx-auto bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-2xl p-4 shadow-xl">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <!-- 課堂單元標題 -->
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🐟</span>
+        <div>
+          <h1 class="text-lg md:text-xl font-bold tracking-wide text-cyan-400">為生命找出口</h1>
+          <p class="text-xs text-slate-400">劉俠《生之歌》・字音形義挑戰</p>
+        </div>
+      </div>
+
+      <!-- 計時器、分數與快捷控制 -->
+      <div class="flex items-center gap-3">
+        <!-- 倒數計時器 -->
+        <div class="flex items-center gap-1 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+          <span class="text-sm">⏱️</span>
+          <span id="timer-text" class="text-xl font-black font-mono text-emerald-400 min-w-[28px] text-center">15</span>
+        </div>
+
+        <!-- 目前積分 -->
+        <div class="flex items-center gap-1 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/40 text-amber-300">
+          <span class="text-sm">⭐</span>
+          <span id="score-text" class="text-lg md:text-xl font-black">0</span>
+        </div>
+
+        <!-- 音效切換 -->
+        <button id="sound-btn" onclick="toggleSound()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200">
+          🔊
+        </button>
+
+        <!-- 重新開始 -->
+        <button onclick="restartGame()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200" title="重新開始">
+          🔄
+        </button>
+      </div>
+    </div>
+
+    <!-- 闖關進度條 -->
+    <div>
+      <div class="flex justify-between items-center text-xs md:text-sm font-semibold mb-1">
+        <span id="round-stage" class="text-cyan-300">第 1 / 30 關</span>
+        <span id="round-type-tag" class="text-xs px-2 py-0.5 rounded-md bg-indigo-900/60 text-indigo-300 border border-indigo-700">是非速決</span>
+      </div>
+      <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-500 via-sky-400 to-emerald-400 transition-all duration-300" style="width: 3.33%;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 中央作戰卡片區 (單人主畫面) ================= -->
+  <main class="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center my-4">
+    <!-- 題目提示與題目內文 -->
+    <div class="bg-slate-800/90 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur">
+      
+      <!-- 連對指示器 (Combo) -->
+      <div id="combo-container" class="absolute top-4 right-4 hidden">
+        <div class="combo-badge bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 font-extrabold text-xs md:text-sm px-3 py-1 rounded-full shadow-lg">
+          🔥 <span id="combo-count">2</span> COMBO!
+        </div>
+      </div>
+
+      <!-- 題幹分類小標 -->
+      <div class="inline-block text-xs md:text-sm font-bold tracking-wider text-cyan-400 bg-cyan-950/60 px-3 py-1 rounded-lg border border-cyan-800/80 mb-3" id="q-category">
+        【課文理解】
+      </div>
+
+      <!-- 題目主文字 -->
+      <div class="min-h-[100px] flex items-center justify-center">
+        <h2 id="q-content" class="text-xl md:text-3xl font-bold leading-relaxed text-center text-white tracking-wide">
+          題目載入中...
+        </h2>
+      </div>
+
+      <!-- 即時解析回饋提示欄 -->
+      <div id="feedback-hint" class="min-h-[28px] mt-2 text-center text-sm md:text-base font-semibold transition-opacity duration-200 opacity-0 text-emerald-400">
+        <!-- 提示內容 -->
+      </div>
+    </div>
+
+    <!-- 作答互動區 (動態注入是非/選擇/連連看) -->
+    <div id="answer-container" class="mt-5 w-full">
+      <!-- 動態產生按鈕 -->
+    </div>
+  </main>
+
+  <!-- ================= 底部快捷導航 / 鍵盤說明 ================= -->
+  <footer class="w-full max-w-4xl mx-auto text-center py-2 text-slate-500 text-xs md:text-sm">
+    <span class="hidden md:inline">💡 電腦鍵盤提示：是非題可用 [O] / [X]；選擇題可按數字鍵 [1]、[2]、[3] 作答。</span>
+    <span class="md:hidden">💡 平板觸控提示：單擊選項立即確認！</span>
+  </footer>
+
+  <!-- ================= 通關結算對話框 (Modal) ================= -->
+  <div id="result-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border-2 border-amber-400/80 rounded-3xl p-6 md:p-10 max-w-lg w-full text-center shadow-2xl relative">
+      <div class="text-6xl mb-3">🏆</div>
+      <h2 class="text-2xl md:text-3xl font-extrabold text-amber-300 mb-2">闖關大挑戰完成！</h2>
+      <p class="text-slate-400 text-sm mb-6">恭喜完成 30 關《為生命找出口》知識考核！</p>
+
+      <!-- 結算成績看板 -->
+      <div class="grid grid-cols-2 gap-4 bg-slate-800/80 p-4 rounded-2xl border border-slate-700 mb-6">
+        <div>
+          <div class="text-xs text-slate-400 mb-1">最終總得分</div>
+          <div id="final-score" class="text-3xl font-black text-amber-400">0</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1">正確答對率</div>
+          <div id="final-accuracy" class="text-3xl font-black text-emerald-400">100%</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1">最大連對 (Combo)</div>
+          <div id="final-max-combo" class="text-2xl font-bold text-orange-400">0 次</div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1">獲得評價稱號</div>
+          <div id="final-rank" class="text-base font-bold text-cyan-300">生之歌大師</div>
+        </div>
+      </div>
+
+      <div class="text-slate-300 text-sm leading-relaxed mb-6 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60">
+        「古人乘舟順風行，現代飛機逆風平。」<br>
+        每一次迎向風浪的奮鬥，都是讓生命飛得更高、更穩的出口！
+      </div>
+
+      <div class="flex gap-3 justify-center">
+        <button onclick="restartGame()" class="btn-press bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-lg px-8 py-3 rounded-xl shadow-lg shadow-orange-500/20">
+          再挑戰一次 🔄
+        </button>
+        <button onclick="showStartCover()" class="btn-press bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-lg px-6 py-3 rounded-xl">
+          回首頁 🏠
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JavaScript 與 30 道真實題庫 ================= -->
+  <script>
+    /* =========================================================
+       1. 題庫陣列 (完整 30 關，依據五上國語教材相片全面延伸)
+       ========================================================= */
+    const QUESTIONS_BANK = [
+      // --------- 1 ~ 10 關：是非題 (tf) ---------
+      {
+        id: 1,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【課文情節】',
+        q: "課文中，朋友搭乘飛機準備回香港時，作者一開始祝福他「一路順風」？",
+        answer: true,
+        explain: "課文第2行原文：朋友回香港時，我祝他一路順風。"
+      },
+      {
+        id: 2,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【課文情節】',
+        q: "朋友笑著打趣說「應該是一路逆風」，是在嚴厲責備作者缺乏禮貌？",
+        answer: false,
+        explain: "「打趣」是取笑、開玩笑之意，朋友是在幽默分享航空常識。"
+      },
+      {
+        id: 3,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【航海科學】',
+        q: "課文中提到：從前古人坐帆船旅行，自然是「順風而行」？",
+        answer: true,
+        explain: "課文第5行：從前古人坐船旅行，自然是順風而行。"
+      },
+      {
+        id: 4,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【航空常識】',
+        q: "現代客機在起降時需要「逆風而進」，才能飛得又平又穩？",
+        answer: true,
+        explain: "課文第7行：飛機起降時需要逆風而進，才能飛得又平又穩呢！"
+      },
+      {
+        id: 5,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【字詞釋義】',
+        q: "教材中「打趣」一詞的意思是指「嚴肅的討論重大學術課題」？",
+        answer: false,
+        explain: "教材字詞卡明確解釋：「打趣」指「取笑、開玩笑」。"
+      },
+      {
+        id: 6,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【字詞釋義】',
+        q: "成語「一路順風」的意思是「一路平安順利」，通常作為送行的祝福語？",
+        answer: true,
+        explain: "教材字詞卡：一路平安順利。為送行的祝福語。"
+      },
+      {
+        id: 7,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【作者出處】',
+        q: "第七課《為生命找出口》一文，是改寫自知名作家劉俠（杏林子）的散文集《生之歌》？",
+        answer: true,
+        explain: "課本標記：改寫自劉俠《生之歌》。"
+      },
+      {
+        id: 8,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【課前生態】',
+        q: "課前想想中，鮭魚群克服激流跳躍瀑布，主要目的是「游回大海享樂」？",
+        answer: false,
+        explain: "鮭魚逆流而上是為了「回故鄉產卵生寶寶」，延續族群生命。"
+      },
+      {
+        id: 9,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【字詞解釋】',
+        q: "教材詞語「可憐」在課本中的標準解釋為「令人憐憫、同情」？",
+        answer: true,
+        explain: "教材詞語解釋卡：令人憐憫、同情。"
+      },
+      {
+        id: 10,
+        type: 'tf',
+        typeLabel: '是非速決',
+        category: '【生字字音】',
+        q: "「隱藏」的「隱」與「穩重」的「穩」，兩字注音完全相同？",
+        answer: false,
+        explain: "「隱」注音為ㄧㄣˇ；「穩」注音為ㄨㄣˇ，讀音不同。"
+      },
+
+      // --------- 11 ~ 20 關：三選一選擇題 (choice) ---------
+      {
+        id: 11,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【課文理解】',
+        q: "現代客機起降時需要「逆風而進」，主要可以達到什麼效果？",
+        options: [
+          "A. 才能飛得又平又穩",
+          "B. 能夠飛得比閃電還快",
+          "C. 能完全不用燃燒任何燃料"
+        ],
+        answer: 0,
+        explain: "課文原文：飛機起降時需要逆風而進，才能飛得又平又穩呢！"
+      },
+      {
+        id: 12,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【例句填空】',
+        q: "「他在這次地震中失去雙親，真是＿＿。」根據教材例句應填入何者？",
+        options: [
+          "A. 穩重",
+          "B. 可憐",
+          "C. 打趣"
+        ],
+        answer: 1,
+        explain: "教材例句：他在這次地震中失去雙親，真是可憐。"
+      },
+      {
+        id: 13,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【生字部首】',
+        q: "生字「穩」的部首與讀音何者正確？",
+        options: [
+          "A. 禾部，讀音 ㄨㄣˇ",
+          "B. 阜部，讀音 ㄧㄣˇ",
+          "C. 邑部，讀音 ㄌㄧㄣˊ"
+        ],
+        answer: 0,
+        explain: "「穩」為禾部，注音 ㄨㄣˇ，可造詞：安穩、穩重。"
+      },
+      {
+        id: 14,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【形近字辨析】',
+        q: "在「遴、鱗、鄰、憐」四個字中，哪一個字的讀音與其他三者「不同」？",
+        options: [
+          "A. 魚部的「鱗」（ㄌㄧㄣˊ）",
+          "B. 心部的「憐」（ㄌㄧㄢˊ）",
+          "C. 辵部的「遴」（ㄌㄧㄣˊ）"
+        ],
+        answer: 1,
+        explain: "遴、鱗、鄰皆讀ㄌㄧㄣˊ；唯有「憐」讀ㄌㄧㄢˊ（二聲）。"
+      },
+      {
+        id: 15,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【成語運用】',
+        q: "形容房屋整齊緊密排列，有如梳齒與魚甲，應用哪一個成語？",
+        options: [
+          "A. 櫛比「鱗」次（魚部）",
+          "B. 櫛比「遴」次（辵部）",
+          "C. 櫛比「鄰」次（邑部）"
+        ],
+        answer: 0,
+        explain: "教材形近字：魚部的「鱗」，造詞：魚鱗、櫛比鱗次。"
+      },
+      {
+        id: 16,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【詞語選用】',
+        q: "公司或學校若要「謹慎選拔出適當人才」，應使用哪一個詞語？",
+        options: [
+          "A. 「鱗」選（魚部）",
+          "B. 「遴」選（辵部）",
+          "C. 「鄰」近（邑部）"
+        ],
+        answer: 1,
+        explain: "教材形近字：辵部的「遴」，造詞：遴聘、遴選。"
+      },
+      {
+        id: 17,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【生字造詞】',
+        q: "生字「隱」為阜部、讀音ㄧㄣˇ，下列哪一組詞語運用正確？",
+        options: [
+          "A. 隱形、隱藏",
+          "B. 隱重、安隱",
+          "C. 隱憐、同隱"
+        ],
+        answer: 0,
+        explain: "教材字詞：阜部「隱」可造詞：隱形、隱藏、隱密。"
+      },
+      {
+        id: 18,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【課文理解】',
+        q: "課文中，朋友動身回哪一座城市時，作者為他送行？",
+        options: [
+          "A. 香港",
+          "B. 東京",
+          "C. 紐約"
+        ],
+        answer: 0,
+        explain: "課文第2行：朋友回香港時，我祝他一路順風。"
+      },
+      {
+        id: 19,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【文意哲理】',
+        q: "課文最後作者自嘲「可憐我這個一向就不了解科學知識的腦袋」，展現何種態度？",
+        options: [
+          "A. 憤怒抱怨朋友指正",
+          "B. 謙虛自省、幽默以對",
+          "C. 驕傲自滿不服輸"
+        ],
+        answer: 1,
+        explain: "作者劉俠以幽默、謙遜的筆觸帶出科學知識與生命啟發。"
+      },
+      {
+        id: 20,
+        type: 'choice',
+        typeLabel: '關鍵選擇',
+        category: '【生態生態】',
+        q: "課前想想插圖中，鮭魚逆流返鄉時，沿途遇到了哪些自然天敵的考驗？",
+        options: [
+          "A. 棕熊與老鷹",
+          "B. 獅子與長頸鹿",
+          "C. 鱷魚與河馬"
+        ],
+        answer: 0,
+        explain: "教材圖片左上方繪有黑熊抓魚與老鷹捕魚的考驗場景。"
+      },
+
+      // --------- 21 ~ 30 關：二對二連連看配對消除 (match) ---------
+      {
+        id: 21,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【語詞釋義配對】',
+        q: "請點選左側「詞語」與右側「正確解釋」進行消除配對！",
+        cardsA: [
+          { id: 'm21_a1', text: "打趣", key: 'k1' },
+          { id: 'm21_a2', text: "一路順風", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm21_b1', text: "送行祝福語，一路平安順利", key: 'k2' },
+          { id: 'm21_b2', text: "取笑、開玩笑", key: 'k1' }
+        ],
+        explain: "打趣＝取笑開玩笑；一路順風＝送行平安祝福語。"
+      },
+      {
+        id: 22,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【語詞文意配對】',
+        q: "請將「課文字詞」與「標準涵義」進行消除配對！",
+        cardsA: [
+          { id: 'm22_a1', text: "可憐", key: 'k1' },
+          { id: 'm22_a2', text: "逆風而進", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm22_b1', text: "客機起降才能平穩飛行", key: 'k2' },
+          { id: 'm22_b2', text: "令人憐憫、同情", key: 'k1' }
+        ],
+        explain: "教材詞語解釋：可憐即令人同情；逆風而進是客機起降平穩關鍵。"
+      },
+      {
+        id: 23,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【生字部首造詞配對】',
+        q: "請將「生字讀音」與「正確部首造詞」進行配對！",
+        cardsA: [
+          { id: 'm23_a1', text: "穩 (ㄨㄣˇ)", key: 'k1' },
+          { id: 'm23_a2', text: "隱 (ㄧㄣˇ)", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm23_b1', text: "阜部（隱形、隱藏）", key: 'k2' },
+          { id: 'm23_b2', text: "禾部（穩重、安穩）", key: 'k1' }
+        ],
+        explain: "穩為禾部（穩重）；隱為阜部（隱蔽隱藏）。"
+      },
+      {
+        id: 24,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【形近字辨析配對】',
+        q: "請將生字「遴」與「鄰」與對應詞語進行消除配對！",
+        cardsA: [
+          { id: 'm24_a1', text: "遴 (ㄌㄧㄣˊ)", key: 'k1' },
+          { id: 'm24_a2', text: "鄰 (ㄌㄧㄣˊ)", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm24_b1', text: "邑部（鄰近、鄰居）", key: 'k2' },
+          { id: 'm24_b2', text: "辵部（遴選、遴聘）", key: 'k1' }
+        ],
+        explain: "辵部遴＝遴聘選拔；邑部鄰＝鄰居鄰近。"
+      },
+      {
+        id: 25,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【形近字辨析配對】',
+        q: "請將「鱗」與「憐」與其部首造詞配對！",
+        cardsA: [
+          { id: 'm25_a1', text: "鱗 (ㄌㄧㄣˊ)", key: 'k1' },
+          { id: 'm25_a2', text: "憐 (ㄌㄧㄢˊ)", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm25_b1', text: "心部（可憐、憐惜）", key: 'k2' },
+          { id: 'm25_b2', text: "魚部（魚鱗、櫛比鱗次）", key: 'k1' }
+        ],
+        explain: "魚部鱗＝魚鱗；心部憐＝同情可憐。"
+      },
+      {
+        id: 26,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【交通工具風向配對】',
+        q: "請將「行進交通對象」與「所需要的風向條件」進行配對！",
+        cardsA: [
+          { id: 'm26_a1', text: "古人坐帆船旅行", key: 'k1' },
+          { id: 'm26_a2', text: "現代客機起降", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm26_b1', text: "自然是順風而行", key: 'k1' },
+          { id: 'm26_b2', text: "需要逆風而進", key: 'k2' }
+        ],
+        explain: "古代帆船靠順風推動；現代飛機起降逆風以獲取更大升力。"
+      },
+      {
+        id: 27,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【生態考驗配對】',
+        q: "請將「鮭魚生態現象」與「所面臨的生存意義」進行配對！",
+        cardsA: [
+          { id: 'm27_a1', text: "鮭魚逆流躍瀑布", key: 'k1' },
+          { id: 'm27_a2', text: "鮭魚返鄉之旅", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm27_b1', text: "克服急流與捕食天敵考驗", key: 'k1' },
+          { id: 'm27_b2', text: "回到上游產卵延續生命", key: 'k2' }
+        ],
+        explain: "鮭魚逆流而上克服種種險境，是為了返鄉產卵延續後代。"
+      },
+      {
+        id: 28,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【文學常識配對】',
+        q: "請將「課文作者背景」與「重要寫作特色」進行配對！",
+        cardsA: [
+          { id: 'm28_a1', text: "《為生命找出口》", key: 'k1' },
+          { id: 'm28_a2', text: "作家劉俠（杏林子）", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm28_b1', text: "改寫自其散文著作《生之歌》", key: 'k1' },
+          { id: 'm28_b2', text: "身殘心堅、文字充滿生命韌性", key: 'k2' }
+        ],
+        explain: "劉俠雖受類風濕性關節炎折磨，作品《生之歌》卻充滿樂觀熱愛生命之情。"
+      },
+      {
+        id: 29,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【詞語語境配對】',
+        q: "請將「教材情境句子」與「適用詞語」進行配對！",
+        cardsA: [
+          { id: 'm29_a1', text: "地震失去雙親的人", key: 'k1' },
+          { id: 'm29_a2', text: "朋友笑著跟我開玩笑", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm29_b1', text: "境遇十分「可憐」", key: 'k1' },
+          { id: 'm29_b2', text: "這是在對我「打趣」", key: 'k2' }
+        ],
+        explain: "失去雙親令人憐憫（可憐）；笑著開玩笑即是打趣。"
+      },
+      {
+        id: 30,
+        type: 'match',
+        typeLabel: '配對消除',
+        category: '【象徵哲思配對】',
+        q: "請將「風向的象徵意義」與「生命哲學」配對消除！",
+        cardsA: [
+          { id: 'm29_a1', text: "一路順風的願望", key: 'k1' },
+          { id: 'm29_a2', text: "逆風而進的啟示", key: 'k2' }
+        ],
+        cardsB: [
+          { id: 'm29_b1', text: "象徵平安順暢的美好祝福", key: 'k1' },
+          { id: 'm29_b2', text: "勇於面對逆境，轉化為前進動力", key: 'k2' }
+        ],
+        explain: "順風是平安期許；逆風則是生命的試金石，讓我們飛得又平又穩。"
+      }
+    ];
+
+    /* =========================================================
+       2. Web Audio API 音效引擎 (原生純音頻合成，絕無外部檔案)
+       ========================================================= */
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) this.ctx = new AudioContextClass();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      // 倒數計時滴答音 (倒數 5 秒升調加壓)
+      playTick(urgent) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+
+        osc.type = urgent ? 'triangle' : 'sine';
+        osc.frequency.setValueAtTime(urgent ? 880 : 440, now);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (urgent ? 0.08 : 0.05));
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.09);
+      }
+
+      // 答對音效：清脆大三度明亮上行和弦
+      playCorrect() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const freqs = [523.25, 659.25, 783.99]; // C5, E5, G5
+        freqs.forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const t = this.ctx.currentTime + i * 0.07;
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, t);
+
+          gain.gain.setValueAtTime(0.2, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(t);
+          osc.stop(t + 0.32);
+        });
+      }
+
+      // 答錯音效：低沉下滑鋸齒波
+      playWrong() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(80, now + 0.3);
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+
+      // 超時警報音
+      playTimeout() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.setValueAtTime(390, now + 0.15);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.48);
+      }
+
+      // 終局優勝交響慶祝音效
+      playVictory() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const chord = [523.25, 659.25, 783.99, 1046.5];
+        chord.forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const t = this.ctx.currentTime + i * 0.09;
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, t);
+
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(t);
+          osc.stop(t + 0.75);
+        });
+      }
+    }
+
+    const sound = new AudioEngine();
+
+    /* =========================================================
+       3. 闖關核心邏輯與狀態管理
+       ========================================================= */
+    const state = {
+      currentIndex: 0,
+      totalQuestions: 30,
+      score: 0,
+      combo: 0,
+      maxCombo: 0,
+      correctCount: 0,
+      timeLeft: 15,
+      timerId: null,
+      isLocked: false,
+      matchSelected: null,
+      matchRemain: 2
+    };
+
+    function toggleSound() {
+      sound.enabled = !sound.enabled;
+      document.getElementById('sound-btn').innerText = sound.enabled ? '🔊' : '🔇';
+    }
+
+    function startTimer() {
+      clearInterval(state.timerId);
+      state.timeLeft = 15;
+      updateTimerDisplay();
+
+      state.timerId = setInterval(() => {
+        state.timeLeft--;
+        const isUrgent = state.timeLeft <= 5;
+        sound.playTick(isUrgent);
+        updateTimerDisplay();
+
+        if (state.timeLeft <= 0) {
+          clearInterval(state.timerId);
+          sound.playTimeout();
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('timer-text');
+      el.innerText = state.timeLeft;
+      if (state.timeLeft <= 5) {
+        el.className = 'text-xl font-black font-mono text-red-400 animate-pulse min-w-[28px] text-center';
+      } else {
+        el.className = 'text-xl font-black font-mono text-emerald-400 min-w-[28px] text-center';
+      }
+    }
+
+    function handleTimeout() {
+      if (state.isLocked) return;
+      state.isLocked = true;
+      resetCombo();
+      showFeedback(false, "⏰ 時間到！本題超時囉～ " + (QUESTIONS_BANK[state.currentIndex].explain || ""));
+      setTimeout(nextQuestion, 1800);
+    }
+
+    function addScore(points) {
+      state.combo++;
+      if (state.combo > state.maxCombo) {
+        state.maxCombo = state.combo;
+      }
+      state.correctCount++;
+
+      // Combo 加成機制
+      const bonus = state.combo >= 2 ? (state.combo * 2) : 0;
+      state.score += (points + bonus);
+
+      document.getElementById('score-text').innerText = state.score;
+
+      // 更新 Combo UI
+      if (state.combo >= 2) {
+        const comboWrap = document.getElementById('combo-container');
+        document.getElementById('combo-count').innerText = state.combo;
+        comboWrap.classList.remove('hidden');
+      }
+    }
+
+    function resetCombo() {
+      state.combo = 0;
+      document.getElementById('combo-container').classList.add('hidden');
+    }
+
+    function showFeedback(isCorrect, message) {
+      const hint = document.getElementById('feedback-hint');
+      hint.innerText = (isCorrect ? "✅ " : "❌ ") + message;
+      hint.className = `min-h-[28px] mt-2 text-center text-sm md:text-base font-semibold transition-opacity duration-200 opacity-100 ${isCorrect ? 'text-emerald-400' : 'text-rose-400'}`;
+    }
+
+    function clearFeedback() {
+      const hint = document.getElementById('feedback-hint');
+      hint.classList.add('opacity-0');
+      hint.classList.remove('opacity-100');
+    }
+
+    function updateProgress() {
+      const progressPct = ((state.currentIndex + 1) / state.totalQuestions) * 100;
+      document.getElementById('progress-bar').style.width = progressPct + '%';
+      document.getElementById('round-stage').innerText = `第 ${state.currentIndex + 1} / ${state.totalQuestions} 關`;
+    }
+
+    function loadQuestion(index) {
+      clearInterval(state.timerId);
+      state.isLocked = false;
+      state.matchSelected = null;
+      state.matchRemain = 2;
+      clearFeedback();
+
+      const q = QUESTIONS_BANK[index];
+      updateProgress();
+
+      document.getElementById('round-type-tag').innerText = q.typeLabel;
+      document.getElementById('q-category').innerText = q.category;
+      document.getElementById('q-content').innerText = q.q;
+
+      const container = document.getElementById('answer-container');
+      container.innerHTML = '';
+
+      if (q.type === 'tf') {
+        renderTrueFalse(container, q.answer, q.explain);
+      } else if (q.type === 'choice') {
+        renderChoice(container, q.options, q.answer, q.explain);
+      } else if (q.type === 'match') {
+        renderMatch(container, q.cardsA, q.cardsB, q.explain);
+      }
+
+      startTimer();
+    }
+
+    /* 1. 是非題渲染 */
+    function renderTrueFalse(container, correctAns, explain) {
+      const wrap = document.createElement('div');
+      wrap.className = 'grid grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto';
+
+      wrap.innerHTML = `
+        <button id="btn-tf-true" class="btn-press min-h-[90px] md:min-h-[110px] bg-slate-800/90 hover:bg-emerald-950/70 border-2 border-emerald-500/60 rounded-2xl flex items-center justify-center gap-3 text-emerald-400 font-black text-4xl md:text-5xl shadow-lg">
+          <span>⭕</span>
+          <span class="text-xl md:text-2xl font-bold">正確</span>
+        </button>
+        <button id="btn-tf-false" class="btn-press min-h-[90px] md:min-h-[110px] bg-slate-800/90 hover:bg-rose-950/70 border-2 border-rose-500/60 rounded-2xl flex items-center justify-center gap-3 text-rose-400 font-black text-4xl md:text-5xl shadow-lg">
+          <span>❌</span>
+          <span class="text-xl md:text-2xl font-bold">錯誤</span>
+        </button>
+      `;
+
+      wrap.querySelector('#btn-tf-true').onclick = (e) => handleTFAnswer(true, correctAns, explain, e.currentTarget);
+      wrap.querySelector('#btn-tf-false').onclick = (e) => handleTFAnswer(false, correctAns, explain, e.currentTarget);
+
+      container.appendChild(wrap);
+    }
+
+    function handleTFAnswer(userChoice, correctAns, explain, btnElem) {
+      if (state.isLocked) return;
+      state.isLocked = true;
+      clearInterval(state.timerId);
+
+      const isCorrect = (userChoice === correctAns);
+      if (isCorrect) {
+        sound.playCorrect();
+        btnElem.classList.add('feedback-correct');
+        addScore(10);
+        showFeedback(true, "太棒了！答對了！ " + explain);
+      } else {
+        sound.playWrong();
+        btnElem.classList.add('feedback-wrong');
+        resetCombo();
+        showFeedback(false, "哎呀答錯了！ " + explain);
+      }
+
+      setTimeout(nextQuestion, 1600);
+    }
+
+    /* 2. 選擇題渲染 */
+    function renderChoice(container, options, correctIdx, explain) {
+      const wrap = document.createElement('div');
+      wrap.className = 'flex flex-col gap-3 max-w-2xl mx-auto';
+
+      options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.id = `choice-btn-${idx}`;
+        btn.className = 'btn-press min-h-[75px] md:min-h-[85px] px-6 py-4 bg-slate-800/90 hover:bg-slate-700/80 border-2 border-slate-700 hover:border-cyan-500/60 rounded-2xl text-left text-lg md:text-xl font-bold text-slate-100 flex items-center shadow-lg leading-relaxed';
+        btn.innerText = optText;
+        btn.onclick = () => handleChoiceAnswer(idx, correctIdx, explain, btn);
+        wrap.appendChild(btn);
+      });
+
+      container.appendChild(wrap);
+    }
+
+    function handleChoiceAnswer(chosenIdx, correctIdx, explain, btnElem) {
+      if (state.isLocked) return;
+      state.isLocked = true;
+      clearInterval(state.timerId);
+
+      const isCorrect = (chosenIdx === correctIdx);
+      if (isCorrect) {
+        sound.playCorrect();
+        btnElem.classList.add('feedback-correct');
+        addScore(10);
+        showFeedback(true, "回答正確！ " + explain);
+      } else {
+        sound.playWrong();
+        btnElem.classList.add('feedback-wrong');
+        resetCombo();
+        showFeedback(false, "答錯囉！ " + explain);
+      }
+
+      setTimeout(nextQuestion, 1600);
+    }
+
+    /* 3. 連連看 (配對消除) 渲染 */
+    function renderMatch(container, cardsA, cardsB, explain) {
+      const wrap = document.createElement('div');
+      wrap.className = 'grid grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto';
+
+      const colA = document.createElement('div');
+      colA.className = 'flex flex-col gap-3';
+      const colB = document.createElement('div');
+      colB.className = 'flex flex-col gap-3';
+
+      cardsA.forEach(c => {
+        const card = document.createElement('div');
+        card.id = c.id;
+        card.dataset.key = c.key;
+        card.dataset.col = 'A';
+        card.className = 'pair-card min-h-[80px] p-4 bg-slate-800/90 border-2 border-slate-700 rounded-2xl flex items-center justify-center text-center font-bold text-base md:text-lg text-slate-100 shadow-md';
+        card.innerText = c.text;
+        card.onclick = () => handleMatchClick(card, explain);
+        colA.appendChild(card);
+      });
+
+      cardsB.forEach(c => {
+        const card = document.createElement('div');
+        card.id = c.id;
+        card.dataset.key = c.key;
+        card.dataset.col = 'B';
+        card.className = 'pair-card min-h-[80px] p-4 bg-slate-800/90 border-2 border-slate-700 rounded-2xl flex items-center justify-center text-center font-bold text-base md:text-lg text-slate-100 shadow-md leading-snug';
+        card.innerText = c.text;
+        card.onclick = () => handleMatchClick(card, explain);
+        colB.appendChild(card);
+      });
+
+      wrap.appendChild(colA);
+      wrap.appendChild(colB);
+      container.appendChild(wrap);
+    }
+
+    function handleMatchClick(card, explain) {
+      if (state.isLocked) return;
+      if (card.classList.contains('matched')) return;
+
+      const cur = state.matchSelected;
+
+      // 初次選取
+      if (!cur) {
+        state.matchSelected = card;
+        card.classList.add('selected');
+        return;
+      }
+
+      // 點擊同張卡片 -> 取消選取
+      if (cur.id === card.id) {
+        card.classList.remove('selected');
+        state.matchSelected = null;
+        return;
+      }
+
+      // 點擊同側欄位 -> 切換選取目標
+      if (cur.dataset.col === card.dataset.col) {
+        cur.classList.remove('selected');
+        state.matchSelected = card;
+        card.classList.add('selected');
+        return;
+      }
+
+      // 配對成功！
+      if (cur.dataset.key === card.dataset.key) {
+        sound.playCorrect();
+        cur.classList.remove('selected');
+        cur.classList.add('matched');
+        card.classList.add('matched');
+        state.matchSelected = null;
+        state.matchRemain--;
+
+        if (state.matchRemain === 0) {
+          state.isLocked = true;
+          clearInterval(state.timerId);
+          addScore(10);
+          showFeedback(true, "配對消除成功！ " + explain);
+          setTimeout(nextQuestion, 1600);
+        }
+      } else {
+        // 配對失敗
+        sound.playWrong();
+        cur.classList.add('feedback-wrong');
+        card.classList.add('feedback-wrong');
+
+        setTimeout(() => {
+          cur.classList.remove('selected', 'feedback-wrong');
+          card.classList.remove('feedback-wrong');
+          state.matchSelected = null;
+        }, 500);
+      }
+    }
+
+    function nextQuestion() {
+      if (state.currentIndex + 1 < state.totalQuestions) {
+        state.currentIndex++;
+        loadQuestion(state.currentIndex);
+      } else {
+        showFinalResult();
+      }
+    }
+
+    function showFinalResult() {
+      clearInterval(state.timerId);
+      sound.playVictory();
+
+      const modal = document.getElementById('result-modal');
+      const scoreEl = document.getElementById('final-score');
+      const accEl = document.getElementById('final-accuracy');
+      const maxComboEl = document.getElementById('final-max-combo');
+      const rankEl = document.getElementById('final-rank');
+
+      scoreEl.innerText = state.score;
+      const acc = Math.round((state.correctCount / state.totalQuestions) * 100);
+      accEl.innerText = acc + '%';
+      maxComboEl.innerText = state.maxCombo + ' 次';
+
+      if (acc >= 90) rankEl.innerText = '🌟 迎風展翅・生命特級大師';
+      else if (acc >= 75) rankEl.innerText = '🚀 逆風而進・卓越領航者';
+      else if (acc >= 60) rankEl.innerText = '🐟 力爭上游・熱血挑戰者';
+      else rankEl.innerText = '🌱 蓄勢待發・潛力新星';
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    /* 啟動遊戲 (從封面進入，順暢啟動 Web Audio API) */
+    function startGame() {
+      sound.init();
+      sound.playCorrect();
+      const cover = document.getElementById('start-cover');
+      cover.classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        cover.classList.add('hidden');
+        restartGame();
+      }, 300);
+    }
+
+    /* 返回首頁封面 */
+    function showStartCover() {
+      clearInterval(state.timerId);
+      document.getElementById('result-modal').classList.add('hidden');
+      document.getElementById('result-modal').classList.remove('flex');
+      const cover = document.getElementById('start-cover');
+      cover.classList.remove('hidden', 'pointer-events-none');
+      setTimeout(() => {
+        cover.classList.remove('opacity-0');
+      }, 20);
+    }
+
+    function restartGame() {
+      clearInterval(state.timerId);
+      state.currentIndex = 0;
+      state.score = 0;
+      state.combo = 0;
+      state.maxCombo = 0;
+      state.correctCount = 0;
+      document.getElementById('score-text').innerText = '0';
+      document.getElementById('combo-container').classList.add('hidden');
+      document.getElementById('result-modal').classList.add('hidden');
+      document.getElementById('result-modal').classList.remove('flex');
+      loadQuestion(0);
+    }
+
+    /* 鍵盤操作監聽 (支援桌機與筆電快捷操作) */
+    window.addEventListener('keydown', (e) => {
+      // 若封面仍開啟，按下 Enter 或 空白鍵即可開始遊戲
+      const cover = document.getElementById('start-cover');
+      if (cover && !cover.classList.contains('hidden')) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          startGame();
+        }
+        return;
+      }
+
+      if (state.isLocked) return;
+      const key = e.key.toUpperCase();
+      const curQ = QUESTIONS_BANK[state.currentIndex];
+
+      if (curQ.type === 'tf') {
+        if (key === 'O' || key === '1') {
+          const btn = document.getElementById('btn-tf-true');
+          if (btn) btn.click();
+        } else if (key === 'X' || key === '2') {
+          const btn = document.getElementById('btn-tf-false');
+          if (btn) btn.click();
+        }
+      } else if (curQ.type === 'choice') {
+        if (key === '1') {
+          const btn = document.getElementById('choice-btn-0');
+          if (btn) btn.click();
+        } else if (key === '2') {
+          const btn = document.getElementById('choice-btn-1');
+          if (btn) btn.click();
+        } else if (key === '3') {
+          const btn = document.getElementById('choice-btn-2');
+          if (btn) btn.click();
+        }
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // 頁面初次載入僅就緒畫面，等待使用者點擊「開始挑戰」才啟動計時與音效
+    });
+  </script>
+</body>
+</html>

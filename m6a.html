@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>異分母加減大冒險 - 平板單人闖關 30 題</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #2ec4b6;
+            --danger: #e71d36;
+            --warning: #ff9f1c;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #2b2d42;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "微軟正黑體", sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2b4a 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* 平板專用主視窗容器 */
+        #game-container {
+            width: 94vw;
+            max-width: 860px;
+            height: 92vh;
+            max-height: 720px;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 頂部儀表板 */
+        #header {
+            background-color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #edf2f4;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .score-pill {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        /* 倒數計時與進度條 */
+        #timer-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #timer-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .bar-container {
+            width: 140px;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background: var(--success);
+            transition: width 0.1s linear, background-color 0.3s;
+        }
+
+        #progress-bar {
+            height: 6px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            transition: width 0.3s ease;
+        }
+
+        /* 題目主視覺卡片 */
+        #main-stage {
+            flex: 1;
+            padding: 20px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .stage-type-tag {
+            background: #eef2ff;
+            color: var(--primary);
+            padding: 4px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .question-box {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 24px;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+        }
+
+        /* 數學垂直分數排版 */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            font-size: 1.15em;
+            line-height: 1;
+            margin: 0 4px;
+        }
+        .frac .num { border-bottom: 3px solid currentColor; padding: 0 4px; }
+        .frac .den { padding: 0 4px; }
+
+        /* 選項按鈕排版 (適合手指點擊) */
+        .options-grid {
+            display: grid;
+            gap: 16px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .options-grid.tf { grid-template-columns: repeat(2, 1fr); }
+        .options-grid.mc { grid-template-columns: repeat(3, 1fr); }
+
+        .btn-option {
+            background: #ffffff;
+            border: 3px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-main);
+            box-shadow: 0 6px 0 #94a3b8;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        .btn-option:active {
+            transform: translateY(6px);
+            box-shadow: none;
+        }
+
+        .btn-option:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 連連看網格 */
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            width: 100%;
+            max-width: 620px;
+        }
+
+        .match-card {
+            background: white;
+            border: 3px solid #94a3b8;
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: var(--text-main);
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 0 #cbd5e1;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .match-card.selected {
+            border-color: var(--warning);
+            background-color: #fffbeb;
+            box-shadow: 0 5px 0 var(--warning);
+            transform: translateY(2px);
+        }
+
+        .match-card.matched {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* 即時回饋浮層 */
+        .feedback-overlay {
+            position: absolute;
+            font-size: 5.5rem;
+            font-weight: 900;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.6);
+        }
+
+        .feedback-overlay.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        .fb-correct { color: var(--success); text-shadow: 0 0 20px white; }
+        .fb-wrong { color: var(--danger); text-shadow: 0 0 20px white; }
+        .fb-timeout { color: var(--warning); font-size: 4rem; text-shadow: 0 0 20px white; }
+
+        /* 結算畫面 */
+        #summary-screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .final-badge {
+            font-size: 4.5rem;
+            margin-bottom: 10px;
+        }
+
+        .final-title {
+            font-size: 2.3rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
+
+        .final-stat-box {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: #f1f5f9;
+            padding: 15px 25px;
+            border-radius: 16px;
+        }
+
+        .stat-item-val {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px 36px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            box-shadow: 0 6px 0 var(--primary-dark);
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-restart:active { transform: translateY(6px); box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- 頂部進度條 -->
+        <div id="progress-bar"></div>
+
+        <!-- 頂部儀表板 -->
+        <div id="header">
+            <div class="stat-badge">
+                <span>關卡</span>
+                <span id="level-indicator" style="color:var(--primary);">1 / 30</span>
+            </div>
+
+            <div id="timer-wrap">
+                <span style="font-size:1.2rem;">⏱️</span>
+                <div id="timer-text">25</div>
+                <div class="bar-container">
+                    <div id="timer-bar"></div>
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button id="sound-btn" onclick="toggleAudio()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">🔊</button>
+                <div class="score-pill" id="score-text">0 分</div>
+            </div>
+        </div>
+
+        <!-- 答題核心舞台 -->
+        <div id="main-stage">
+            <div class="stage-type-tag" id="type-tag">暖身是非題</div>
+            <div class="question-box" id="question-text">載入題目中...</div>
+            <div id="options-area" style="width:100%; display:flex; justify-content:center;"></div>
+            
+            <div id="feedback-layer" class="feedback-overlay"></div>
+        </div>
+
+        <!-- 結算畫面 -->
+        <div id="summary-screen">
+            <div class="final-badge" id="rank-icon">🏆</div>
+            <div class="final-title" id="rank-title">太棒了！通分大師</div>
+            <p style="color:#64748b; font-size:1.2rem; margin:0;">你已完成全數 30 道異分母分數加減挑戰！</p>
+            
+            <div class="final-stat-box">
+                <div class="stat-item">
+                    <div style="color:#64748b; font-size:0.95rem; font-weight:bold;">最終得分</div>
+                    <div class="stat-item-val" id="final-score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div style="color:#64748b; font-size:0.95rem; font-weight:bold;">答對題數</div>
+                    <div class="stat-item-val" id="final-correct">0 / 30</div>
+                </div>
+                <div class="stat-item">
+                    <div style="color:#64748b; font-size:0.95rem; font-weight:bold;">最高連擊</div>
+                    <div class="stat-item-val" id="final-combo">0</div>
+                </div>
+            </div>
+
+            <button class="btn-restart" onclick="restartGame()">再挑戰一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 數學垂直分數排版輔助函式
+        const f = (n, d) => `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+
+        // ------------------ 完整 30 道題庫 ------------------
+        const database = [
+            // [1~10] 是非題：建立概念
+            { type: 'tf', tag: '概念是非', q: `${f(1,3)} + ${f(1,4)} 通分時，分母可以化為 12 嗎？`, ans: 'O' }, // cite: 1, 2
+            { type: 'tf', tag: '概念是非', q: `${f(2,5)} + ${f(3,10)} 可以直接把分子跟分母相加變成 ${f(5,15)} 嗎？`, ans: 'X' }, // cite: 1
+            { type: 'tf', tag: '概念是非', q: `異分母分數相加減前，必須先進行「通分」化為同分母？`, ans: 'O' }, // cite: 1, 2
+            { type: 'tf', tag: '概念是非', q: `計算 ${f(3,4)} + ${f(5,6)} 時，4 和 6 的最小公倍數是 12？`, ans: 'O' }, // cite: 1, 2
+            { type: 'tf', tag: '概念是非', q: `${f(25,20)} + ${f(21,12)} 先約分再計算，結果依然會完全相同？`, ans: 'O' }, // cite: 1, 2
+            { type: 'tf', tag: '概念是非', q: `${f(5,6)} - ${f(1,3)} 是異分母，分子可以直接相減變成 ${f(4,3)}？`, ans: 'X' },
+            { type: 'tf', tag: '概念是非', q: `帶分數相加，可先把「整數與整數相加，分數與分數相加」？`, ans: 'O' }, // cite: 2
+            { type: 'tf', tag: '概念是非', q: `假分數 ${f(15,6)} 約分成最簡分數後是 ${f(5,2)} 嗎？`, ans: 'O' }, // cite: 1
+            { type: 'tf', tag: '概念是非', q: `${f(1,12)} + ${f(5,6)} 的相加結果是 ${f(6,18)} 嗎？`, ans: 'X' }, // cite: 1
+            { type: 'tf', tag: '概念是非', q: `同分母分數相加時，分母保持不變，只將分子相加？`, ans: 'O' },
+
+            // [11~26] 選擇題：實戰計算
+            { type: 'mc', tag: '運算選擇', q: `${f(1,3)} + ${f(1,4)} = ？`, options: [f(7,12), f(2,7), f(5,12)], ans: 0 }, // cite: 1, 2
+            { type: 'mc', tag: '運算選擇', q: `${f(2,5)} + ${f(3,10)} = ？`, options: [f(5,10), f(7,10), f(5,15)], ans: 1 }, // cite: 1
+            { type: 'mc', tag: '運算選擇', q: `${f(1,2)} + ${f(2,5)} = ？`, options: [f(9,10), f(3,7), f(7,10)], ans: 0 }, // cite: 1
+            { type: 'mc', tag: '運算選擇', q: `${f(1,12)} + ${f(5,6)} = ？`, options: [f(6,18), f(11,12), f(7,12)], ans: 1 }, // cite: 1
+            { type: 'mc', tag: '運算選擇', q: `${f(3,4)} - ${f(1,2)} = ？`, options: [f(1,4), f(2,2), f(1,2)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(5,6)} - ${f(2,3)} = ？`, options: [f(3,3), f(1,6), f(3,6)], ans: 1 },
+            { type: 'mc', tag: '運算選擇', q: `${f(7,8)} + ${f(5,6)} = ？`, options: [f(41,24), f(12,14), f(35,24)], ans: 0 }, // cite: 1
+            { type: 'mc', tag: '運算選擇', q: `${f(3,5)} + ${f(11,20)} = ？`, options: [f(23,20), f(14,25), f(17,20)], ans: 0 }, // cite: 2
+            { type: 'mc', tag: '運算選擇', q: `${f(5,6)} + ${f(4,9)} = ？`, options: [f(23,18), f(9,15), f(19,18)], ans: 0 }, // cite: 2
+            { type: 'mc', tag: '運算選擇', q: `${f(4,5)} - ${f(1,2)} = ？`, options: [f(3,10), f(3,3), f(5,10)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(7,10)} - ${f(2,5)} = ？`, options: [f(3,10), f(5,5), f(1,2)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(2,3)} + ${f(5,7)} = ？`, options: [f(29,21), f(7,10), f(27,21)], ans: 0 }, // cite: 2
+            { type: 'mc', tag: '運算選擇', q: `${f(3,4)} + ${f(8,9)} = ？`, options: [f(59,36), f(11,13), f(45,36)], ans: 0 }, // cite: 2
+            { type: 'mc', tag: '運算選擇', q: `${f(11,12)} - ${f(3,4)} = ？`, options: [f(1,6), f(8,8), f(1,4)], ans: 0 },
+            { type: 'mc', tag: '運算選擇', q: `${f(25,20)} + ${f(21,12)} = ？`, options: ['3', f(46,32), `2${f(1,2)}`], ans: 0 }, // cite: 1, 2
+            { type: 'mc', tag: '運算選擇', q: `${f(15,6)} + ${f(35,10)} = ？`, options: ['6', '5', f(50,16)], ans: 0 }, // cite: 1
+
+            // [27~30] 連連看：綜合配對挑戰
+            {
+                type: 'match',
+                tag: '速算連連看',
+                q: '請配對算式與正確答案！',
+                items: [
+                    { text: `${f(1,2)} + ${f(1,3)}`, match: 'M1' },
+                    { text: f(1,6), match: 'M2' },
+                    { text: f(5,6), match: 'M1' },
+                    { text: `${f(1,2)} - ${f(1,3)}`, match: 'M2' }
+                ]
+            },
+            {
+                type: 'match',
+                tag: '速算連連看',
+                q: '請配對算式與正確答案！',
+                items: [
+                    { text: `${f(3,4)} + ${f(5,6)}`, match: 'M3' }, // cite: 1, 2
+                    { text: f(7,12), match: 'M4' },
+                    { text: f(19,12), match: 'M3' }, // cite: 1, 2
+                    { text: `${f(5,6)} - ${f(1,4)}`, match: 'M4' }
+                ]
+            },
+            {
+                type: 'match',
+                tag: '速算連連看',
+                q: '請配對約分後的正確答案！',
+                items: [
+                    { text: `${f(10,16)} + ${f(9,12)}`, match: 'M5' }, // cite: 2
+                    { text: f(21,10), match: 'M6' }, // cite: 2
+                    { text: f(11,8), match: 'M5' }, // cite: 2
+                    { text: `${f(27,45)} + ${f(36,24)}`, match: 'M6' } // cite: 2
+                ]
+            },
+            {
+                type: 'match',
+                tag: '終極挑戰連連看',
+                q: '最後關卡：配對並完成通分！',
+                items: [
+                    { text: `${f(33,18)} + ${f(14,12)}`, match: 'M7' }, // cite: 2
+                    { text: f(19,12), match: 'M8' }, // cite: 2
+                    { text: '3', match: 'M7' }, // cite: 2
+                    { text: `${f(6,8)} + ${f(15,18)}`, match: 'M8' } // cite: 2
+                ]
+            }
+        ];
+
+        // ------------------ 狀態管理 ------------------
+        const TOTAL_QUESTIONS = database.length; // 30 題
+        const TIME_LIMIT = 25; // 平板單人每題給予 25 秒
+        let currentIndex = 0;
+        let score = 0;
+        let correctCount = 0;
+        let currentCombo = 0;
+        let maxCombo = 0;
+        let timeLeft = TIME_LIMIT;
+        let timerId = null;
+        let isAnswered = false;
+
+        // ------------------ Web Audio API 離線合成音效 ------------------
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            document.getElementById('sound-btn').innerText = isAudioMuted ? "🔇" : "🔊";
+        }
+
+        function playTick(urgent) {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = urgent ? 'sawtooth' : 'sine';
+            osc.frequency.setValueAtTime(urgent ? 800 : 440, ctx.currentTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.06);
+        }
+
+        function playCorrect() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.06);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.06 + 0.2);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime + i * 0.06);
+                osc.stop(ctx.currentTime + i * 0.06 + 0.25);
+            });
+        }
+
+        function playWrong() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.26);
+        }
+
+        // ------------------ 計時器機制 ------------------
+        function startTimer() {
+            clearInterval(timerId);
+            timeLeft = TIME_LIMIT;
+            updateTimerDisplay();
+
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                playTick(timeLeft <= 5);
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const txt = document.getElementById('timer-text');
+            const bar = document.getElementById('timer-bar');
+            txt.innerText = timeLeft;
+            const pct = (timeLeft / TIME_LIMIT) * 100;
+            bar.style.width = pct + "%";
+
+            if (timeLeft <= 5) {
+                bar.style.backgroundColor = "var(--danger)";
+                txt.style.color = "var(--danger)";
+            } else if (timeLeft <= 10) {
+                bar.style.backgroundColor = "var(--warning)";
+                txt.style.color = "var(--warning)";
+            } else {
+                bar.style.backgroundColor = "var(--success)";
+                txt.style.color = "var(--primary)";
+            }
+        }
+
+        function handleTimeOut() {
+            if (isAnswered) return;
+            isAnswered = true;
+            currentCombo = 0;
+            showFeedback("⏳ 時間到", "timeout");
+            setTimeout(nextQuestion, 1400);
+        }
+
+        // ------------------ 答題與渲染核心 ------------------
+        function renderCurrentQuestion() {
+            if (currentIndex >= TOTAL_QUESTIONS) {
+                showSummary();
+                return;
+            }
+
+            isAnswered = false;
+            const data = database[currentIndex];
+
+            // 更新頂部資訊
+            document.getElementById('level-indicator').innerText = `${currentIndex + 1} / ${TOTAL_QUESTIONS}`;
+            document.getElementById('progress-bar').style.width = `${(currentIndex / TOTAL_QUESTIONS) * 100}%`;
+            document.getElementById('type-tag').innerText = data.tag;
+            document.getElementById('question-text').innerHTML = data.q;
+
+            const optArea = document.getElementById('options-area');
+            optArea.innerHTML = '';
+
+            if (data.type === 'tf') {
+                optArea.innerHTML = `
+                    <div class="options-grid tf">
+                        <button class="btn-option" onclick="handleAnswer('O')">⭕ 是 (O)</button>
+                        <button class="btn-option" onclick="handleAnswer('X')">❌ 否 (X)</button>
+                    </div>
+                `;
+            } else if (data.type === 'mc') {
+                let btns = data.options.map((opt, i) => 
+                    `<button class="btn-option" onclick="handleAnswer(${i})">${opt}</button>`
+                ).join('');
+                optArea.innerHTML = `<div class="options-grid mc">${btns}</div>`;
+            } else if (data.type === 'match') {
+                renderMatchGame(data.items);
+            }
+
+            startTimer();
+        }
+
+        function handleAnswer(choice) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(timerId);
+
+            const data = database[currentIndex];
+            const isCorrect = String(choice) === String(data.ans);
+
+            if (isCorrect) {
+                currentCombo++;
+                if (currentCombo > maxCombo) maxCombo = currentCombo;
+                const bonus = Math.min(currentCombo * 2, 10);
+                score += (10 + bonus);
+                correctCount++;
+                playCorrect();
+                showFeedback(currentCombo >= 3 ? `🔥 連擊 x${currentCombo}!` : "✔️ 答對!", "correct");
+            } else {
+                currentCombo = 0;
+                playWrong();
+                showFeedback("❌ 答錯了!", "wrong");
+            }
+
+            document.getElementById('score-text').innerText = `${score} 分`;
+            setTimeout(nextQuestion, 1200);
+        }
+
+        // 連連看配對控制
+        let matchSelected = null;
+        let matchPairsLeft = 0;
+
+        function renderMatchGame(items) {
+            matchSelected = null;
+            matchPairsLeft = items.length / 2;
+            const optArea = document.getElementById('options-area');
+
+            let cardsHtml = items.map((item, idx) => `
+                <div class="match-card" id="mcard-${idx}" data-match="${item.match}" onclick="handleMatchClick(${idx})">
+                    ${item.text}
+                </div>
+            `).join('');
+
+            optArea.innerHTML = `<div class="match-grid">${cardsHtml}</div>`;
+        }
+
+        function handleMatchClick(idx) {
+            if (isAnswered) return;
+            const card = document.getElementById(`mcard-${idx}`);
+            if (card.classList.contains('matched')) return;
+
+            if (!matchSelected) {
+                card.classList.add('selected');
+                matchSelected = card;
+            } else {
+                if (matchSelected.id === card.id) {
+                    card.classList.remove('selected');
+                    matchSelected = null;
+                    return;
+                }
+
+                if (matchSelected.dataset.match === card.dataset.match) {
+                    matchSelected.classList.replace('selected', 'matched');
+                    card.classList.add('matched');
+                    playCorrect();
+                    matchPairsLeft--;
+
+                    if (matchPairsLeft === 0) {
+                        isAnswered = true;
+                        clearInterval(timerId);
+                        score += 20;
+                        correctCount++;
+                        document.getElementById('score-text').innerText = `${score} 分`;
+                        showFeedback("🎉 配對完成!", "correct");
+                        setTimeout(nextQuestion, 1200);
+                    }
+                } else {
+                    matchSelected.classList.remove('selected');
+                    playWrong();
+                }
+                matchSelected = null;
+            }
+        }
+
+        function showFeedback(text, type) {
+            const layer = document.getElementById('feedback-layer');
+            layer.innerText = text;
+            layer.className = `feedback-overlay fb-${type} show`;
+            setTimeout(() => { layer.className = "feedback-overlay"; }, 1000);
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            renderCurrentQuestion();
+        }
+
+        // ------------------ 結算畫面展示 ------------------
+        function showSummary() {
+            clearInterval(timerId);
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('main-stage').style.display = 'none';
+            document.getElementById('header').style.display = 'none';
+            
+            const summary = document.getElementById('summary-screen');
+            summary.style.display = 'flex';
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-correct').innerText = `${correctCount} / ${TOTAL_QUESTIONS}`;
+            document.getElementById('final-combo').innerText = `${maxCombo} 次`;
+
+            const icon = document.getElementById('rank-icon');
+            const title = document.getElementById('rank-title');
+            if (score >= 320) {
+                icon.innerText = "👑";
+                title.innerText = "不可思議！全能數學神算家";
+            } else if (score >= 240) {
+                icon.innerText = "🏆";
+                title.innerText = "表現優異！通分高段訓練師";
+            } else if (score >= 160) {
+                icon.innerText = "⭐";
+                title.innerText = "穩定發揮！分數探險好手";
+            } else {
+                icon.innerText = "🌱";
+                title.innerText = "再接再厲！基礎穩紮穩打";
+            }
+        }
+
+        function restartGame() {
+            currentIndex = 0;
+            score = 0;
+            correctCount = 0;
+            currentCombo = 0;
+            maxCombo = 0;
+            document.getElementById('score-text').innerText = "0 分";
+            document.getElementById('main-stage').style.display = 'flex';
+            document.getElementById('header').style.display = 'flex';
+            document.getElementById('summary-screen').style.display = 'none';
+            renderCurrentQuestion();
+        }
+
+        // 啟動首題
+        renderCurrentQuestion();
+    </script>
+</body>
+</html>

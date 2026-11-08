@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>異分母分數對決：單人極限挑戰 30 關</title>
+    <style>
+        * { box-sizing: border-box; font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif; }
+        html, body { 
+            margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; 
+            background-color: #0f172a; color: #fff;
+            -webkit-user-select: none; user-select: none; touch-action: manipulation;
+        }
+        
+        /* 頂部教師控制面板 */
+        #teacher-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
+            background: #1e293b; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; z-index: 100; border-bottom: 4px solid #334155; box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+        }
+        .panel-info { display: flex; align-items: center; gap: 30px; font-size: 1.8rem; font-weight: bold; }
+        .score-box { font-size: 2rem; color: #fbbf24; background: rgba(0,0,0,0.5); padding: 5px 25px; border-radius: 12px; border: 2px solid #fbbf24; }
+        .timer-box { font-size: 2.5rem; color: #10b981; background: #000; padding: 5px 30px; border-radius: 12px; border: 3px solid #10b981; min-width: 100px; text-align: center; }
+        .timer-box.danger { color: #ef4444; border-color: #ef4444; animation: flash 0.5s infinite; }
+        .panel-controls button {
+            min-height: 55px; font-size: 1.3rem; padding: 0 25px; margin-left: 15px;
+            border-radius: 10px; border: none; cursor: pointer; font-weight: bold; background: #475569; color: white; transition: 0.2s;
+        }
+        .panel-controls button:active { background: #64748b; }
+        .panel-controls button.highlight { background: #f59e0b; color: #000; animation: pop 0.8s infinite; }
+
+        /* 主作戰區 (單一置中版面) */
+        #game-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; height: calc(100vh - 80px); margin-top: 80px; padding: 30px 50px;
+            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); position: relative;
+        }
+        
+        .question-box {
+            width: 100%; max-width: 1000px; min-height: 250px;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(255,255,255,0.95); border-radius: 25px; padding: 30px; margin-bottom: 40px;
+            color: #0f172a; font-size: 5rem; font-weight: bold; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex-wrap: wrap; gap: 15px; border: 6px solid #e2e8f0;
+        }
+
+        .options-area { 
+            display: grid; gap: 25px; width: 100%; max-width: 1000px; 
+        }
+        .options-area.tf-mode { grid-template-columns: 1fr 1fr; }
+        .options-area.mc-mode { grid-template-columns: 1fr 1fr; }
+        .options-area.match-mode { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+
+        .btn-option {
+            min-height: 140px; font-size: 3.5rem; font-weight: bold; border-radius: 20px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; transition: transform 0.1s;
+            background: #e0f2fe; color: #0369a1; border: 5px solid #7dd3fc; box-shadow: 0 8px 0 #38bdf8;
+        }
+        .btn-option:active { transform: translateY(8px); box-shadow: 0 0 0 #38bdf8; }
+        .btn-option:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .btn-option.selected { box-shadow: 0 0 30px 10px #fde047; transform: scale(1.05); z-index: 10; border-color: #facc15; }
+        .btn-option.matched { visibility: hidden; pointer-events: none; }
+
+        /* 分數垂直排版規範 */
+        .math-expr { display: inline-flex; align-items: center; vertical-align: middle; gap: 5px; margin: 0 8px; }
+        .whole { font-size: 5.5rem; line-height: 1; }
+        .frac { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; }
+        .num, .den { font-size: 2.8rem; line-height: 1.1; padding: 0 6px; }
+        .num { border-bottom: 5px solid currentColor; }
+        
+        .btn-option .whole { font-size: 4rem; }
+        .btn-option .num, .btn-option .den { font-size: 2.2rem; border-bottom-width: 4px; }
+
+        /* 鎖定遮罩層 */
+        .lock-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
+            font-size: 7rem; font-weight: bold; z-index: 50; text-align: center;
+        }
+        .lock-overlay.correct { background: rgba(16, 185, 129, 0.85); color: #fff; text-shadow: 0 0 30px #047857; }
+        .lock-overlay.wrong { background: rgba(239, 68, 68, 0.85); color: #fff; text-shadow: 0 0 30px #b91c1c; }
+        .lock-overlay.timeout { background: rgba(71, 85, 105, 0.9); color: #fff; text-shadow: 0 0 20px #fff; }
+
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+
+        /* 啟動頁面 */
+        #start-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.98); z-index: 999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center; padding: 20px;
+        }
+        #start-screen h1 { font-size: 5.5rem; color: #fff; text-shadow: 0 0 30px #38bdf8; margin-bottom: 20px;}
+        #start-screen p { font-size: 2.2rem; color: #94a3b8; margin-bottom: 50px; max-width: 800px; line-height: 1.6; }
+        #start-btn {
+            font-size: 3.5rem; padding: 20px 80px; background: #10b981; color: #fff; border: 6px solid #fff;
+            border-radius: 25px; cursor: pointer; font-weight: bold; box-shadow: 0 0 40px #10b981; transition: 0.2s;
+        }
+        #start-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="start-screen">
+        <h1>分數計算極限挑戰：單人 30 關</h1>
+        <p>測試你的通分、借位與約分極限。<br>點擊下方按鈕啟動全螢幕與音效。</p>
+        <button id="start-btn" onclick="startGame()">▶ 開始挑戰</button>
+    </div>
+
+    <div id="teacher-panel">
+        <div class="panel-info">
+            <span>關卡：<span id="level-indicator">1 / 30</span></span>
+            <span id="level-type" style="color: #38bdf8;">【是非題】</span>
+            <div class="score-box">分數: <span id="total-score">0</span></div>
+        </div>
+        <div class="timer-box" id="timer-display">20</div>
+        <div class="panel-controls">
+            <button onclick="toggleSound()" id="sound-btn">🔊 音效: 開</button>
+            <button onclick="resetGame()">↺ 重新挑戰</button>
+            <button onclick="nextLevel()" id="next-btn">下一關 ➔</button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div class="question-box" id="question-display">載入中...</div>
+        <div class="options-area" id="options-display"></div>
+        <div class="lock-overlay" id="board-lock"></div>
+    </div>
+
+    <script>
+        function F(w, n, d) {
+            let html = '<span class="math-expr">';
+            if (w !== '' && w !== undefined && w !== null) html += `<span class="whole">${w}</span>`;
+            if (n && d) html += `<div class="frac"><span class="num">${n}</span><span class="den">${d}</span></div>`;
+            html += '</span>';
+            return html;
+        }
+
+        const levels = [
+            // 1-10 關：是非題
+            { type: 'tf', q: F('2',7,10) + ' + ' + F('',7,4) + ' = ' + F('4',9,20), ans: true },
+            { type: 'tf', q: F('',4,7) + ' - ' + F('',5,14) + ' = ' + F('',1,7), ans: false },
+            { type: 'tf', q: F('5',7,18) + ' + ' + F('7',7,12) + ' = ' + F('12',35,36), ans: true },
+            { type: 'tf', q: F('7',4,10) + ' + ' + F('2',5,8) + ' = ' + F('9',9,18), ans: false },
+            { type: 'tf', q: F('4',1,6) + ' - ' + F('2',5,8) + ' = ' + F('1',13,24), ans: true },
+            { type: 'tf', q: F('3',9,12) + ' + ' + F('1',20,24) + ' = ' + F('5',7,12), ans: true },
+            { type: 'tf', q: F('5','','') + ' - ' + F('2',3,7) + ' = ' + F('3',4,7), ans: false },
+            { type: 'tf', q: F('6','','') + ' - ' + F('3',5,8) + ' = ' + F('2',3,8), ans: true },
+            { type: 'tf', q: F('4',1,5) + ' - ' + F('1',7,10) + ' = ' + F('2',1,2), ans: true },
+            { type: 'tf', q: F('5',1,3) + ' - ' + F('2',5,9) + ' = ' + F('3',2,9), ans: false },
+            
+            // 11-20 關：四選一選擇題
+            { type: 'mc', q: F('2',3,5) + ' + ' + F('1',4,7) + ' = ?', opts: [F('4',6,35), F('3',7,12), F('3',41,35), F('4',1,35)], ans: 0 },
+            { type: 'mc', q: F('1',5,6) + ' + ' + F('3',5,8) + ' = ?', opts: [F('5',11,24), F('4',10,14), F('5',1,24), F('4',11,24)], ans: 0 },
+            { type: 'mc', q: F('4',1,4) + ' - ' + F('1',5,6) + ' = ?', opts: [F('3',4,6), F('2',5,12), F('2',7,12), F('3',1,12)], ans: 1 },
+            { type: 'mc', q: F('5',2,9) + ' - ' + F('2',5,6) + ' = ?', opts: [F('3',3,3), F('2',7,18), F('2',11,18), F('3',7,18)], ans: 1 },
+            { type: 'mc', q: F('3',5,12) + ' + ' + F('2',7,18) + ' = ?', opts: [F('5',12,30), F('6',1,36), F('5',29,36), F('5',19,36)], ans: 2 },
+            { type: 'mc', q: F('2',7,15) + ' + ' + F('4',3,10) + ' = ?', opts: [F('6',10,25), F('7',3,30), F('6',23,30), F('6',17,30)], ans: 2 },
+            { type: 'mc', q: F('6',1,8) + ' - ' + F('2',5,12) + ' = ?', opts: [F('4',4,4), F('3',7,24), F('4',17,24), F('3',17,24)], ans: 3 },
+            { type: 'mc', q: F('7',3,14) + ' - ' + F('3',5,21) + ' = ?', opts: [F('4',2,7), F('3',31,42), F('4',41,42), F('3',41,42)], ans: 3 },
+            { type: 'mc', q: F('2',6,10) + ' + ' + F('1',9,18) + ' = ?', opts: [F('4',1,10), F('3',15,28), F('4',1,5), F('3',11,18)], ans: 0 },
+            { type: 'mc', q: F('8','','') + ' - ' + F('3',7,12) + ' = ?', opts: [F('5',5,12), F('5',7,12), F('4',7,12), F('4',5,12)], ans: 3 },
+            
+            // 21-30 關：配對連連看
+            { type: 'match', pairs: [ { q: F('1',3,4)+' + '+F('2',2,3), a: F('4',5,12) }, { q: F('3',1,4)+' - '+F('1',2,3), a: F('1',7,12) } ] },
+            { type: 'match', pairs: [ { q: F('2',1,6)+' + '+F('1',3,4), a: F('3',11,12) }, { q: F('4',1,6)+' - '+F('1',3,4), a: F('2',5,12) } ] },
+            { type: 'match', pairs: [ { q: F('3',1,2)+' + '+F('2',4,5), a: F('6',3,10) }, { q: F('5',1,2)+' - '+F('2',4,5), a: F('2',7,10) } ] },
+            { type: 'match', pairs: [ { q: F('1',2,3)+' + '+F('3',3,5), a: F('5',4,15) }, { q: F('4',2,3)+' - '+F('1',4,5), a: F('2',13,15) } ] },
+            { type: 'match', pairs: [ { q: F('2',5,8)+' + '+F('1',5,6), a: F('4',11,24) }, { q: F('4',3,8)+' - '+F('1',5,6), a: F('2',13,24) } ] },
+            { type: 'match', pairs: [ { q: F('3',7,10)+' + '+F('2',5,8), a: F('6',13,40) }, { q: F('5',1,10)+' - '+F('2',5,8), a: F('2',19,40) } ] },
+            { type: 'match', pairs: [ { q: F('1',7,12)+' + '+F('3',5,9), a: F('5',5,36) }, { q: F('4',5,12)+' - '+F('1',7,9), a: F('2',23,36) } ] },
+            { type: 'match', pairs: [ { q: F('2',3,8)+' + '+F('1',7,8), a: F('4',1,4) }, { q: F('5',1,6)+' - '+F('2',5,6), a: F('2',1,3) } ] },
+            { type: 'match', pairs: [ { q: F('3',5,14)+' + '+F('1',4,7), a: F('4',13,14) }, { q: F('5',3,14)+' - '+F('2',6,7), a: F('2',5,14) } ] },
+            { type: 'match', pairs: [ { q: F('5',5,12)+' + '+F('2',7,16), a: F('7',41,48) }, { q: F('7',1,12)+' - '+F('3',9,16), a: F('3',25,48) } ] }
+        ];
+
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playTone(freq, type, duration, vol) {
+            if (!soundEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playTick() { playTone(850, 'sine', 0.08, 0.1); }
+        function playHighTick() { playTone(1300, 'sine', 0.09, 0.3); }
+        function playCorrect() {
+            if (!soundEnabled || !audioCtx) return;
+            playTone(523.25, 'sine', 0.15, 0.3);
+            setTimeout(() => playTone(659.25, 'sine', 0.15, 0.3), 100);
+            setTimeout(() => playTone(783.99, 'sine', 0.35, 0.3), 200);
+        }
+        function playWrong() { playTone(140, 'sawtooth', 0.45, 0.4); }
+        function playAlarm() {
+            if (!soundEnabled || !audioCtx) return;
+            let count = 0;
+            let interval = setInterval(() => {
+                playTone(count % 2 === 0 ? 650 : 450, 'square', 0.2, 0.4);
+                count++;
+                if (count > 5) clearInterval(interval);
+            }, 250);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-btn').innerText = soundEnabled ? '🔊 音效: 開' : '🔇 音效: 關';
+        }
+
+        let currentLevelIndex = 0;
+        let score = 0;
+        let state = { locked: false, selectedMatch: null, matchCount: 0 };
+        let timer = 20;
+        let timerInterval = null;
+
+        function startGame() {
+            initAudio();
+            document.getElementById('start-screen').style.display = 'none';
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(()=>{});
+            }
+            resetGame();
+        }
+
+        function resetGame() {
+            currentLevelIndex = 0;
+            score = 0;
+            updateScore();
+            loadLevel();
+        }
+
+        function updateScore() {
+            document.getElementById('total-score').innerText = score;
+        }
+
+        function loadLevel() {
+            clearInterval(timerInterval);
+            document.getElementById('next-btn').classList.remove('highlight');
+            state = { locked: false, selectedMatch: null, matchCount: 0 };
+            document.getElementById('board-lock').style.display = 'none';
+
+            let lvl = levels[currentLevelIndex];
+            document.getElementById('level-indicator').innerText = (currentLevelIndex + 1) + ' / ' + levels.length;
+            
+            let typeLabel = lvl.type === 'tf' ? '【是非題】' : (lvl.type === 'mc' ? '【四選一】' : '【配對連連看】');
+            document.getElementById('level-type').innerText = typeLabel;
+
+            renderUI(lvl);
+
+            timer = 20;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timer--;
+                updateTimerDisplay();
+                if (timer > 0 && timer <= 5) playHighTick();
+                else if (timer > 5) playTick();
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    playAlarm();
+                    timeoutLock();
+                    document.getElementById('next-btn').classList.add('highlight');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            let tb = document.getElementById('timer-display');
+            tb.innerText = timer;
+            if (timer <= 5) tb.classList.add('danger');
+            else tb.classList.remove('danger');
+        }
+
+        function renderUI(lvl) {
+            let qBox = document.getElementById('question-display');
+            let oBox = document.getElementById('options-display');
+            oBox.className = 'options-area ' + lvl.type + '-mode';
+            oBox.innerHTML = '';
+
+            if (lvl.type === 'tf' || lvl.type === 'mc') {
+                qBox.innerHTML = lvl.q;
+                if (lvl.type === 'tf') {
+                    oBox.innerHTML = `
+                        <button class="btn-option" style="background:#dcfce7; color:#166534; border-color:#86efac" onclick="submitAnswer(true, ${lvl.ans === true})">⭕ 正確</button>
+                        <button class="btn-option" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5" onclick="submitAnswer(false, ${lvl.ans === false})">❌ 錯誤</button>
+                    `;
+                } else {
+                    lvl.opts.forEach((opt, idx) => {
+                        let btn = document.createElement('button');
+                        btn.className = 'btn-option';
+                        btn.innerHTML = opt;
+                        btn.onclick = () => submitAnswer(idx, lvl.ans === idx);
+                        oBox.appendChild(btn);
+                    });
+                }
+            } else if (lvl.type === 'match') {
+                qBox.innerHTML = "請點選算式與對應答案進行配對";
+                let cards = [];
+                lvl.pairs.forEach((pair, pIdx) => {
+                    cards.push({ id: pIdx, type: 'q', html: pair.q });
+                    cards.push({ id: pIdx, type: 'a', html: pair.a });
+                });
+                cards.sort(() => Math.random() - 0.5);
+                
+                cards.forEach(c => {
+                    let btn = document.createElement('button');
+                    btn.className = 'btn-option';
+                    btn.innerHTML = c.html;
+                    btn.dataset.id = c.id;
+                    btn.dataset.type = c.type;
+                    btn.onclick = () => handleMatch(btn);
+                    oBox.appendChild(btn);
+                });
+            }
+        }
+
+        function submitAnswer(ans, isCorrect) {
+            if (state.locked) return;
+            state.locked = true;
+            clearInterval(timerInterval);
+            let lockDiv = document.getElementById('board-lock');
+            lockDiv.style.display = 'flex';
+            
+            if (isCorrect) {
+                playCorrect();
+                score += 10;
+                updateScore();
+                lockDiv.className = 'lock-overlay correct';
+                lockDiv.innerHTML = "✔ 答對了！<br><span style='font-size:4rem'>+10 分</span>";
+            } else {
+                playWrong();
+                lockDiv.className = 'lock-overlay wrong';
+                lockDiv.innerHTML = "✖ 算錯了！";
+            }
+            document.getElementById('next-btn').classList.add('highlight');
+        }
+
+        function handleMatch(btnElement) {
+            if (state.locked) return;
+            
+            if (state.selectedMatch === btnElement) {
+                btnElement.classList.remove('selected');
+                state.selectedMatch = null;
+                return;
+            }
+
+            if (!state.selectedMatch) {
+                btnElement.classList.add('selected');
+                state.selectedMatch = btnElement;
+                return;
+            }
+
+            let first = state.selectedMatch;
+            let second = btnElement;
+
+            if (first.dataset.id === second.dataset.id && first.dataset.type !== second.dataset.type) {
+                playCorrect();
+                first.classList.remove('selected');
+                first.classList.add('matched');
+                second.classList.add('matched');
+                state.selectedMatch = null;
+                state.matchCount++;
+                
+                score += 5;
+                updateScore();
+
+                if (state.matchCount === 2) {
+                    state.locked = true;
+                    clearInterval(timerInterval);
+                    let lockDiv = document.getElementById('board-lock');
+                    lockDiv.style.display = 'flex';
+                    lockDiv.className = 'lock-overlay correct';
+                    lockDiv.innerHTML = "✔ 完美配對！<br><span style='font-size:4rem'>共得 10 分</span>";
+                    document.getElementById('next-btn').classList.add('highlight');
+                }
+            } else {
+                playWrong();
+                first.classList.remove('selected');
+                state.selectedMatch = null;
+            }
+        }
+
+        function timeoutLock() {
+            if (state.locked) return;
+            state.locked = true;
+            let lockDiv = document.getElementById('board-lock');
+            lockDiv.style.display = 'flex';
+            lockDiv.className = 'lock-overlay timeout';
+            lockDiv.innerHTML = "⌛ 時間到！";
+        }
+
+        function nextLevel() {
+            if (currentLevelIndex < levels.length - 1) {
+                currentLevelIndex++;
+                loadLevel();
+            } else {
+                clearInterval(timerInterval);
+                document.getElementById('question-display').innerHTML = `🎉 恭喜完成 30 關挑戰！<br>總分：${score} 分`;
+                document.getElementById('options-display').innerHTML = '';
+                document.getElementById('board-lock').style.display = 'none';
+                document.getElementById('next-btn').classList.remove('highlight');
+                document.getElementById('level-type').innerText = "【挑戰結束】";
+            }
+        }
+    </script>
+</body>
+</html>
