@@ -2,86 +2,166 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>互動遊戲與教學展示平台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>教學互動遊戲整合平台</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; height: 100vh; background: #0f172a; color: #f8fafc; overflow: hidden; }
+    :root {
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --sidebar-bg: #f8fafc;
+      --active-bg: #dbeafe;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", sans-serif; }
+    body { display: flex; height: 100vh; height: 100dvh; background: #f1f5f9; overflow: hidden; color: var(--text-dark); }
 
+    /* 側邊欄 */
     #sidebar {
-      width: 280px;
-      background: #1e293b;
+      width: 320px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      border-right: 1px solid #334155;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      z-index: 20;
     }
-    .header { padding: 20px; border-bottom: 1px solid #334155; }
-    .header h1 { font-size: 1.1rem; color: #38bdf8; }
-    .header p { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+    #sidebar.collapsed {
+      margin-left: -320px;
+    }
+    .brand-box {
+      padding: 18px 20px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-box h1 { font-size: 1.15rem; font-weight: 800; color: #1e3a8a; }
+    .brand-box p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
 
-    #game-list {
+    /* 選單列表 */
+    #menu-container {
       flex: 1;
       overflow-y: auto;
-      padding: 12px;
+      padding: 14px 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 12px;
     }
-    .day-divider {
-      font-size: 0.75rem;
-      font-weight: bold;
-      color: #64748b;
-      margin: 12px 6px 4px 6px;
-      letter-spacing: 0.05em;
+    
+    /* 分類群組摺疊 */
+    .category-group {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
-    .menu-item {
+    .category-header {
       padding: 12px 14px;
-      border-radius: 8px;
-      background: #334155;
-      color: #e2e8f0;
-      border: 1px solid transparent;
-      text-align: left;
+      background: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: background 0.2s, border-color 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
     }
-    .menu-item:hover { background: #475569; }
-    .menu-item.active {
-      background: #0284c7;
-      color: #fff;
-      border-color: #38bdf8;
-      font-weight: 600;
-    }
+    .category-header:hover { background: #f8fafc; }
+    .category-title { display: flex; align-items: center; gap: 8px; }
+    .arrow { font-size: 0.75rem; color: var(--text-muted); transition: transform 0.2s ease; }
+    .category-group.open .arrow { transform: rotate(180deg); }
 
-    #content {
+    .category-items {
+      display: none;
+      padding: 6px 8px 10px 8px;
+      flex-direction: column;
+      gap: 4px;
+      background: #fcfcfd;
+      border-top: 1px solid #f1f5f9;
+    }
+    .category-group.open .category-items { display: flex; }
+
+    .game-btn {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #334155;
+      text-align: left;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s ease;
+    }
+    .game-btn:hover { background: #f1f5f9; color: var(--primary); }
+    .game-btn.active {
+      background: var(--active-bg);
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .tag-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #e2e8f0;
+      color: #475569;
+    }
+    .game-btn.active .tag-badge { background: #bfdbfe; color: #1d4ed8; }
+
+    /* 右側主舞台 */
+    #main-area {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #020617;
+      background: #ffffff;
+      min-width: 0;
     }
-    #top-bar {
-      height: 52px;
-      background: #1e293b;
+    #top-nav {
+      height: 56px;
+      padding: 0 16px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
-      border-bottom: 1px solid #334155;
+      gap: 12px;
     }
-    #current-title { font-size: 0.95rem; font-weight: 500; }
-    .action-btn {
-      color: #38bdf8;
+    .nav-left { display: flex; align-items: center; gap: 12px; }
+    .toggle-sidebar-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+    .current-game-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
+
+    .nav-actions { display: flex; gap: 8px; }
+    .btn-action {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      padding: 6px 14px;
+      border-radius: 8px;
       text-decoration: none;
       font-size: 0.85rem;
-      background: rgba(56, 189, 248, 0.1);
-      padding: 6px 12px;
-      border-radius: 6px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    #iframe-container {
+    #iframe-box {
       flex: 1;
       width: 100%;
-      height: calc(100% - 52px);
+      height: calc(100% - 56px);
+      background: #000000;
     }
     iframe {
       width: 100%;
@@ -93,39 +173,122 @@
 </head>
 <body>
 
+  <!-- 側邊選單欄 -->
   <aside id="sidebar">
-    <div class="header">
-      <h1>互動作品集</h1>
-      <p>點選單元即時切換</p>
+    <div class="brand-box">
+      <h1>互動教學整合展示室</h1>
+      <p>點選單元展開，即時在線遊玩</p>
     </div>
-    <div id="game-list">
-      <div class="day-divider">第 1 天</div>
-      <button class="menu-item active" onclick="loadGame(this, './ch7a.html', '遊戲 ch7a')">🎮 遊戲 ch7a</button>
-      <button class="menu-item" onclick="loadGame(this, './m6a.html', '遊戲 m6a')">🎮 遊戲 m6a</button>
-      <button class="menu-item" onclick="loadGame(this, './m6b.html', '遊戲 m6b')">🎮 遊戲 m6b</button>
-    </div>
+    <div id="menu-container"></div>
   </aside>
 
-  <main id="content">
-    <div id="top-bar">
-      <span id="current-title">遊戲 ch7a</span>
-      <a id="open-window-btn" class="action-btn" href="./ch7a.html" target="_blank">全螢幕開啟 ↗</a>
+  <!-- 遊戲顯示舞台 -->
+  <main id="main-area">
+    <div id="top-nav">
+      <div class="nav-left">
+        <button class="toggle-sidebar-btn" onclick="toggleSidebar()" title="切換選單">☰ 選單</button>
+        <div class="current-game-title" id="display-title">載入中...</div>
+      </div>
+      <div class="nav-actions">
+        <a id="btn-fullscreen" class="btn-action" href="#" target="_blank">全螢幕獨立視窗 ↗</a>
+      </div>
     </div>
-    <div id="iframe-container">
-      <iframe id="game-viewer" src="./ch7a.html"></iframe>
+    <div id="iframe-box">
+      <iframe id="game-frame" src=""></iframe>
     </div>
   </main>
 
   <script>
-    function loadGame(button, fileUrl, title) {
-      document.getElementById('game-viewer').src = fileUrl;
-      document.getElementById('current-title').textContent = title;
-      document.getElementById('open-window-btn').href = fileUrl;
+    // ---------------- 遊戲與單元清單資料庫 ----------------
+    // 未來要新增任何單元或題目，只需在此清單中增加一行即可
+    const menuData = [
+      {
+        category: "國語科 互動闖關",
+        icon: "📖",
+        isOpen: true,
+        items: [
+          { title: "第七課：為生命找出路", file: "./ch7a.html", tag: "30關挑戰" }
+        ]
+      },
+      {
+        category: "數學科 互動闖關",
+        icon: "📐",
+        isOpen: true,
+        items: [
+          { title: "第十單元：異分母加減大冒險", file: "./m6a.html", tag: "觀念與計算" },
+          { title: "數學單元延伸：進階通分闖關", file: "./m6b.html", tag: "綜合挑戰" }
+        ]
+      }
+    ];
 
-      document.querySelectorAll('.menu-item').forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
+    // 初始化渲染側邊欄
+    function initMenu() {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = '';
+      let isFirstItem = true;
+
+      menuData.forEach((group, groupIdx) => {
+        const groupEl = document.createElement('div');
+        groupEl.className = `category-group ${group.isOpen ? 'open' : ''}`;
+        
+        const headerEl = document.createElement('div');
+        headerEl.className = 'category-header';
+        headerEl.innerHTML = `
+          <div class="category-title">
+            <span>${group.icon}</span>
+            <span>${group.category}</span>
+          </div>
+          <span class="arrow">▼</span>
+        `;
+        headerEl.onclick = () => groupEl.classList.toggle('open');
+
+        const itemsEl = document.createElement('div');
+        itemsEl.className = 'category-items';
+
+        group.items.forEach(item => {
+          const btn = document.createElement('button');
+          btn.className = 'game-btn';
+          btn.innerHTML = `
+            <span>${item.title}</span>
+            <span class="tag-badge">${item.tag}</span>
+          `;
+          btn.onclick = () => selectGame(btn, item.file, item.title);
+
+          itemsEl.appendChild(btn);
+
+          // 預設載入第一個遊戲
+          if (isFirstItem) {
+            btn.classList.add('active');
+            loadIframe(item.file, item.title);
+            isFirstItem = false;
+          }
+        });
+
+        groupEl.appendChild(headerEl);
+        groupEl.appendChild(itemsEl);
+        container.appendChild(groupEl);
+      });
     }
-  </script>
 
+    // 切換顯示遊戲
+    function selectGame(button, fileUrl, title) {
+      document.querySelectorAll('.game-btn').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      loadIframe(fileUrl, title);
+    }
+
+    function loadIframe(fileUrl, title) {
+      document.getElementById('game-frame').src = fileUrl;
+      document.getElementById('display-title').textContent = title;
+      document.getElementById('btn-fullscreen').href = fileUrl;
+    }
+
+    // iPad 側邊欄隱藏/展開切換
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+
+    initMenu();
+  </script>
 </body>
 </html>
