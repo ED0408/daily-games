@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>國小五上數學【整數四則計算・7-2 多步驟計算】30題單人極速闖關挑戰</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+      background-color: #050811;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+    }
+
+    .font-num {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    .glow-cyan {
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.45);
+      border-color: #06b6d4;
+    }
+    .glow-gold {
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.65);
+    }
+    
+    @keyframes alertPulse {
+      0%, 100% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); }
+      50% { border-color: #7f1d1d; box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+    }
+    .negative-score {
+      animation: alertPulse 1.2s infinite;
+      color: #f87171 !important;
+    }
+
+    @keyframes floatUpFade {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      60% { opacity: 1; transform: translateY(-18px) scale(1.15); }
+      100% { opacity: 0; transform: translateY(-34px) scale(0.95); }
+    }
+    .animate-float-score {
+      animation: floatUpFade 1.1s ease-out forwards;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.5);
+      border-radius: 4px;
+    }
+
+    .scroll-y-touch {
+      touch-action: pan-y !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    canvas, .touch-btn, .interactive-zone {
+      touch-action: none !important;
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+      cursor: pointer;
+    }
+
+    .btn-pressed {
+      transform: scale(0.97) !important;
+      filter: brightness(1.22);
+    }
+
+    .math-font {
+      font-family: 'Chakra Petch', 'Noto Sans TC', monospace, sans-serif;
+      letter-spacing: 0.03em;
+    }
+  </style>
+</head>
+<body class="text-white flex flex-col h-screen w-screen relative select-none bg-slate-950">
+
+  <!-- ==================== 頂部 HUD 資訊列 (適配 PC 與 iPad 橫直屏) ==================== -->
+  <header class="min-h-[68px] sm:h-[76px] bg-slate-900/95 border-b border-slate-700/80 px-2.5 sm:px-5 md:px-8 py-1.5 flex items-center justify-between z-20 shrink-0 shadow-xl gap-2 sm:gap-4">
+    
+    <!-- 左側：單人玩家積分 HUD -->
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600 flex items-center justify-center text-xl sm:text-2xl shadow-md border border-cyan-300/60">🧑‍🎓</div>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-black text-cyan-300 text-xs sm:text-sm md:text-base tracking-wider">單人挑戰者</span>
+          <span id="p1-score-box" class="px-2 sm:px-2.5 py-0.5 rounded-lg font-black font-num text-cyan-200 bg-slate-800 border border-cyan-600/70 transition-all text-xs sm:text-sm md:text-base">
+            總分: <span id="p1-total">0</span>
+          </span>
+        </div>
+        <div class="flex items-center gap-2 text-[11px] sm:text-xs font-num text-slate-300 mt-0.5">
+          <span>答對: <b id="p1-acc" class="text-emerald-400">0/30</b></span>
+          <span class="hidden sm:inline text-slate-500">|</span>
+          <span class="hidden sm:inline">題庫:<b id="p1-quiz-pts" class="text-cyan-300">0</b></span>
+          <span class="hidden sm:inline">遊戲:<b id="p1-game-pts" class="text-amber-300">0</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中央：進度與 35 秒倒數計時條 -->
+    <div class="flex flex-col items-center justify-center text-center flex-1 max-w-[440px] min-w-[120px]">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 flex-wrap justify-center">
+        <span class="text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-amber-500/60 tracking-wider hidden md:inline" id="phase-badge">7-2 多步驟計算</span>
+        <span class="text-xs sm:text-base md:text-lg font-black tracking-wider text-white font-num" id="round-indicator">ROUND 1 / 30</span>
+        <button id="sound-toggle" onclick="toggleMute()" class="text-xs sm:text-sm text-slate-200 hover:text-white px-2 py-0.5 bg-slate-800 rounded-lg border border-slate-600 active:scale-95" title="音效開關">🔊</button>
+        
+        <!-- 遊樂場直達快捷鈕 (大螢幕顯示) -->
+        <div class="hidden xl:flex items-center gap-1 bg-slate-800/90 px-2 py-0.5 rounded-lg border border-slate-700">
+          <span class="text-[10px] text-amber-300 font-bold">🎮練習:</span>
+          <button onclick="launchDirectMiniGame('shoot')" class="text-[10px] bg-rose-900/70 hover:bg-rose-800 px-1.5 py-0.5 rounded text-rose-200 border border-rose-700 active:scale-95">🎯Q10射擊</button>
+          <button onclick="launchDirectMiniGame('whack')" class="text-[10px] bg-emerald-900/70 hover:bg-emerald-800 px-1.5 py-0.5 rounded text-emerald-200 border border-emerald-700 active:scale-95">🔨Q20地鼠</button>
+          <button onclick="launchDirectMiniGame('taiko')" class="text-[10px] bg-amber-900/70 hover:bg-amber-800 px-1.5 py-0.5 rounded text-amber-200 border border-amber-700 active:scale-95">🥁Q30太鼓</button>
+        </div>
+      </div>
+      
+      <div class="w-full max-w-[300px] mt-1 flex items-center gap-2">
+        <div class="text-xs sm:text-sm font-num font-black text-amber-300 w-9 text-right" id="timer-text">35s</div>
+        <div class="flex-1 h-2.5 sm:h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+          <div id="timer-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右側：題目切換控制鈕 -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <button id="btn-prev-q" onclick="prevQuestion()" title="回到上一題 (快捷鍵: [ )" class="touch-btn flex items-center justify-center gap-1 px-2.5 sm:px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-600 text-slate-100 font-black shadow transition-all">
+        <span class="text-sm sm:text-base">⏮️</span>
+        <span class="text-xs sm:text-sm hidden md:inline">上一題</span>
+      </button>
+
+      <button id="btn-next-q" onclick="nextQuestion()" title="跳至下一題 (快捷鍵: ] )" class="touch-btn flex items-center justify-center gap-1 px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 active:scale-95 border border-emerald-400 text-white font-black shadow-lg transition-all">
+        <span class="text-xs sm:text-sm hidden md:inline">下一題</span>
+        <span class="text-sm sm:text-base">⏭️</span>
+      </button>
+    </div>
+
+  </header>
+
+  <!-- ==================== 主要單人闖關舞台 (PC 與 iPad 寬屏/直屏自適應) ==================== -->
+  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-6 pb-16 overflow-hidden">
+    
+    <!-- 單人主挑戰卡片 -->
+    <section class="w-full max-w-4xl flex-1 flex flex-col justify-between gap-3 sm:gap-4 min-h-0 bg-slate-900/80 p-3 sm:p-5 md:p-6 rounded-3xl border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden backdrop-blur-sm">
+      
+      <!-- 浮動得分/扣分特效 -->
+      <div id="p1-float-fx" class="pointer-events-none absolute top-12 right-6 z-30 font-num font-black text-xl sm:text-3xl opacity-0"></div>
+
+      <!-- 頂部題型與加速提示條 -->
+      <div class="flex items-center justify-between gap-2 shrink-0 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span id="q-type-badge" class="px-3 py-1 rounded-xl bg-cyan-950 border border-cyan-600 text-cyan-300 text-xs sm:text-sm font-black tracking-wide">
+            🎯 第 1～10 題：三態是非診斷題
+          </span>
+          <span class="text-[11px] sm:text-xs font-bold text-amber-300/90 bg-amber-950/60 border border-amber-500/40 px-2.5 py-0.5 rounded-lg hidden sm:inline">
+            ⚡ 剩餘 20 秒以上答對享 2X 雙倍積分！
+          </span>
+        </div>
+        <span id="p1-status-stamp" class="text-xs sm:text-sm font-black px-3 py-1 rounded-xl hidden font-num"></span>
+      </div>
+
+      <!-- 題目顯示區 (寬敞易讀，支援 iPad 直/橫屏與電腦大螢幕) -->
+      <div class="min-h-[130px] sm:min-h-[155px] max-h-[220px] flex-shrink-0 bg-slate-950/90 rounded-2xl border-2 border-cyan-400/50 p-3.5 sm:p-5 flex flex-col justify-between shadow-inner relative overflow-hidden">
+        <div id="p1-q-text" class="scroll-y-touch overflow-y-auto text-base sm:text-xl md:text-2xl font-bold text-white leading-relaxed math-font pr-1">
+          題目載入中...
+        </div>
+        <div class="text-[11px] sm:text-xs text-cyan-300/90 font-mono border-t border-slate-800 pt-2 mt-2 flex justify-between items-center shrink-0">
+          <span>💡 口訣：有括號先算・先乘除後加減・連減＝減去總和</span>
+          <span id="q-shortcut-hint" class="text-slate-400 hidden md:inline">快捷鍵: 1 / 2 / 3</span>
+        </div>
+      </div>
+
+      <!-- 互動答題按鈕區 -->
+      <div class="flex-1 flex flex-col gap-3 min-h-0 relative justify-center">
+        <div id="p1-interactive" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone"></div>
+
+        <!-- 答錯觀念盲點深入解析卡片 -->
+        <div id="p1-analysis-card" class="max-h-[130px] rounded-2xl bg-rose-950/90 border-2 border-rose-400 p-3 sm:p-4 hidden flex-col justify-start text-rose-100 shrink-0 shadow-xl overflow-hidden">
+          <div class="text-xs sm:text-sm font-black text-amber-300 mb-1 flex items-center gap-1.5">
+            <span>💡 觀念盲點深入解析：</span>
+          </div>
+          <div id="p1-analysis-text" class="scroll-y-touch text-xs sm:text-sm md:text-base font-medium leading-relaxed overflow-y-auto flex-1 text-white pr-1">--</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 答錯暫停與推進中控浮動條 ==================== -->
+    <div id="teacher-control-bar" class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 hidden items-center gap-3 bg-slate-900/98 border-2 border-amber-400 px-4 sm:px-6 py-2.5 rounded-2xl shadow-2xl backdrop-blur-md max-w-[94vw] transition-all">
+      <div class="flex items-center gap-2">
+        <span class="text-xl" id="ctrl-icon">🚨</span>
+        <span id="ctrl-msg" class="text-xs sm:text-sm font-bold text-amber-300 whitespace-nowrap">作答有誤・倒數已停止</span>
+      </div>
+      <button id="btn-next-question" onclick="advanceToNextStep()" class="shrink-0 px-4 py-2 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow-md active:scale-95 transition-all flex items-center gap-1 touch-btn">
+        <span>確認解析・繼續下一題 ➔</span>
+      </button>
+    </div>
+
+    <!-- ==================== 單人中場手速小遊戲覆蓋層 (每 10 題觸發) ==================== -->
+    <div id="minigame-overlay" class="absolute inset-0 bg-slate-950 z-30 hidden flex flex-col p-2.5 sm:p-4 md:p-6">
+      
+      <!-- 頂部資訊列 -->
+      <div class="h-13 sm:h-14 bg-slate-900 border border-slate-700 px-3 sm:px-6 py-2 flex items-center justify-between shrink-0 rounded-t-2xl max-w-5xl w-full mx-auto">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-black tracking-widest font-num shrink-0">中場獎勵關</span>
+          <h2 id="mg-title" class="text-xs sm:text-base md:text-lg font-black text-amber-300 truncate">手速獎勵遊樂場</h2>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-6 shrink-0">
+          <div class="text-xs sm:text-sm text-cyan-300 font-bold">本局得分: <b id="mg-p1-pts" class="text-cyan-400 font-num text-lg sm:text-2xl">0</b></div>
+          <div id="mg-timer" class="text-base sm:text-xl font-black text-amber-400 font-num tracking-widest">20.0s</div>
+          <button onclick="skipMiniGame()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-amber-300 shadow active:scale-95 transition-all touch-btn">
+            ⏭️ 跳過
+          </button>
+        </div>
+      </div>
+      
+      <!-- 單人全寬遊戲畫布區 -->
+      <div class="flex-1 relative flex flex-col items-center justify-between p-2.5 sm:p-3 bg-slate-900/75 rounded-b-2xl overflow-hidden border-x border-b border-slate-800 min-h-0 max-w-5xl w-full mx-auto">
+        <div class="text-xs sm:text-sm font-bold text-cyan-300 mb-1.5 flex items-center justify-between w-full px-2 shrink-0">
+          <span>🎮 單人極速挑戰（得分將全數計入總積分！）</span>
+          <span id="mg-hint" class="text-amber-300 font-bold">--</span>
+        </div>
+
+        <div class="flex-1 w-full relative flex items-center justify-center min-h-0">
+          <canvas id="mg-canvas" class="w-full h-full rounded-2xl bg-slate-950 border-2 border-slate-700/80 shadow-inner"></canvas>
+        </div>
+
+        <!-- 底部單人實體大按鍵 (支援 iPad 觸控與電腦鍵盤) -->
+        <div id="mg-ctrl" class="w-full shrink-0 pt-2.5 flex justify-center gap-3 max-w-3xl"></div>
+      </div>
+    </div>
+
+    <!-- ==================== 開場首頁彈窗 ==================== -->
+    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 text-center overflow-y-auto">
+      <div class="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div class="text-xs font-black tracking-widest text-cyan-400 uppercase mb-1.5">國小五年級數學・單元 7 整數四則計算</div>
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mb-2">
+          7-2 多步驟計算<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-amber-300">30 題單人極速闖關挑戰</span>
+        </h1>
+        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4">
+          完整收錄課本 P96～P98 與習作 P66～P68 精選題型！<br>
+          全套 <b class="text-amber-400">30 題</b> 挑戰，每題限時 <b class="text-cyan-300">35 秒</b>，支援電腦鍵盤與 Apple iPad 觸控！
+        </p>
+
+        <!-- 計分規則說明 -->
+        <div class="grid grid-cols-3 gap-2 mb-4 text-center bg-slate-950/80 p-3 rounded-2xl border border-slate-700/80">
+          <div class="px-1">
+            <div class="text-amber-400 font-black text-xs sm:text-sm">⚡ 極速答對 2X</div>
+            <div class="text-[10px] sm:text-xs text-slate-300 mt-0.5">15 秒內快速答對<br><b class="text-amber-300">積分直接雙倍！</b></div>
+          </div>
+          <div class="px-1 border-x border-slate-800">
+            <div class="text-rose-400 font-black text-xs sm:text-sm">❌ 答錯扣積分</div>
+            <div class="text-[10px] sm:text-xs text-slate-300 mt-0.5">答錯或超時未答<br><b class="text-rose-300">倒扣 50 積分！</b></div>
+          </div>
+          <div class="px-1">
+            <div class="text-emerald-400 font-black text-xs sm:text-sm">🎮 遊戲併入總分</div>
+            <div class="text-[10px] sm:text-xs text-slate-300 mt-0.5">每 10 題手速遊戲<br><b class="text-emerald-300">得分全計入總分！</b></div>
+          </div>
+        </div>
+
+        <!-- 關卡階段說明 (每 10 題一階段) -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-5 text-left">
+          <div class="p-2.5 sm:p-3 rounded-2xl bg-cyan-950/50 border border-cyan-500/50">
+            <div class="text-cyan-400 font-bold text-xs sm:text-sm mb-1">🎯 第 1～10 題</div>
+            <div class="text-[10px] sm:text-xs text-slate-300 leading-snug">三態是非診斷題<br>過關解鎖射擊靶場</div>
+          </div>
+          <div class="p-2.5 sm:p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/50">
+            <div class="text-emerald-400 font-bold text-xs sm:text-sm mb-1">📚 第 11～20 題</div>
+            <div class="text-[10px] sm:text-xs text-slate-300 leading-snug">四選一單選題<br>過關解鎖打地鼠擂台</div>
+          </div>
+          <div class="p-2.5 sm:p-3 rounded-2xl bg-amber-950/40 border border-amber-500/50">
+            <div class="text-amber-400 font-bold text-xs sm:text-sm mb-1">🔗 第 21～30 題</div>
+            <div class="text-[10px] sm:text-xs text-slate-300 leading-snug">2對2 連連看配對<br>壓軸解鎖太鼓達人</div>
+          </div>
+        </div>
+
+        <button id="btn-start-game" onclick="startGame()" class="w-full py-3.5 sm:py-4 rounded-2xl font-black text-base sm:text-xl tracking-widest text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-amber-300 hover:opacity-95 shadow-xl glow-cyan active:scale-95 transition-all">
+          🚀 開始 30 題極速挑戰！
+        </button>
+
+        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-center gap-2 flex-wrap">
+          <span class="text-xs text-amber-300 font-bold">🎮 直達獎勵小遊戲練習：</span>
+          <button onclick="launchDirectMiniGame('shoot')" class="px-2.5 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-xs font-bold border border-rose-600 active:scale-95">🎯 Q10 射擊靶場</button>
+          <button onclick="launchDirectMiniGame('whack')" class="px-2.5 py-1 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 text-xs font-bold border border-emerald-600 active:scale-95">🔨 Q20 打地鼠</button>
+          <button onclick="launchDirectMiniGame('taiko')" class="px-2.5 py-1 rounded-lg bg-amber-900/60 hover:bg-amber-800 text-amber-200 text-xs font-bold border border-amber-600 active:scale-95">🥁 Q30 太鼓達人</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 小遊戲結算戰報彈窗 ==================== -->
+    <div id="mg-result-modal" class="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="max-w-md w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl text-center">
+        <span class="text-xs uppercase font-black text-amber-400 font-num">MINI-GAME BONUS</span>
+        <h3 id="mg-result-title" class="text-xl sm:text-2xl font-black text-white mt-1 mb-3">獎勵遊樂場結算</h3>
+        
+        <div class="p-4 rounded-2xl bg-cyan-950/60 border border-cyan-500/50 my-3">
+          <div class="text-xs sm:text-sm text-cyan-300 font-bold">🧑‍🎓 本局獲得獎勵積分</div>
+          <div id="mg-res-p1" class="text-3xl sm:text-4xl font-black text-amber-300 font-num mt-1">+0</div>
+        </div>
+
+        <div id="mg-winner-announcement" class="text-xs sm:text-sm font-bold text-slate-200 mb-5 py-2.5 px-3 rounded-xl bg-slate-800">
+          獎勵積分已正式計入總分！
+        </div>
+
+        <button id="btn-close-mg-result" onclick="closeMgResultModal()" class="w-full py-3 rounded-xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:opacity-95 shadow-lg active:scale-95 transition-transform">
+          繼續下一階段挑戰 ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 終局 30 題榮譽頒獎覆蓋層 ==================== -->
+    <div id="final-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 sm:p-8 text-center overflow-y-auto">
+      <div class="max-w-xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+        
+        <span class="text-xs font-black tracking-widest text-amber-400 uppercase">CHALLENGE COMPLETE</span>
+        <h2 id="final-champion-title" class="text-2xl sm:text-4xl font-black text-white mt-1 mb-2">30 題全破榮譽結算</h2>
+        <div id="final-stars" class="text-3xl sm:text-4xl mb-4 tracking-widest">⭐⭐⭐</div>
+
+        <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-cyan-950/70 to-slate-900 border-2 border-cyan-400 mb-5">
+          <div class="text-xs sm:text-sm font-black text-cyan-300 uppercase tracking-wider">最終累計總積分</div>
+          <div id="final-p1-total" class="text-4xl sm:text-6xl font-black text-amber-300 font-num my-2">0</div>
+          <div class="text-sm sm:text-base text-slate-200 font-mono">正答題數：<b id="final-p1-acc" class="text-emerald-400">0 / 30</b></div>
+          <div id="final-p1-breakdown" class="text-xs sm:text-sm text-slate-400 font-num mt-1.5">題庫積分 0 分 ＋ 遊戲積分 0 分</div>
+        </div>
+
+        <div id="final-summary-quote" class="text-xs sm:text-sm font-bold text-slate-200 mb-6 bg-slate-800/80 p-4 rounded-xl leading-relaxed">
+          你已徹底掌握五上「7-2 多步驟計算」的四則運算順序與巧算秘訣！
+        </div>
+
+        <button onclick="location.reload()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-amber-300 hover:opacity-95 shadow-xl active:scale-95 transition-all">
+          🔄 重新挑戰 30 題全關卡
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== 遊戲核心 JavaScript 邏輯 (單人 30 題・35 秒倒數・每 10 題小遊戲) ==================== -->
+  <script>
+    /* ==========================================================================
+       1. 原生 Web Audio API 合成音效引擎 (SoundEngine)
+       ========================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.compressor = null;
+        this.isMuted = false;
+        this.bpm = 128;
+        this.bgmTimer = null;
+        this.step = 0;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+
+          this.compressor = this.ctx.createDynamicsCompressor();
+          this.compressor.threshold.setValueAtTime(-18, this.ctx.currentTime);
+          this.compressor.knee.setValueAtTime(10, this.ctx.currentTime);
+          this.compressor.ratio.setValueAtTime(5, this.ctx.currentTime);
+          this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+          this.compressor.release.setValueAtTime(0.2, this.ctx.currentTime);
+
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+
+          this.compressor.connect(this.masterGain);
+          this.masterGain.connect(this.ctx.destination);
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        this.startBgm();
+      }
+
+      setBpm(newBpm) {
+        this.bpm = newBpm;
+        if (this.bgmTimer) {
+          this.stopBgm();
+          this.startBgm();
+        }
+      }
+
+      startBgm() {
+        if (this.bgmTimer || !this.ctx) return;
+        const intervalMs = (60 / this.bpm / 4) * 1000;
+        this.bgmTimer = setInterval(() => {
+          if (this.isMuted) return;
+          this.playBgmStep(this.step);
+          this.step = (this.step + 1) % 16;
+        }, intervalMs);
+      }
+
+      stopBgm() {
+        if (this.bgmTimer) {
+          clearInterval(this.bgmTimer);
+          this.bgmTimer = null;
+        }
+      }
+
+      playBgmStep(s) {
+        if (!this.ctx || !this.compressor) return;
+        const t = this.ctx.currentTime;
+
+        if (s % 4 === 0) {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.frequency.setValueAtTime(160, t);
+          osc.frequency.exponentialRampToValueAtTime(35, t + 0.12);
+          gain.gain.setValueAtTime(0.32, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.13);
+        }
+
+        if (s === 4 || s === 12) {
+          const bufferSize = this.ctx.sampleRate * 0.08;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1400;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.16, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.compressor);
+          noise.start(t);
+        }
+
+        if (s % 2 === 1) {
+          const bufferSize = this.ctx.sampleRate * 0.025;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'highpass';
+          filter.frequency.value = 7500;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(s === 14 ? 0.08 : 0.04, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + (s === 14 ? 0.06 : 0.025));
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.compressor);
+          noise.start(t);
+        }
+      }
+
+      playCorrect() {
+        if (this.isMuted || !this.ctx) return;
+        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        freqs.forEach((freq, i) => {
+          const t = this.ctx.currentTime + i * 0.06;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.28);
+        });
+      }
+
+      playWrong() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, t);
+        osc.frequency.exponentialRampToValueAtTime(70, t + 0.35);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.36);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.38);
+      }
+
+      playGrab() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, t);
+        osc.frequency.setValueAtTime(1318.51, t + 0.04);
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.13);
+      }
+
+      playShoot() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(950, t);
+        osc.frequency.exponentialRampToValueAtTime(90, t + 0.11);
+        gain.gain.setValueAtTime(0.28, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      }
+
+      playHammer() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(190, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.14);
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      }
+
+      playDon() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(165, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.18);
+        gain.gain.setValueAtTime(0.42, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.19);
+      }
+
+      playKa() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(880, t);
+        osc.frequency.exponentialRampToValueAtTime(280, t + 0.08);
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.09);
+      }
+
+      playRoll() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        [0, 0.05, 0.1].forEach((off, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(260 + idx * 80, t + off);
+          gain.gain.setValueAtTime(0.28, t + off);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + off + 0.06);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t + off);
+          osc.stop(t + off + 0.07);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /* ==========================================================================
+       2. 7-2 多步驟計算 30 題完整單人題庫 (每 10 題切換題型並解鎖小遊戲)
+       ========================================================================== */
+    const QUESTION_BANK = [
+      // ==================== 第 1～10 題：三態是非診斷題 (tf3: 'correct', 'rule', 'calc') ====================
+      {
+        round: 1, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【課本 P96 吊飾湊整速算】<br><span class="text-cyan-300">145 ＋ 102 ＋ 155 ＋ 98 ＝ (145 ＋ 155) ＋ (102 ＋ 98) ＝ 300 ＋ 200 ＝ 500</span><br>👉 判斷上述連加湊整算式與答案是否正確？`,
+        answer: "correct",
+        tip: "【完全正確】連加算式可利用交換律與結合律湊整百：145＋155＝300、102＋98＝200，相加得 500！"
+      },
+      {
+        round: 2, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【習作 P66 連加湊整速算】<br><span class="text-cyan-300">72 ＋ 89 ＋ 28 ＋ 11 ＝ (72 ＋ 28) ＋ (89 ＋ 11) ＝ 100 ＋ 100 ＝ 200</span><br>👉 判斷上述連加湊整算式與答案是否正確？`,
+        answer: "correct",
+        tip: "【完全正確】72＋28＝100、89＋11＝100，兩組整百相加等於 200，算則與計算完全無誤！"
+      },
+      {
+        round: 3, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【課本 P96 買點心找零】<br><span class="text-cyan-300">500 － 75 － 168 － 32 ＝ 500 － (75 ＋ 168 ＋ 32) ＝ 500 － 275 ＝ 235</span><br>👉 先算共花多少元再相減，判斷結果是否正確？`,
+        answer: "calc",
+        tip: "【錯在計算數值】連減改寫為減去總和（75＋200＝275）算則正確，但最後減法借位粗心：500 － 275 ＝ 225，不是 235！"
+      },
+      {
+        round: 4, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【習作 P66 連減速算】<br><span class="text-cyan-300">305 － 150 － 43 － 57 ＝ 305 － (150 ＋ 43 ＋ 57) ＝ 305 － 250 ＝ 65</span><br>👉 先把減數加起來湊整百再相減，判斷結果是否正確？`,
+        answer: "calc",
+        tip: "【錯在計算數值】算則變形正確（43＋57＝100，共減 250），但最後心算粗心：305 － 250 ＝ 55，不是 65！"
+      },
+      {
+        round: 5, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【課本 P96 試試看陷阱】<br><span class="text-cyan-300">382 － 199 － 101 － 62 ＝ 382 － (199 － 101 － 62)</span><br>👉 判斷加上括號後的算式是否等值？`,
+        answer: "rule",
+        tip: "【錯在算則符號】大陷阱！連續減去三個數，等於減去這三個數的「總和」，括號裡面必須全部改為「＋」號！"
+      },
+      {
+        round: 6, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【習作 P66 連減括號陷阱】<br><span class="text-cyan-300">352 － 138 － 52 － 10 ＝ 352 － (138 － 52 － 10)</span><br>👉 判斷加上括號後的算式是否等值？`,
+        answer: "rule",
+        tip: "【錯在算則符號】大陷阱！連減改寫為減去總和時，括號前面是減號，括號內的減號必須全部變為「＋」號！"
+      },
+      {
+        round: 7, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【習作 P66 加減混合巧算】<br><span class="text-cyan-300">285 － 173 ＋ 115 － 127 ＝ (285 ＋ 115) － (173 ＋ 127) ＝ 400 － 300 ＝ 100</span><br>👉 判斷加減混合湊整過程是否正確？`,
+        answer: "correct",
+        tip: "【完全正確】將加數結合 (285＋115＝400)，減數合併 (173＋127＝300)，400－300＝100，既快又準！"
+      },
+      {
+        round: 8, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【課本 P96 試試看巧算】<br><span class="text-cyan-300">465 － 345 － 65 ＋ 345 ＝ (465 － 65) － 345 ＋ 345 ＝ 400</span><br>👉 判斷加減抵消與湊整過程是否正確？`,
+        answer: "correct",
+        tip: "【完全正確】465 先減 65 得到 400，後面 －345＋345 剛好抵消，最後答案就是 400！"
+      },
+      {
+        round: 9, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【習作 P66 學習重點】計算 <span class="text-cyan-300">28 ÷ 4 ＋ 3 × 12</span>：<br>過程：<span class="text-cyan-300">7 ＋ 3 × 12 ＝ 10 × 12 ＝ 120</span>`,
+        answer: "rule",
+        tip: "【錯在算則符號】四則混合算式必須「先算乘除、後算加減」！應先算 28÷4＝7 與 3×12＝36，再相加得 43！"
+      },
+      {
+        round: 10, type: "tf3", badge: "🎯 第 1～10 題：三態是非診斷題",
+        text: `【習作 P68 有括號先算】<br><span class="text-cyan-300">144 － 108 ÷ (9 ＋ 27) ＝ 144 － 108 ÷ 36 ＝ 144 － 3 ＝ 141</span><br>👉 先算括號內，再算除法，最後算減法。`,
+        answer: "correct",
+        tip: "【完全正確】有括號先算 9＋27＝36，再算 108÷36＝3，最後 144－3＝141，順序與計算完全正確！"
+      },
+
+      // ==================== 第 11～20 題：四選一單選題 (mc) ====================
+      {
+        round: 11, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【課本 P97 例題4】一份蛋餅賣 35 元，一杯綠豆湯賣 40 元，政緯買了 4 份蛋餅和 3 杯綠豆湯，共花了幾元？`,
+        options: [
+          `A. 35 × 4 ＋ 40 × 3 ＝ 260 (元)`,
+          `B. (35 ＋ 40) × (4 ＋ 3) ＝ 525 (元)`,
+          `C. 35 ＋ 4 × 40 ＋ 3 ＝ 198 (元)`,
+          `D. 35 × 3 ＋ 40 × 4 ＝ 265 (元)`
+        ],
+        answer: 0,
+        tip: "【解析】4 份蛋餅是 35×4＝140 元，3 杯綠豆湯是 40×3＝120 元，共花 140＋120＝260 元！"
+      },
+      {
+        round: 12, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【習作 P67 大題4】買相同飲料兩杯便宜 9 元。紅茶 35 元，麥茶 27 元，小欣買 1 杯紅茶和 2 杯麥茶，共要付幾元？`,
+        options: [
+          `A. (35 ＋ 27) × 2 － 9 ＝ 115 (元)`,
+          `B. 35 ＋ 27 × 2 － 9 ＝ 80 (元)`,
+          `C. 35 ＋ 27 × 2 ＋ 9 ＝ 98 (元)`,
+          `D. 35 × 2 ＋ 27 － 9 ＝ 88 (元)`
+        ],
+        answer: 1,
+        tip: "【解析】麥茶買了兩杯（相同飲料）所以便宜 9 元：35 ＋ 54 － 9 ＝ 80 元！"
+      },
+      {
+        round: 13, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【課本 P97 例題5】3 盆仙人掌賣 270 元，定禾買 9 盆付了 1000 元，可以找回幾元？下列哪一個算式「錯誤」？`,
+        options: [
+          `A. 1000 － (270 ÷ 3) × 9`,
+          `B. 1000 － 270 × (9 ÷ 3)`,
+          `C. 1000 － 270 × 9 ÷ 3`,
+          `D. 1000 － 270 ÷ 9 × 3`
+        ],
+        answer: 3,
+        tip: "【解析】A 是先算 1 盆 90 元再乘 9；B 是先算 9 盆是 3 盆的 3 倍；D 誤用 270÷9 會把單價算錯！"
+      },
+      {
+        round: 14, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【習作 P68 大題6】3 個造型磁鐵賣 120 元，小濤買了 15 個，付了 1000 元，可找回幾元？`,
+        options: [
+          `A. 1000 － 120 × 15 ＝ 800 (元)`,
+          `B. 1000 － 120 × (15 ÷ 3) ＝ 400 (元)`,
+          `C. 1000 － (120 ÷ 3) ＝ 960 (元)`,
+          `D. 1000 － 120 ÷ (15 ÷ 3) ＝ 976 (元)`
+        ],
+        answer: 1,
+        tip: "【解析】15 個磁鐵是 3 個的 (15÷3＝5) 倍，共花 120×5＝600 元，1000－600＝400 元！"
+      },
+      {
+        round: 15, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【課本 P98 例題6】玉涵買 4 盞精油燈和 2 個手工肥皂共花了 1500 元，1 盞燈賣 300 元，1 個肥皂賣幾元？`,
+        options: [
+          `A. 1500 － 300 × 4 ÷ 2 ＝ 900 (元)`,
+          `B. (1500 － 300 × 4) ÷ 2 ＝ 150 (元)`,
+          `C. (1500 － 300) ÷ 4 ÷ 2 ＝ 150 (元)`,
+          `D. 1500 ÷ 2 － 300 × 4 ＝ 450 (元)`
+        ],
+        answer: 1,
+        tip: "【解析】必須用括號先減去 4 盞燈的價錢 (1500－1200＝300)，剩下的 300 元才是 2 個肥皂的錢，再除以 2 得 150 元！"
+      },
+      {
+        round: 16, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【習作 P68 大題6】可可買 3 盒紅豆麻糬和 2 盒花生麻糬共付 370 元，1 盒紅豆麻糬 80 元，1 盒花生麻糬賣幾元？`,
+        options: [
+          `A. 370 － 80 × 3 ÷ 2 ＝ 250 (元)`,
+          `B. (370 － 80) ÷ 2 ＝ 145 (元)`,
+          `C. (370 － 80 × 3) ÷ 2 ＝ 65 (元)`,
+          `D. (370 ＋ 80 × 3) ÷ 2 ＝ 305 (元)`
+        ],
+        answer: 2,
+        tip: "【解析】先用括號減去 3 盒紅豆麻糬 (370－240＝130)，再除以 2 盒花生麻糬，得到每盒 65 元！"
+      },
+      {
+        round: 17, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【課本 P98 GO!素養】橘子 1 個 20 元，10 個放 1 盤，整盤買便宜 15 元，媽媽買 8 盤共花幾元？誰的算式正確？`,
+        options: [
+          `A. 粉粉 (20×10)×8－15×8 與 小綠 (20×10－15)×8 都正確`,
+          `B. 只有小棕 (20 × 10) × 8 － 15 正確`,
+          `C. 只有粉粉正確，小綠錯誤`,
+          `D. 三個人的算式都不正確`
+        ],
+        answer: 0,
+        tip: "【解析】粉粉先算 8 盤原價再扣 8 個 15 元；小綠先算 1 盤促銷價 185 元再乘 8 盤，兩者皆算出 1480 元！"
+      },
+      {
+        round: 18, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【習作 P66 大題2】文華買 625 元籃球、150 元護肘、25 元頭帶和一件背心，共付 1150 元，一件背心賣幾元？`,
+        options: [
+          `A. 1150 － 625 ＋ 150 ＋ 25 ＝ 700 (元)`,
+          `B. 1150 － (625 － 150 － 25) ＝ 700 (元)`,
+          `C. 1150 － (625 ＋ 150 ＋ 25) ＝ 350 (元)`,
+          `D. (1150 － 625) ＋ 150 ＋ 25 ＝ 700 (元)`
+        ],
+        answer: 2,
+        tip: "【解析】籃球、護肘、頭帶共 625＋150＋25＝800 元，從總金額 1150 元減去 800 元，背心賣 350 元！"
+      },
+      {
+        round: 19, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【習作 P67 大題4】報社有 84 捆報紙，每捆 16 份；1 個送報員送 48 份，15 個送報員送完後，報社還剩幾份？`,
+        options: [
+          `A. 16 × 84 － 48 × 15 ＝ 624 (份)`,
+          `B. (84 － 48) × 16 － 15 ＝ 561 (份)`,
+          `C. 16 × 84 ＋ 48 × 15 ＝ 2064 (份)`,
+          `D. 84 × 48 － 16 × 15 ＝ 3792 (份)`
+        ],
+        answer: 0,
+        tip: "【解析】總報紙數 16×84＝1344 份，送出 48×15＝720 份，相減剩下 1344－720＝624 份！"
+      },
+      {
+        round: 20, type: "mc", badge: "📚 第 11～20 題：四選一選擇題",
+        text: `【課本 P97 髮圈裝箱】1200 條髮圈，每 25 條裝一包，每 4 包裝一盒，每 6 盒裝一箱，共可裝成幾箱？`,
+        options: [
+          `A. 1200 ÷ (25 × 4 × 6) ＝ 1200 ÷ 600 ＝ 2 (箱)`,
+          `B. 1200 ÷ (25 ＋ 4 ＋ 6) ＝ 34...10 (箱)`,
+          `C. 1200 ÷ (25 × 4) × 6 ＝ 72 (箱)`,
+          `D. 1200 × 25 ÷ 4 ÷ 6 ＝ 1250 (箱)`
+        ],
+        answer: 0,
+        tip: "【解析】連除以三個數等於除以這三個數的乘積：25×4×6＝600，1200÷600＝2 箱！"
+      },
+
+      // ==================== 第 21～30 題：2對2連連看配對題 (match) ====================
+      {
+        round: 21, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【課本 P96 算式】與其【湊整巧算過程與答案】配對消除：",
+        left: [{ key: "L1", label: "① 145 ＋ 102 ＋ 155 ＋ 98" }, { key: "L2", label: "② 500 － 75 － 168 － 32" }],
+        right: [{ key: "R1", label: "A. (145＋155) ＋ (102＋98) ＝ 500" }, { key: "R2", label: "B. 500 － (75＋168＋32) ＝ 225" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】加法湊整百、連減改寫為減去總和，心算速度倍增！"
+      },
+      {
+        round: 22, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【習作 P66 算式】與其【湊整巧算過程與答案】配對消除：",
+        left: [{ key: "L1", label: "① 72 ＋ 89 ＋ 28 ＋ 11" }, { key: "L2", label: "② 305 － 150 － 43 － 57" }],
+        right: [{ key: "R1", label: "A. (72＋28) ＋ (89＋11) ＝ 200" }, { key: "R2", label: "B. 305 － (150＋43＋57) ＝ 55" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】72＋28＝100、89＋11＝100；43＋57＝100，善用湊整更準確！"
+      },
+      {
+        round: 23, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【加減混合算式】與其【簡化步驟與結果】配對消除：",
+        left: [{ key: "L1", label: "① 382 － 199 － 101 － 62" }, { key: "L2", label: "② 285 － 173 ＋ 115 － 127" }],
+        right: [{ key: "R1", label: "A. 382 － (300 ＋ 62) ＝ 20" }, { key: "R2", label: "B. 400 － 300 ＝ 100" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】199＋101＝300；285＋115＝400 且 173＋127＝300！"
+      },
+      {
+        round: 24, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【加減抵消算式】與其【簡化步驟與結果】配對消除：",
+        left: [{ key: "L1", label: "① 352 － 138 － 52 － 10" }, { key: "L2", label: "② 465 － 345 － 65 ＋ 345" }],
+        right: [{ key: "R1", label: "A. 352 － (190 ＋ 10) ＝ 152" }, { key: "R2", label: "B. (465 － 65) － 345 ＋ 345 ＝ 400" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】138＋52＋10＝200；－345＋345 抵消後剩 465－65＝400！"
+      },
+      {
+        round: 25, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【習作 P66 學習重點例題】與其【正確計算答案】配對消除：",
+        left: [{ key: "L1", label: "① 28 ÷ 4 ＋ 3 × 12" }, { key: "L2", label: "② 75 ＋ (45 － 25) × 3" }],
+        right: [{ key: "R1", label: "A. 7 ＋ 36 ＝ 43" }, { key: "R2", label: "B. 75 ＋ 60 ＝ 135" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】先乘除後加減，有括號先算括號內！"
+      },
+      {
+        round: 26, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【習作 P67 四則算式】與其【正確計算答案】配對消除：",
+        left: [{ key: "L1", label: "① 36 × 2 ＋ 42 × 5" }, { key: "L2", label: "② 135 ＋ 20 × 4 ÷ 8" }],
+        right: [{ key: "R1", label: "A. 72 ＋ 210 ＝ 282" }, { key: "R2", label: "B. 135 ＋ 10 ＝ 145" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】20×4÷8 ＝ 80÷8 ＝ 10，再加上 135 得到 145！"
+      },
+      {
+        round: 27, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【習作 P68 有括號算式】與其【最終計算答案】配對消除：",
+        left: [{ key: "L1", label: "① 144 － 108 ÷ (9 ＋ 27)" }, { key: "L2", label: "② (573 ＋ 27) × 7 － 122" }],
+        right: [{ key: "R1", label: "A. 144 － 3 ＝ 141" }, { key: "R2", label: "B. 4200 － 122 ＝ 4078" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】先算括號內：108÷36＝3；600×7＝4200！"
+      },
+      {
+        round: 28, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【習作 P67 乘除算式】與其【最終計算答案】配對消除：",
+        left: [{ key: "L1", label: "① 240 ÷ 3 ÷ 4 ÷ 5" }, { key: "L2", label: "② 25 × 8 ÷ 50 ÷ 2" }],
+        right: [{ key: "R1", label: "A. 240 ÷ 60 ＝ 4" }, { key: "R2", label: "B. 200 ÷ 100 ＝ 2" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】240÷(3×4×5)＝4；200÷(50×2)＝2！"
+      },
+      {
+        round: 29, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【課本 P98 GO!素養橘子促銷】與【兩位同學解題思路】配對消除：",
+        left: [{ key: "L1", label: "① 先算8盤原價總金額，再扣8盤便宜的錢(粉粉)" }, { key: "L2", label: "② 先算1盤促銷後的金額，再乘以8盤(小綠)" }],
+        right: [{ key: "R1", label: "A. (20 × 10) × 8 － 15 × 8" }, { key: "R2", label: "B. (20 × 10 － 15) × 8" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】兩種解題思路都正確，皆能算出 1480 元！"
+      },
+      {
+        round: 30, type: "match", badge: "🔗 第 21～30 題：2對2配對題",
+        text: "請將【多步驟計算規則】與【括號變號口訣】配對消除：",
+        left: [{ key: "L1", label: "① 連續減去多個數，改寫為減去總和" }, { key: "L2", label: "② 四則混合且含有括號的多步驟算式" }],
+        right: [{ key: "R1", label: "A. 括號前面是減號，括號內減號變「＋」號" }, { key: "R2", label: "B. 先算括號內，再算乘除，後算加減" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】恭喜完成全部 30 題！準備迎接壓軸太鼓達人獎勵關！"
+      }
+    ];
+
+    /* ==========================================================================
+       3. 單人闖關核心狀態機 (Single Player State Engine)
+       ========================================================================== */
+    const GAME_STATE = {
+      roundIndex: 0,
+      timer: 35,
+      maxTimer: 35,
+      timerInterval: null,
+      autoAdvanceTimer: null,
+      hasError: false,
+
+      player: {
+        score: 0,
+        quizScore: 0,
+        gameScore: 0,
+        correctCount: 0,
+        answered: false,
+        answerVal: null,
+        selectedMatches: {},
+        selectedL: null,
+        selectedR: null
+      },
+
+      currentMiniGame: 0,
+      mgTimer: 20.0,
+      mgInterval: null,
+      mgScore: 0
+    };
+
+    // DOM 快取
+    const elP1Total = document.getElementById('p1-total');
+    const elP1QuizPts = document.getElementById('p1-quiz-pts');
+    const elP1GamePts = document.getElementById('p1-game-pts');
+    const elP1Acc = document.getElementById('p1-acc');
+    const elP1ScoreBox = document.getElementById('p1-score-box');
+    const elP1QText = document.getElementById('p1-q-text');
+    const elP1Interactive = document.getElementById('p1-interactive');
+    const elP1Analysis = document.getElementById('p1-analysis-card');
+    const elP1AnalysisText = document.getElementById('p1-analysis-text');
+    const elP1Status = document.getElementById('p1-status-stamp');
+    const elP1FloatFx = document.getElementById('p1-float-fx');
+    const elQTypeBadge = document.getElementById('q-type-badge');
+    const elQShortcutHint = document.getElementById('q-shortcut-hint');
+
+    const elRoundIndicator = document.getElementById('round-indicator');
+    const elTimerText = document.getElementById('timer-text');
+    const elTimerBar = document.getElementById('timer-bar');
+    const elTeacherBar = document.getElementById('teacher-control-bar');
+    const elCtrlMsg = document.getElementById('ctrl-msg');
+    let gameStarted = false;
+
+    function showFloatFx(text, colorClass) {
+      if (!elP1FloatFx) return;
+      elP1FloatFx.className = `pointer-events-none absolute top-12 right-6 z-30 font-num font-black text-xl sm:text-3xl ${colorClass}`;
+      elP1FloatFx.textContent = text;
+      void elP1FloatFx.offsetWidth;
+      elP1FloatFx.classList.add('animate-float-score');
+    }
+
+    /**
+     * PC 與 iPad 通用即時觸控與滑鼠點擊綁定器
+     */
+    function bindInstantTap(el, handler) {
+      if (!el) return;
+      let lastTouchTs = 0;
+
+      const triggerVisual = () => {
+        el.classList.add('btn-pressed');
+        setTimeout(() => el.classList.remove('btn-pressed'), 140);
+      };
+
+      el.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        lastTouchTs = performance.now();
+        triggerVisual();
+        handler(e);
+      }, { passive: false });
+
+      el.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch' || (performance.now() - lastTouchTs < 450)) return;
+        e.preventDefault();
+        triggerVisual();
+        handler(e);
+      });
+    }
+
+    /**
+     * 畫布多點觸控與滑鼠點擊綁定器
+     */
+    function bindCanvasTouch(canvas, pointHandler) {
+      if (!canvas) return;
+      if (canvas._touchStartFn) canvas.removeEventListener('touchstart', canvas._touchStartFn);
+      if (canvas._pointerDownFn) canvas.removeEventListener('pointerdown', canvas._pointerDownFn);
+
+      let lastCanvasTouchTs = 0;
+
+      canvas._touchStartFn = (e) => {
+        e.preventDefault();
+        lastCanvasTouchTs = performance.now();
+        const r = canvas.getBoundingClientRect();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          pointHandler(t.clientX - r.left, t.clientY - r.top);
+        }
+      };
+
+      canvas._pointerDownFn = (e) => {
+        if (e.pointerType === 'touch' || (performance.now() - lastCanvasTouchTs < 450)) return;
+        e.preventDefault();
+        const r = canvas.getBoundingClientRect();
+        pointHandler(e.clientX - r.left, e.clientY - r.top);
+      };
+
+      canvas.addEventListener('touchstart', canvas._touchStartFn, { passive: false });
+      canvas.addEventListener('pointerdown', canvas._pointerDownFn);
+    }
+
+    function startGame() {
+      try { sound.init(); } catch (e) {}
+      const sm = document.getElementById('start-modal');
+      if (sm) sm.classList.add('hidden');
+      if (!gameStarted) {
+        gameStarted = true;
+        loadQuestion(0);
+      }
+    }
+    window.startGame = startGame;
+
+    function launchDirectMiniGame(mode) {
+      startGame();
+      if (mode === 'shoot') startMiniGameShooting();
+      else if (mode === 'whack') startMiniGameWhack();
+      else if (mode === 'taiko') startMiniGameTaiko();
+    }
+    window.launchDirectMiniGame = launchDirectMiniGame;
+
+    function toggleMute() {
+      sound.isMuted = !sound.isMuted;
+      document.getElementById('sound-toggle').textContent = sound.isMuted ? '🔇' : '🔊';
+    }
+    window.toggleMute = toggleMute;
+
+    function loadQuestion(index) {
+      if (index >= QUESTION_BANK.length) {
+        showFinalVictory();
+        return;
+      }
+
+      if (mgActive) {
+        mgActive = false;
+        if (mgAnimId) cancelAnimationFrame(mgAnimId);
+        if (GAME_STATE.mgInterval) clearInterval(GAME_STATE.mgInterval);
+      }
+      elMgOverlay.classList.add('hidden');
+      document.getElementById('mg-result-modal').classList.add('hidden');
+
+      const qData = QUESTION_BANK[index];
+      GAME_STATE.maxTimer = 35;
+      GAME_STATE.timer = 35;
+      GAME_STATE.hasError = false;
+      if (GAME_STATE.autoAdvanceTimer) clearTimeout(GAME_STATE.autoAdvanceTimer);
+
+      // 重置單人答題狀態
+      GAME_STATE.player.answered = false;
+      GAME_STATE.player.answerVal = null;
+      GAME_STATE.player.selectedMatches = {};
+      GAME_STATE.player.selectedL = null;
+      GAME_STATE.player.selectedR = null;
+
+      sound.setBpm(128);
+      updateHUD();
+
+      elTeacherBar.classList.add('hidden');
+      elTeacherBar.classList.remove('flex');
+      elP1Analysis.classList.add('hidden');
+      elP1Analysis.classList.remove('flex');
+      elP1Status.classList.add('hidden');
+
+      elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
+      elRoundIndicator.textContent = `ROUND ${index + 1} / 30`;
+      elQTypeBadge.textContent = qData.badge;
+
+      if (qData.type === 'tf3') {
+        elQShortcutHint.textContent = '快捷鍵: 1 / 2 / 3';
+      } else if (qData.type === 'mc') {
+        elQShortcutHint.textContent = '快捷鍵: 1~4 或 A / B / C / D';
+      } else {
+        elQShortcutHint.textContent = '點擊左右兩側配對消除';
+      }
+
+      elP1QText.innerHTML = qData.text;
+      renderInteractive(qData);
+      startTimer();
+    }
+
+    function renderInteractive(qData) {
+      elP1Interactive.innerHTML = '';
+      elP1Interactive.classList.remove('pointer-events-none', 'opacity-65');
+
+      if (qData.type === 'tf3') {
+        elP1Interactive.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 h-full items-stretch">
+            <button id="btn-correct" class="w-full min-h-[56px] sm:min-h-[84px] rounded-2xl bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/70 hover:border-emerald-400 p-3 sm:p-4 flex sm:flex-col items-center justify-between sm:justify-center gap-2 active:scale-[0.98] transition-all shadow-lg touch-btn">
+              <span class="flex items-center gap-2 text-base sm:text-xl font-black text-emerald-300 pointer-events-none">
+                <span>⭕</span> <span>完全正確</span>
+              </span>
+              <span class="text-xs text-slate-300 pointer-events-none">算則與計算皆無誤 [1]</span>
+            </button>
+            <button id="btn-rule" class="w-full min-h-[56px] sm:min-h-[84px] rounded-2xl bg-gradient-to-br from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/70 hover:border-rose-400 p-3 sm:p-4 flex sm:flex-col items-center justify-between sm:justify-center gap-2 active:scale-[0.98] transition-all shadow-lg touch-btn">
+              <span class="flex items-center gap-2 text-base sm:text-xl font-black text-rose-300 pointer-events-none">
+                <span>❌</span> <span>錯在算則符號</span>
+              </span>
+              <span class="text-xs text-slate-300 pointer-events-none">括號變號或運算順序錯 [2]</span>
+            </button>
+            <button id="btn-calc" class="w-full min-h-[56px] sm:min-h-[84px] rounded-2xl bg-gradient-to-br from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/70 hover:border-amber-400 p-3 sm:p-4 flex sm:flex-col items-center justify-between sm:justify-center gap-2 active:scale-[0.98] transition-all shadow-lg touch-btn">
+              <span class="flex items-center gap-2 text-base sm:text-xl font-black text-amber-300 pointer-events-none">
+                <span>💡</span> <span>錯在計算數值</span>
+              </span>
+              <span class="text-xs text-slate-300 pointer-events-none">算則對但心算錯數字 [3]</span>
+            </button>
+          </div>
+        `;
+
+        bindInstantTap(document.getElementById('btn-correct'), () => handleAnswer('correct'));
+        bindInstantTap(document.getElementById('btn-rule'), () => handleAnswer('rule'));
+        bindInstantTap(document.getElementById('btn-calc'), () => handleAnswer('calc'));
+      } else if (qData.type === 'mc') {
+        let btns = '';
+        qData.options.forEach((opt, idx) => {
+          btns += `
+            <button id="mc-${idx}" class="w-full min-h-[56px] sm:min-h-[72px] text-left px-3.5 sm:px-5 py-2.5 sm:py-3.5 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-between text-sm sm:text-base md:text-lg font-bold shadow-lg hover:bg-slate-800/90 touch-btn">
+              <span class="text-slate-100 break-words leading-snug pointer-events-none math-font">${opt}</span>
+              <span class="text-xs font-mono px-2 py-1 rounded-lg bg-slate-800 text-cyan-300 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
+            </button>
+          `;
+        });
+        elP1Interactive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 h-full">${btns}</div>`;
+        qData.options.forEach((_, idx) => {
+          bindInstantTap(document.getElementById(`mc-${idx}`), () => handleAnswer(idx));
+        });
+      } else if (qData.type === 'match') {
+        let leftCols = '';
+        qData.left.forEach(item => {
+          leftCols += `
+            <button id="match-${item.key}" class="w-full flex-1 min-h-[60px] sm:min-h-[74px] px-3.5 sm:px-5 py-2.5 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/45 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base md:text-lg font-bold shadow-lg touch-btn">
+              <span class="w-full leading-snug break-words pointer-events-none math-font">${item.label}</span>
+            </button>
+          `;
+        });
+
+        const shuffledRight = [...qData.right].sort(() => Math.random() - 0.5);
+        let rightCols = '';
+        shuffledRight.forEach(item => {
+          rightCols += `
+            <button id="match-${item.key}" class="w-full flex-1 min-h-[60px] sm:min-h-[74px] px-3.5 sm:px-5 py-2.5 rounded-2xl bg-slate-900/95 border-2 border-amber-500/45 hover:border-amber-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base md:text-lg font-bold shadow-lg touch-btn">
+              <span class="w-full leading-snug break-words pointer-events-none math-font">${item.label}</span>
+            </button>
+          `;
+        });
+
+        elP1Interactive.innerHTML = `
+          <div class="grid grid-cols-2 gap-3 sm:gap-5 h-full items-stretch">
+            <div class="flex flex-col gap-2.5 sm:gap-3.5 h-full justify-between">${leftCols}</div>
+            <div class="flex flex-col gap-2.5 sm:gap-3.5 h-full justify-between">${rightCols}</div>
+          </div>
+        `;
+
+        qData.left.forEach(item => {
+          bindInstantTap(document.getElementById(`match-${item.key}`), () => {
+            handleMatchClick('L', item.key);
+          });
+        });
+        shuffledRight.forEach(item => {
+          bindInstantTap(document.getElementById(`match-${item.key}`), () => {
+            handleMatchClick('R', item.key);
+          });
+        });
+      }
+    }
+
+    function handleAnswer(val) {
+      if (GAME_STATE.player.answered) return;
+
+      GAME_STATE.player.answered = true;
+      GAME_STATE.player.answerVal = val;
+      if (GAME_STATE.timerInterval) clearInterval(GAME_STATE.timerInterval);
+
+      const qData = QUESTION_BANK[GAME_STATE.roundIndex];
+      elP1Interactive.classList.add('pointer-events-none', 'opacity-65');
+      elP1Status.classList.remove('hidden');
+
+      const isCorrect = (qData.type === 'match') ? (val === true) : (val === qData.answer);
+
+      if (isCorrect) {
+        sound.playCorrect();
+        // 35秒內若剩餘 >= 20 秒（即 15 秒內快速答對），享 2X 雙倍積分！
+        const isFastBonus = (GAME_STATE.timer >= 20);
+        const timeBonus = Math.floor(GAME_STATE.timer * 2.5);
+        const baseEarned = 100 + timeBonus;
+        const earned = isFastBonus ? (baseEarned * 2) : baseEarned;
+
+        GAME_STATE.player.quizScore += earned;
+        GAME_STATE.player.score = GAME_STATE.player.quizScore + GAME_STATE.player.gameScore;
+        GAME_STATE.player.correctCount++;
+
+        if (isFastBonus) {
+          elP1Status.className = 'text-xs sm:text-sm font-black px-3 py-1 rounded-xl bg-amber-950 border border-amber-400 text-amber-300 font-num shadow';
+          elP1Status.textContent = `⚡ 極速2X +${earned}`;
+          showFloatFx(`⚡ 2X +${earned}`, 'text-amber-300');
+        } else {
+          elP1Status.className = 'text-xs sm:text-sm font-black px-3 py-1 rounded-xl bg-emerald-950 border border-emerald-500 text-emerald-300 font-num';
+          elP1Status.textContent = `✅ 正確 +${earned}`;
+          showFloatFx(`+${earned}`, 'text-emerald-400');
+        }
+
+        elTeacherBar.classList.remove('hidden');
+        elTeacherBar.classList.add('flex');
+        elTeacherBar.style.borderColor = '#10b981';
+        elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-emerald-400 whitespace-nowrap';
+        elCtrlMsg.textContent = '🎉 答對了！1.5 秒後自動進入下一題...';
+
+        GAME_STATE.autoAdvanceTimer = setTimeout(() => {
+          advanceToNextStep();
+        }, 1500);
+      } else {
+        sound.playWrong();
+        const penalty = 50;
+        GAME_STATE.player.quizScore -= penalty;
+        GAME_STATE.player.score = GAME_STATE.player.quizScore + GAME_STATE.player.gameScore;
+        GAME_STATE.hasError = true;
+
+        elTimerText.textContent = '⏸️ 暫停';
+        elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
+
+        elP1Status.className = 'text-xs sm:text-sm font-black px-3 py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num';
+        elP1Status.textContent = `❌ 扣分 -${penalty}`;
+        showFloatFx(`-${penalty}`, 'text-rose-400');
+
+        elP1Analysis.classList.remove('hidden');
+        elP1Analysis.classList.add('flex');
+        elP1AnalysisText.innerHTML = qData.tip;
+
+        elTeacherBar.classList.remove('hidden');
+        elTeacherBar.classList.add('flex');
+        elTeacherBar.style.borderColor = '#ef4444';
+        elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-rose-300 whitespace-nowrap';
+        elCtrlMsg.textContent = '🚨 作答有誤(扣50分)・請閱讀解析後點擊繼續 ➔';
+      }
+
+      updateHUD();
+    }
+
+    function handleMatchClick(side, key) {
+      const pState = GAME_STATE.player;
+      if (pState.answered) return;
+
+      if (!pState.selectedL && side === 'L') {
+        pState.selectedL = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      } else if (pState.selectedL && side === 'L') {
+        highlightMatchBtn(pState.selectedL, false);
+        pState.selectedL = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      } else if (!pState.selectedR && side === 'R') {
+        pState.selectedR = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      } else if (pState.selectedR && side === 'R') {
+        highlightMatchBtn(pState.selectedR, false);
+        pState.selectedR = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      }
+
+      if (pState.selectedL && pState.selectedR) {
+        const qData = QUESTION_BANK[GAME_STATE.roundIndex];
+        const isPairCorrect = (qData.matches[pState.selectedL] === pState.selectedR);
+
+        if (isPairCorrect) {
+          sound.playCorrect();
+          pState.selectedMatches[pState.selectedL] = pState.selectedR;
+          eliminateMatchPair(pState.selectedL, pState.selectedR);
+          pState.selectedL = null;
+          pState.selectedR = null;
+
+          if (Object.keys(pState.selectedMatches).length === 2) {
+            setTimeout(() => { handleAnswer(true); }, 320);
+          }
+        } else {
+          const prevL = pState.selectedL;
+          const prevR = pState.selectedR;
+          pState.selectedL = null;
+          pState.selectedR = null;
+          shakeMatchBtn(prevL);
+          shakeMatchBtn(prevR);
+          handleAnswer(false);
+        }
+      }
+    }
+
+    function highlightMatchBtn(key, active) {
+      const btn = document.getElementById(`match-${key}`);
+      if (!btn) return;
+      if (active) {
+        btn.classList.add('border-amber-400', 'bg-amber-950/50', 'scale-[1.02]');
+      } else {
+        btn.classList.remove('border-amber-400', 'bg-amber-950/50', 'scale-[1.02]');
+      }
+    }
+
+    function shakeMatchBtn(key) {
+      const btn = document.getElementById(`match-${key}`);
+      if (!btn) return;
+      btn.classList.add('border-rose-500', 'bg-rose-950/60');
+      setTimeout(() => { btn.classList.remove('border-rose-500', 'bg-rose-950/60'); }, 500);
+    }
+
+    function eliminateMatchPair(lKey, rKey) {
+      const lBtn = document.getElementById(`match-${lKey}`);
+      const rBtn = document.getElementById(`match-${rKey}`);
+      [lBtn, rBtn].forEach(b => {
+        if (b) {
+          b.disabled = true;
+          b.classList.add('border-emerald-400', 'bg-emerald-600/40');
+          setTimeout(() => {
+            b.style.transition = 'all 0.32s ease-out';
+            b.style.opacity = '0';
+            b.style.transform = 'scale(0.88)';
+            b.style.pointerEvents = 'none';
+            b.style.visibility = 'hidden';
+          }, 180);
+        }
+      });
+    }
+
+    function handleTimeout() {
+      sound.playWrong();
+      GAME_STATE.hasError = true;
+      if (GAME_STATE.timerInterval) clearInterval(GAME_STATE.timerInterval);
+
+      if (!GAME_STATE.player.answered) {
+        handleAnswer('timeout');
+      }
+      elCtrlMsg.textContent = '⌛ 35 秒時間結束(扣50分)・請閱讀解析後點擊繼續 ➔';
+      elTeacherBar.classList.remove('hidden');
+      elTeacherBar.classList.add('flex');
+    }
+
+    function startTimer() {
+      if (GAME_STATE.timerInterval) clearInterval(GAME_STATE.timerInterval);
+      const maxTimer = GAME_STATE.maxTimer || 35;
+      elTimerText.textContent = `${GAME_STATE.timer}s`;
+      elTimerBar.style.width = '100%';
+
+      GAME_STATE.timerInterval = setInterval(() => {
+        if (GAME_STATE.hasError || GAME_STATE.player.answered) return;
+        GAME_STATE.timer--;
+        const pct = Math.max(0, (GAME_STATE.timer / maxTimer) * 100);
+        elTimerBar.style.width = `${pct}%`;
+        elTimerText.textContent = `${GAME_STATE.timer}s`;
+
+        if (GAME_STATE.timer === 7) {
+          sound.setBpm(152);
+        }
+
+        if (GAME_STATE.timer <= 0) {
+          clearInterval(GAME_STATE.timerInterval);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function prevQuestion() {
+      if (GAME_STATE.roundIndex > 0) {
+        if (GAME_STATE.autoAdvanceTimer) clearTimeout(GAME_STATE.autoAdvanceTimer);
+        GAME_STATE.roundIndex--;
+        loadQuestion(GAME_STATE.roundIndex);
+      }
+    }
+    window.prevQuestion = prevQuestion;
+
+    function nextQuestion() {
+      if (mgActive) {
+        skipMiniGame();
+        return;
+      }
+      advanceToNextStep();
+    }
+    window.nextQuestion = nextQuestion;
+
+    function advanceToNextStep() {
+      if (GAME_STATE.autoAdvanceTimer) clearTimeout(GAME_STATE.autoAdvanceTimer);
+      elTeacherBar.classList.add('hidden');
+      elTeacherBar.classList.remove('flex');
+
+      const currentRoundNum = GAME_STATE.roundIndex + 1;
+
+      // 每 10 題穿插 1 款單人手速獎勵小遊戲
+      if (currentRoundNum === 10 && GAME_STATE.currentMiniGame < 1) {
+        GAME_STATE.currentMiniGame = 1;
+        startMiniGameShooting();
+        return;
+      } else if (currentRoundNum === 20 && GAME_STATE.currentMiniGame < 2) {
+        GAME_STATE.currentMiniGame = 2;
+        startMiniGameWhack();
+        return;
+      } else if (currentRoundNum === 30 && GAME_STATE.currentMiniGame < 3) {
+        GAME_STATE.currentMiniGame = 3;
+        startMiniGameTaiko();
+        return;
+      }
+
+      GAME_STATE.roundIndex++;
+      loadQuestion(GAME_STATE.roundIndex);
+    }
+    window.advanceToNextStep = advanceToNextStep;
+
+    function updateHUD() {
+      GAME_STATE.player.score = GAME_STATE.player.quizScore + GAME_STATE.player.gameScore;
+
+      elP1Total.textContent = GAME_STATE.player.score;
+      if (elP1QuizPts) elP1QuizPts.textContent = GAME_STATE.player.quizScore;
+      if (elP1GamePts) elP1GamePts.textContent = GAME_STATE.player.gameScore;
+      elP1Acc.textContent = `${GAME_STATE.player.correctCount}/30`;
+
+      if (GAME_STATE.player.score < 0) elP1ScoreBox.classList.add('negative-score');
+      else elP1ScoreBox.classList.remove('negative-score');
+    }
+
+    /* ==========================================================================
+       4. 單人手速獎勵小遊戲（每 10 題解鎖：射擊①、打地鼠②、太鼓達人③）
+       ========================================================================== */
+    const elMgOverlay = document.getElementById('minigame-overlay');
+    const elMgTitle = document.getElementById('mg-title');
+    const elMgTimer = document.getElementById('mg-timer');
+    const elMgP1Pts = document.getElementById('mg-p1-pts');
+    const elMgHint = document.getElementById('mg-hint');
+    const elMgCtrl = document.getElementById('mg-ctrl');
+
+    const cvs = document.getElementById('mg-canvas');
+    const ctx = cvs.getContext('2d');
+
+    let mgActive = false;
+    let mgAnimId = null;
+
+    function resizeMiniGameCanvas() {
+      if (!cvs || !cvs.parentElement) return;
+      const rect = cvs.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const w = rect.width || 720;
+      const h = rect.height || 380;
+      cvs.width = w * dpr;
+      cvs.height = h * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      cvs.style.width = `${w}px`;
+      cvs.style.height = `${h}px`;
+
+      if (mgActive && GAME_STATE.currentMiniGame === 2 && singleWhack) {
+        singleWhack.initHoles();
+      }
+    }
+
+    function openMiniGameUI(title, hint) {
+      try { sound.init(); } catch (e) {}
+      sound.setBpm(152);
+      if (GAME_STATE.timerInterval) clearInterval(GAME_STATE.timerInterval);
+      if (GAME_STATE.autoAdvanceTimer) clearTimeout(GAME_STATE.autoAdvanceTimer);
+      elTeacherBar.classList.add('hidden');
+      elTeacherBar.classList.remove('flex');
+      if (cvs._touchStartFn) cvs.removeEventListener('touchstart', cvs._touchStartFn);
+      if (cvs._pointerDownFn) cvs.removeEventListener('pointerdown', cvs._pointerDownFn);
+
+      elMgOverlay.classList.remove('hidden');
+      elMgTitle.textContent = title;
+      elMgHint.textContent = hint;
+
+      GAME_STATE.mgTimer = 20.0;
+      GAME_STATE.mgScore = 0;
+      elMgP1Pts.textContent = '0';
+      elMgTimer.textContent = '20.0s';
+      mgActive = true;
+
+      resizeMiniGameCanvas();
+      if (elMgCtrl) elMgCtrl.innerHTML = '';
+
+      if (GAME_STATE.mgInterval) clearInterval(GAME_STATE.mgInterval);
+      const startTime = performance.now();
+      GAME_STATE.mgInterval = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        const remain = Math.max(0, 20.0 - elapsed);
+        GAME_STATE.mgTimer = remain;
+        elMgTimer.textContent = `${remain.toFixed(1)}s`;
+
+        if (remain <= 0) {
+          clearInterval(GAME_STATE.mgInterval);
+          finishMiniGame();
+        }
+      }, 100);
+    }
+
+    function finishMiniGame() {
+      mgActive = false;
+      if (mgAnimId) cancelAnimationFrame(mgAnimId);
+      elMgOverlay.classList.add('hidden');
+
+      // 將獎勵小遊戲積分正式算入總積分
+      GAME_STATE.player.gameScore += GAME_STATE.mgScore;
+      updateHUD();
+
+      const modal = document.getElementById('mg-result-modal');
+      document.getElementById('mg-res-p1').textContent = (GAME_STATE.mgScore >= 0 ? `+${GAME_STATE.mgScore}` : `${GAME_STATE.mgScore}`);
+
+      const winEl = document.getElementById('mg-winner-announcement');
+      winEl.innerHTML = `🎉 獎勵分數已併入總積分！目前累計總分：<b class="text-cyan-300 text-base">${GAME_STATE.player.score}</b> 分`;
+      modal.classList.remove('hidden');
+    }
+
+    function skipMiniGame() {
+      mgActive = false;
+      if (mgAnimId) cancelAnimationFrame(mgAnimId);
+      if (GAME_STATE.mgInterval) clearInterval(GAME_STATE.mgInterval);
+      elMgOverlay.classList.add('hidden');
+      document.getElementById('mg-result-modal').classList.add('hidden');
+
+      if (GAME_STATE.currentMiniGame === 3) {
+        showFinalVictory();
+      } else {
+        GAME_STATE.roundIndex++;
+        loadQuestion(GAME_STATE.roundIndex);
+      }
+    }
+    window.skipMiniGame = skipMiniGame;
+
+    function closeMgResultModal() {
+      document.getElementById('mg-result-modal').classList.add('hidden');
+      if (GAME_STATE.currentMiniGame === 3) {
+        showFinalVictory();
+      } else {
+        GAME_STATE.roundIndex++;
+        loadQuestion(GAME_STATE.roundIndex);
+      }
+    }
+    window.closeMgResultModal = closeMgResultModal;
+
+    /* ==========================================================
+       【小遊戲 ①】（第 10 題後）：🎯 單人極速射擊靶場
+       ========================================================== */
+    class SingleShooter {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.targets = [];
+        this.lasers = [];
+        this.effects = [];
+        this.initTargets();
+      }
+
+      initTargets() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        const types = [
+          { emoji: '🎯', pts: 25, r: 26, speed: 2.5 },
+          { emoji: '🦅', pts: 50, r: 28, speed: 3.1 },
+          { emoji: '⭐', pts: 30, r: 24, speed: 2.0 },
+          { emoji: '💣', pts: -25, r: 24, speed: 2.4 }
+        ];
+
+        this.targets = [];
+        for (let i = 0; i < 6; i++) {
+          const t = types[Math.floor(Math.random() * types.length)];
+          this.targets.push({
+            x: 45 + Math.random() * (w - 90),
+            y: 38 + i * ((h - 76) / 6),
+            emoji: t.emoji,
+            pts: t.pts,
+            r: t.r,
+            vx: (Math.random() > 0.5 ? 1 : -1) * t.speed,
+            minX: 35,
+            maxX: w - 35
+          });
+        }
+      }
+
+      shoot(x, y) {
+        sound.playShoot();
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        this.lasers.push({
+          startX: w * 0.5,
+          startY: h - 10,
+          endX: x,
+          endY: y,
+          color: 'rgba(6, 182, 212, 1)',
+          alpha: 1.0
+        });
+
+        let hit = false;
+        for (let i = this.targets.length - 1; i >= 0; i--) {
+          const tg = this.targets[i];
+          const dist = Math.hypot(x - tg.x, y - tg.y);
+          if (dist <= tg.r + 22) {
+            hit = true;
+            if (tg.emoji === '💣') {
+              sound.playWrong();
+              GAME_STATE.mgScore -= 25;
+              this.effects.push({ x: tg.x, y: tg.y, text: '💥 -25', color: '#f87171', life: 25 });
+            } else {
+              sound.playCorrect();
+              GAME_STATE.mgScore += tg.pts;
+              this.effects.push({ x: tg.x, y: tg.y, text: `+${tg.pts}`, color: '#38bdf8', life: 25 });
+            }
+            elMgP1Pts.textContent = GAME_STATE.mgScore;
+
+            this.targets.splice(i, 1);
+            setTimeout(() => { this.respawnSingle(); }, 320);
+            break;
+          }
+        }
+
+        if (!hit) {
+          this.effects.push({ x, y, text: 'MISS', color: '#64748b', life: 15 });
+        }
+      }
+
+      respawnSingle() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+        const types = [
+          { emoji: '🎯', pts: 25, r: 26, speed: 2.5 },
+          { emoji: '🦅', pts: 50, r: 28, speed: 3.1 },
+          { emoji: '⭐', pts: 30, r: 24, speed: 2.0 },
+          { emoji: '💣', pts: -25, r: 24, speed: 2.4 }
+        ];
+        const t = types[Math.floor(Math.random() * types.length)];
+
+        this.targets.push({
+          x: 45 + Math.random() * (w - 90),
+          y: 38 + Math.random() * (h - 76),
+          emoji: t.emoji,
+          pts: t.pts,
+          r: t.r,
+          vx: (Math.random() > 0.5 ? 1 : -1) * t.speed,
+          minX: 35,
+          maxX: w - 35
+        });
+      }
+
+      autoShootClosest() {
+        if (this.targets.length > 0) {
+          const goodTargets = this.targets.filter(t => t.emoji !== '💣');
+          const target = goodTargets.length > 0 ? goodTargets[0] : this.targets[0];
+          this.shoot(target.x, target.y);
+        }
+      }
+
+      update() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+
+        this.targets.forEach(t => {
+          t.maxX = w - 35;
+          t.x += t.vx;
+          if (t.x < t.minX) { t.x = t.minX; t.vx *= -1; }
+          if (t.x > t.maxX) { t.x = t.maxX; t.vx *= -1; }
+        });
+
+        for (let i = this.lasers.length - 1; i >= 0; i--) {
+          this.lasers[i].alpha -= 0.15;
+          if (this.lasers[i].alpha <= 0) this.lasers.splice(i, 1);
+        }
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.2;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        this.ctx.fillStyle = '#060d1b';
+        this.ctx.fillRect(0, 0, w, h);
+
+        // 中央瞄準光環
+        this.ctx.strokeStyle = 'rgba(6, 182, 212, 0.22)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(w * 0.5, h * 0.5, Math.min(w, h) * 0.25, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.font = '32px sans-serif';
+
+        this.targets.forEach(t => this.ctx.fillText(t.emoji, t.x, t.y));
+
+        this.lasers.forEach(l => {
+          this.ctx.strokeStyle = l.color;
+          this.ctx.lineWidth = 4;
+          this.ctx.beginPath();
+          this.ctx.moveTo(l.startX, l.startY);
+          this.ctx.lineTo(l.endX, l.endY);
+          this.ctx.stroke();
+        });
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 22px sans-serif';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    let singleShooter = null;
+
+    function startMiniGameShooting() {
+      GAME_STATE.currentMiniGame = 1;
+      openMiniGameUI(
+        "【第 10 題獎勵關】🎯 極速射擊靶場",
+        "直接點擊畫面目標射擊 (避開炸彈 💣)"
+      );
+
+      singleShooter = new SingleShooter(cvs, ctx);
+
+      bindCanvasTouch(cvs, (x, y) => {
+        singleShooter.shoot(x, y);
+      });
+
+      elMgCtrl.innerHTML = `
+        <button id="btn-p1-shoot" class="w-full max-w-md py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-base sm:text-lg border-2 border-cyan-300 shadow-xl active:scale-95 touch-btn flex items-center justify-center gap-2">
+          <span>🔥 自動鎖定射擊 [空白鍵 / A]</span>
+        </button>
+      `;
+
+      bindInstantTap(document.getElementById('btn-p1-shoot'), () => singleShooter.autoShootClosest());
+
+      function shootLoop() {
+        if (!mgActive) return;
+        singleShooter.update();
+        singleShooter.draw();
+        mgAnimId = requestAnimationFrame(shootLoop);
+      }
+      mgAnimId = requestAnimationFrame(shootLoop);
+    }
+    window.startMiniGameShooting = startMiniGameShooting;
+
+    /* ==========================================================
+       【小遊戲 ②】（第 20 題後）：🔨 單人瘋狂打地鼠擂台 (6 洞全屏)
+       ========================================================== */
+    class SingleWhack {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.holes = [];
+        this.effects = [];
+        this.popTimer = 0;
+        this.initHoles();
+      }
+
+      initHoles() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+        this.holes = [];
+
+        const cols = 3;
+        const rows = 2;
+        const cellW = w / cols;
+        const cellH = h / rows;
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            this.holes.push({
+              x: cellW * (c + 0.5),
+              y: cellH * (r + 0.58),
+              rx: Math.min(cellW * 0.34, 76),
+              ry: Math.min(cellH * 0.16, 26),
+              mole: null
+            });
+          }
+        }
+      }
+
+      spawnMole() {
+        const avail = this.holes.filter(h => !h.mole);
+        if (avail.length > 0 && Math.random() < 0.72) {
+          const h = avail[Math.floor(Math.random() * avail.length)];
+          const types = [
+            { emoji: '🐹', pts: 25 },
+            { emoji: '👑', pts: 50 },
+            { emoji: '💎', pts: 40 },
+            { emoji: '💣', pts: -25 }
+          ];
+          const m = types[Math.floor(Math.random() * types.length)];
+          h.mole = { emoji: m.emoji, pts: m.pts, life: 36, maxLife: 36 };
+        }
+      }
+
+      hit(x, y) {
+        sound.playHammer();
+        for (let i = 0; i < this.holes.length; i++) {
+          const h = this.holes[i];
+          if (h.mole) {
+            const dist = Math.hypot(x - h.x, y - (h.y - 14));
+            if (dist <= 56) {
+              const m = h.mole;
+              if (m.emoji === '💣') {
+                sound.playWrong();
+                GAME_STATE.mgScore -= 25;
+                this.effects.push({ x: h.x, y: h.y - 28, text: '💥 -25', color: '#f87171', life: 25 });
+              } else {
+                sound.playCorrect();
+                GAME_STATE.mgScore += m.pts;
+                this.effects.push({ x: h.x, y: h.y - 28, text: `🔨 +${m.pts}`, color: '#38bdf8', life: 25 });
+              }
+              elMgP1Pts.textContent = GAME_STATE.mgScore;
+              h.mole = null;
+              break;
+            }
+          }
+        }
+      }
+
+      update() {
+        this.popTimer++;
+        if (this.popTimer % 16 === 0) {
+          this.spawnMole();
+        }
+
+        this.holes.forEach(h => {
+          if (h.mole) {
+            h.mole.life--;
+            if (h.mole.life <= 0) h.mole = null;
+          }
+        });
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.3;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        this.ctx.fillStyle = '#06131a';
+        this.ctx.fillRect(0, 0, w, h);
+
+        this.holes.forEach(hole => {
+          this.ctx.fillStyle = '#0e3247';
+          this.ctx.beginPath();
+          this.ctx.ellipse(hole.x, hole.y, hole.rx, hole.ry, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          this.ctx.fillStyle = '#04090f';
+          this.ctx.beginPath();
+          this.ctx.ellipse(hole.x, hole.y, hole.rx * 0.85, hole.ry * 0.75, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          if (hole.mole) {
+            const ratio = Math.sin((hole.mole.life / hole.mole.maxLife) * Math.PI);
+            const moleY = hole.y - 14 - ratio * 22;
+            this.ctx.font = '40px sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(hole.mole.emoji, hole.x, moleY);
+          }
+        });
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 24px sans-serif';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    let singleWhack = null;
+
+    function startMiniGameWhack() {
+      GAME_STATE.currentMiniGame = 2;
+      openMiniGameUI(
+        "【第 20 題獎勵關】🔨 瘋狂打地鼠擂台",
+        "快速點擊冒出的地鼠與皇冠 (避開炸彈 💣)"
+      );
+
+      singleWhack = new SingleWhack(cvs, ctx);
+
+      bindCanvasTouch(cvs, (x, y) => {
+        singleWhack.hit(x, y);
+      });
+
+      elMgCtrl.innerHTML = `
+        <div class="w-full max-w-lg bg-cyan-950/75 border border-cyan-600 px-4 py-2.5 rounded-2xl text-cyan-200 text-xs sm:text-sm font-bold text-center">
+          👆 直接在 iPad 觸控或用滑鼠點擊畫面中的地鼠洞！
+        </div>
+      `;
+
+      function whackLoop() {
+        if (!mgActive) return;
+        singleWhack.update();
+        singleWhack.draw();
+        mgAnimId = requestAnimationFrame(whackLoop);
+      }
+      mgAnimId = requestAnimationFrame(whackLoop);
+    }
+    window.startMiniGameWhack = startMiniGameWhack;
+
+    /* ==========================================================
+       【小遊戲 ③】（第 30 題後）：🥁 單人極速太鼓達人
+       ========================================================== */
+    class SingleTaiko {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.notes = [];
+        this.effects = [];
+        this.spawnTick = 0;
+      }
+
+      getTrackY() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const h = rect.height || 380;
+        return Math.floor(h * 0.5);
+      }
+
+      spawnNote() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const trackY = this.getTrackY();
+        const types = [
+          { type: 'don', color: '#ef4444', label: '🔴咚', pts: 30 },
+          { type: 'don', color: '#ef4444', label: '🔴咚', pts: 30 },
+          { type: 'ka',  color: '#0284c7', label: '🔵咔', pts: 30 },
+          { type: 'big', color: '#eab308', label: '🟡連打', pts: 50 }
+        ];
+
+        const n = types[Math.floor(Math.random() * types.length)];
+        this.notes.push({ x: w + 25, y: trackY, ...n, speed: 5.8 });
+      }
+
+      hit(type) {
+        if (type === 'don') sound.playDon();
+        else if (type === 'ka') sound.playKa();
+        else sound.playRoll();
+
+        const judgeX = 100;
+        const trackY = this.getTrackY();
+        let judged = false;
+
+        for (let i = 0; i < this.notes.length; i++) {
+          const n = this.notes[i];
+          const dist = Math.abs(n.x - judgeX);
+
+          if (dist < 70) {
+            judged = true;
+            const isMatch = (n.type === type) || (n.type === 'big');
+
+            if (isMatch) {
+              const score = (n.type === 'big' ? n.pts + 20 : n.pts);
+              GAME_STATE.mgScore += score;
+              elMgP1Pts.textContent = GAME_STATE.mgScore;
+
+              const text = dist < 28 ? `良! +${score}` : `可! +${score}`;
+              this.effects.push({
+                x: judgeX,
+                y: trackY - 25,
+                text: text,
+                color: dist < 28 ? '#facc15' : '#38bdf8',
+                life: 18
+              });
+
+              this.notes.splice(i, 1);
+            } else {
+              this.effects.push({ x: judgeX, y: trackY - 25, text: '錯!', color: '#ef4444', life: 14 });
+              this.notes.splice(i, 1);
+            }
+            break;
+          }
+        }
+
+        if (!judged) {
+          this.effects.push({ x: judgeX, y: trackY - 25, text: '空!', color: '#64748b', life: 10 });
+        }
+      }
+
+      update() {
+        this.spawnTick++;
+        if (this.spawnTick % 16 === 0) {
+          this.spawnNote();
+        }
+
+        const trackY = this.getTrackY();
+        for (let i = this.notes.length - 1; i >= 0; i--) {
+          this.notes[i].y = trackY;
+          this.notes[i].x -= this.notes[i].speed;
+          if (this.notes[i].x < 20) this.notes.splice(i, 1);
+        }
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.4;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+        const trackY = this.getTrackY();
+
+        this.ctx.fillStyle = '#080d19';
+        this.ctx.fillRect(0, 0, w, h);
+
+        // 單人中央音軌
+        this.ctx.fillStyle = '#0f2538';
+        this.ctx.fillRect(0, trackY - 42, w, 84);
+        this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(0, trackY - 42, w, 84);
+
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.font = 'bold 14px sans-serif';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText('🥁 節奏判定區', 16, trackY - 54);
+
+        // 判定圈 (x: 100)
+        this.ctx.strokeStyle = '#facc15';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.arc(100, trackY, 28, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        // 繪製音符
+        this.notes.forEach(n => {
+          this.ctx.fillStyle = n.color;
+          this.ctx.beginPath();
+          this.ctx.arc(n.x, n.y, 24, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.strokeStyle = '#ffffff';
+          this.ctx.lineWidth = 3;
+          this.ctx.stroke();
+
+          this.ctx.fillStyle = '#ffffff';
+          this.ctx.font = 'bold 13px sans-serif';
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText(n.label, n.x, n.y);
+        });
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 24px sans-serif';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    let singleTaiko = null;
+
+    function startMiniGameTaiko() {
+      GAME_STATE.currentMiniGame = 3;
+      sound.setBpm(168);
+      openMiniGameUI(
+        "【第 30 題壓軸獎勵關】🥁 極速太鼓達人",
+        "音符進入黃色判定圈時，點擊對應鼓面打擊！"
+      );
+
+      singleTaiko = new SingleTaiko(cvs, ctx);
+
+      elMgCtrl.innerHTML = `
+        <div class="w-full flex gap-2.5 sm:gap-4 p-1.5 rounded-2xl bg-slate-900/90 border border-cyan-500/50">
+          <button id="p1-don" class="flex-1 py-3.5 sm:py-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-sm sm:text-lg active:scale-95 touch-btn shadow-lg">🔴 咚 [Q / 1]</button>
+          <button id="p1-roll" class="flex-1 py-3.5 sm:py-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm sm:text-lg active:scale-95 touch-btn shadow-lg">🟡 連打 [W / 2]</button>
+          <button id="p1-ka" class="flex-1 py-3.5 sm:py-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-sm sm:text-lg active:scale-95 touch-btn shadow-lg">🔵 咔 [E / 3]</button>
+        </div>
+      `;
+
+      bindInstantTap(document.getElementById('p1-don'), () => singleTaiko.hit('don'));
+      bindInstantTap(document.getElementById('p1-roll'), () => singleTaiko.hit('big'));
+      bindInstantTap(document.getElementById('p1-ka'), () => singleTaiko.hit('ka'));
+
+      function taikoLoop() {
+        if (!mgActive) return;
+        singleTaiko.update();
+        singleTaiko.draw();
+        mgAnimId = requestAnimationFrame(taikoLoop);
+      }
+      mgAnimId = requestAnimationFrame(taikoLoop);
+    }
+    window.startMiniGameTaiko = startMiniGameTaiko;
+
+    /* ==========================================================
+       5. 終局 30 題單人榮譽結算
+       ========================================================== */
+    function showFinalVictory() {
+      sound.stopBgm();
+      updateHUD();
+      const finalModal = document.getElementById('final-modal');
+      finalModal.classList.remove('hidden');
+
+      const correctCount = GAME_STATE.player.correctCount;
+      document.getElementById('final-p1-total').textContent = GAME_STATE.player.score;
+      document.getElementById('final-p1-acc').textContent = `${correctCount} / 30`;
+      document.getElementById('final-p1-breakdown').textContent = `題庫積分 ${GAME_STATE.player.quizScore} 分 ＋ 遊戲積分 ${GAME_STATE.player.gameScore} 分`;
+
+      const starsEl = document.getElementById('final-stars');
+      const titleEl = document.getElementById('final-champion-title');
+      const quoteEl = document.getElementById('final-summary-quote');
+
+      if (correctCount >= 26) {
+        starsEl.textContent = '⭐⭐⭐';
+        titleEl.innerHTML = `🏆 <span class="text-amber-300">多步驟神算大師</span> 🏆`;
+        quoteEl.innerHTML = `太厲害了！答對 <b class="text-emerald-400">${correctCount}</b> 題，累計總分高達 <b class="text-amber-300">${GAME_STATE.player.score}</b> 分！你已完全精通「7-2 多步驟計算」的所有觀念與巧算！`;
+      } else if (correctCount >= 18) {
+        starsEl.textContent = '⭐⭐';
+        titleEl.innerHTML = `🎖️ <span class="text-cyan-300">四則計算優等生</span> 🎖️`;
+        quoteEl.innerHTML = `表現很棒！答對 <b class="text-emerald-400">${correctCount}</b> 題，累計總分 <b class="text-amber-300">${GAME_STATE.player.score}</b> 分！再複習一下括號變號口訣，就能拿下滿星榮譽！`;
+      } else {
+        starsEl.textContent = '⭐';
+        titleEl.innerHTML = `💪 <span class="text-teal-300">完成 30 題勇者挑戰</span> 💪`;
+        quoteEl.innerHTML = `順利完成全部 30 題挑戰，獲得 <b class="text-amber-300">${GAME_STATE.player.score}</b> 分！記得「有括號先算、先乘除後加減」，再挑戰一次會更進步喔！`;
+      }
+      sound.playCorrect();
+    }
+
+    /* ==========================================================
+       6. 鍵盤快捷鍵與視窗尺寸自適應監聽 (PC & iPad)
+       ========================================================== */
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '[' || e.key === 'PageUp') prevQuestion();
+      if (e.key === ']' || e.key === 'PageDown') nextQuestion();
+
+      // 射擊小遊戲快捷鍵
+      if (mgActive && GAME_STATE.currentMiniGame === 1 && singleShooter) {
+        if (e.key === ' ' || e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          singleShooter.autoShootClosest();
+        }
+      }
+
+      // 太鼓小遊戲快捷鍵
+      if (mgActive && GAME_STATE.currentMiniGame === 3 && singleTaiko) {
+        if (e.key === 'q' || e.key === 'Q' || e.key === '1') singleTaiko.hit('don');
+        if (e.key === 'w' || e.key === 'W' || e.key === '2') singleTaiko.hit('big');
+        if (e.key === 'e' || e.key === 'E' || e.key === '3') singleTaiko.hit('ka');
+      }
+
+      const q = QUESTION_BANK[GAME_STATE.roundIndex];
+      if (!q || GAME_STATE.player.answered || mgActive) return;
+
+      if (q.type === 'tf3') {
+        if (e.key === '1') handleAnswer('correct');
+        if (e.key === '2') handleAnswer('rule');
+        if (e.key === '3') handleAnswer('calc');
+      } else if (q.type === 'mc') {
+        if (e.key === '1' || e.key === 'a' || e.key === 'A') handleAnswer(0);
+        if (e.key === '2' || e.key === 'b' || e.key === 'B') handleAnswer(1);
+        if (e.key === '3' || e.key === 'c' || e.key === 'C') handleAnswer(2);
+        if (e.key === '4' || e.key === 'd' || e.key === 'D') handleAnswer(3);
+      }
+    });
+
+    // 視窗縮放或 iPad 旋轉螢幕時自動重設畫布解析度
+    window.addEventListener('resize', () => {
+      if (mgActive) {
+        resizeMiniGameCanvas();
+      }
+    });
+
+    document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+    window.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
+</body>
+</html>
