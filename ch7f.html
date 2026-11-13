@@ -1,0 +1,2357 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>國小國語【為生命找出口・最後3~4段精熟】單人極速挑戰賽</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
+    
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+      background-color: #050811;
+    }
+
+    .font-num {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    .glow-cyan {
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.45);
+      border-color: #06b6d4;
+    }
+    .glow-gold {
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.7);
+    }
+    
+    @keyframes alertPulse {
+      0%, 100% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); }
+      50% { border-color: #7f1d1d; box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+    }
+    .negative-score {
+      animation: alertPulse 1.2s infinite;
+      color: #f87171 !important;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.5);
+      border-radius: 4px;
+    }
+
+    *, *::before, *::after {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    canvas, .touch-btn, .interactive-zone {
+      touch-action: none !important;
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+      cursor: pointer;
+    }
+
+    .lesson-font {
+      font-family: 'Noto Sans TC', sans-serif;
+      letter-spacing: 0.03em;
+    }
+  </style>
+</head>
+<body class="text-white flex flex-col h-screen w-screen relative select-none bg-slate-950">
+
+  <!-- ==================== 頂部 HUD 資訊列 (單人玩家狀態・中控計時台・直達捷徑) ==================== -->
+  <header class="h-[74px] bg-slate-900/95 border-b border-slate-700/80 px-2 sm:px-4 md:px-6 flex items-center justify-between z-20 shrink-0 shadow-xl gap-1 sm:gap-3">
+    
+    <!-- 左側：挑戰者 HUD -->
+    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+      <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600 flex items-center justify-center text-lg sm:text-xl shadow-md border border-cyan-400/50">🧑‍🎓</div>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-black text-cyan-400 text-xs sm:text-sm md:text-base tracking-wider">語文挑戰者</span>
+          <span class="text-[9px] bg-cyan-950 text-cyan-300 px-1.5 py-0.5 rounded border border-cyan-800 font-mono hidden md:inline">SOLO MODE</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs font-num">
+          <span id="p1-score-box" class="px-1.5 sm:px-2 py-0.5 rounded-lg font-bold text-cyan-300 bg-slate-800 border border-cyan-700/60 transition-all text-xs sm:text-sm">
+            總分: <span id="p1-total">0</span>
+          </span>
+          <span class="text-slate-400 text-[11px] hidden sm:inline">正答: <b id="p1-acc" class="text-cyan-400">0/30</b></span>
+          <span class="text-amber-400 text-[11px] hidden md:inline">🔥連對: <b id="p1-streak">0</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中央：中控計時台 (上一題、進度、倒數、下一題) -->
+    <div class="flex items-center justify-center gap-1.5 sm:gap-3 flex-1 max-w-[540px]">
+      
+      <!-- 上一題按鈕 -->
+      <button id="btn-prev-q" onclick="prevQuestion()" title="回到上一題 (快捷鍵: [ )" class="touch-btn flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-90 border-2 border-slate-600 text-slate-100 font-black shadow transition-all shrink-0">
+        <span class="text-sm sm:text-lg">⏮️</span>
+        <span class="text-xs hidden md:inline">上一題</span>
+      </button>
+
+      <!-- 中央進度與倒數計時條 -->
+      <div class="flex flex-col items-center justify-center text-center flex-1 min-w-[110px]">
+        <div class="flex items-center gap-1 sm:gap-2">
+          <span class="text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-amber-500/60 tracking-widest hidden sm:inline" id="phase-badge">三態是非題</span>
+          <span class="text-xs sm:text-sm md:text-base font-black tracking-wider text-slate-100 font-num" id="round-indicator">ROUND 1 / 30</span>
+          <button id="sound-toggle" onclick="toggleMute()" class="text-xs text-slate-300 hover:text-white px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 active:scale-95" title="音效開關">🔊</button>
+        </div>
+        
+        <div class="w-full max-w-[240px] mt-1 flex items-center gap-1.5">
+          <div class="text-[10px] sm:text-xs font-num font-black text-slate-400 w-12 text-center" id="timer-text">25s</div>
+          <div class="flex-1 h-2 sm:h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+            <div id="timer-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下一題按鈕 -->
+      <button id="btn-next-q" onclick="nextQuestion()" title="跳至下一題 (快捷鍵: ] )" class="touch-btn flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 active:scale-90 border-2 border-emerald-400 text-white font-black shadow-lg transition-all shrink-0">
+        <span class="text-xs hidden md:inline">下一題</span>
+        <span class="text-sm sm:text-lg">⏭️</span>
+      </button>
+
+    </div>
+
+    <!-- 右側：直達小遊戲快捷鈕 -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <div class="hidden lg:flex items-center gap-1 bg-slate-800/90 px-2 py-1.5 rounded-xl border border-slate-700">
+        <span class="text-[11px] text-amber-300 font-bold">🎮獎勵關:</span>
+        <button onclick="startMiniGameShooting()" class="text-[11px] bg-rose-900/70 hover:bg-rose-800 px-1.5 py-0.5 rounded text-rose-300 border border-rose-700 active:scale-95">🎯Q10射擊</button>
+        <button onclick="startMiniGameWhack()" class="text-[11px] bg-emerald-900/70 hover:bg-emerald-800 px-1.5 py-0.5 rounded text-emerald-300 border border-emerald-700 active:scale-95">🔨Q20地鼠</button>
+        <button onclick="startMiniGameDance()" class="text-[11px] bg-lime-900/70 hover:bg-lime-800 px-1.5 py-0.5 rounded text-lime-300 border border-lime-700 active:scale-95">💃Q30舞動草原</button>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- ==================== 主要單人挑戰舞台 ==================== -->
+  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 pb-12 sm:pb-14 overflow-hidden">
+    
+    <!-- 單人精熟對戰主容器 -->
+    <section class="w-full max-w-4xl flex-1 flex flex-col justify-between gap-3 min-h-0 bg-slate-900/75 p-3 sm:p-5 rounded-3xl border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden backdrop-blur-sm">
+      
+      <!-- 頂部題型與狀態列 -->
+      <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cyan-400 shrink-0">
+        <div class="flex items-center gap-2">
+          <span id="q-category-tag" class="px-3 py-1 rounded-xl bg-cyan-950 border border-cyan-700 font-mono text-cyan-300">🎯 第 1～10 題：三態是非診斷</span>
+          <span class="text-slate-400 text-xs hidden sm:inline">〈為生命找出口〉最後 3～4 段精熟</span>
+        </div>
+        <span id="p1-status-stamp" class="text-xs sm:text-sm font-black px-2.5 py-1 rounded-lg hidden font-num"></span>
+      </div>
+
+      <!-- 題目展示卡片 -->
+      <div class="min-h-[145px] max-h-[210px] flex-shrink-0 bg-slate-900/95 rounded-2xl border-2 border-cyan-400/50 p-4 sm:p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
+        <div id="p1-q-text" class="overflow-y-auto text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed lesson-font pr-1">
+          題目載入中...
+        </div>
+        <div class="text-[11px] text-cyan-300 font-mono border-t border-slate-800/80 pt-2 flex justify-between shrink-0">
+          <span>課文重點：生字注音・詞語解釋・譬喻／誇飾／設問・段落主旨</span>
+          <span id="shortcut-hint" class="text-slate-400 hidden md:inline">快捷鍵: 1 / 2 / 3</span>
+        </div>
+      </div>
+
+      <!-- 互動答題區與錯題解析卡片 -->
+      <div class="flex-1 flex flex-col gap-2 min-h-0 relative justify-center">
+        <div id="p1-interactive" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone"></div>
+
+        <!-- 答錯深入解析 -->
+        <div id="p1-analysis-card" class="max-h-[95px] sm:max-h-[105px] rounded-2xl bg-cyan-950/95 border border-cyan-400/80 px-3.5 py-2.5 hidden flex-col justify-start text-cyan-200 shrink-0 shadow-lg overflow-hidden">
+          <div class="text-xs font-black text-cyan-300 leading-tight mb-1 flex items-center gap-1 shrink-0">
+            <span>💡 課文重點深入解析：</span>
+          </div>
+          <div id="p1-analysis-text" class="text-xs sm:text-sm font-medium leading-snug overflow-y-auto flex-1 text-slate-100 pr-1">--</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== 錯題暫停與推進中控浮動條 ==================== -->
+    <div id="teacher-control-bar" class="fixed bottom-2 left-1/2 -translate-x-1/2 z-40 hidden items-center gap-3 bg-slate-900/95 border-2 border-amber-400 px-4 py-1.5 rounded-2xl shadow-2xl backdrop-blur-md max-w-[94vw] transition-all"></div>
+
+    <!-- ==================== 單人中場手速小遊戲覆蓋層 ==================== -->
+    <div id="minigame-overlay" class="absolute inset-0 bg-slate-950 z-30 hidden flex flex-col p-2 sm:p-4">
+      
+      <!-- 頂部資訊列 -->
+      <div class="h-12 sm:h-14 bg-slate-900 border-b border-slate-700 px-3 sm:px-6 flex items-center justify-between shrink-0 rounded-t-2xl">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] sm:text-xs px-2.5 py-0.5 rounded bg-amber-500 text-slate-950 font-black tracking-widest font-num">每 10 題獎勵關</span>
+          <h2 id="mg-title" class="text-xs sm:text-base font-black text-amber-300 truncate">手速遊樂場</h2>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-6">
+          <div class="text-xs sm:text-sm text-cyan-300">獎勵得分: <b id="mg-p1-pts" class="text-cyan-400 font-num text-lg sm:text-2xl">0</b></div>
+          <div id="mg-timer" class="text-base sm:text-xl font-black text-amber-400 font-num tracking-widest">20.0s</div>
+          <button onclick="skipMiniGame()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-amber-300 shadow active:scale-95 transition-all touch-btn">
+            ⏭️ 跳過
+          </button>
+        </div>
+      </div>
+      
+      <!-- 單人全螢幕遊戲區 -->
+      <div class="flex-1 relative flex flex-col items-center justify-between p-2 bg-slate-900/70 rounded-b-2xl overflow-hidden border border-slate-800 min-h-0">
+        <div class="text-xs sm:text-sm font-bold text-amber-300 mb-1 flex items-center justify-center w-full px-2 shrink-0 text-center">
+          <span id="mg-hint">--</span>
+        </div>
+
+        <div class="flex-1 w-full relative flex items-center justify-center min-h-0">
+          <canvas id="mg-canvas" class="w-full h-full rounded-2xl bg-slate-950 border-2 border-slate-700/80 shadow-inner"></canvas>
+        </div>
+
+        <!-- 底部單人操作控制區 -->
+        <div id="mg-ctrl" class="w-full shrink-0 pt-2 flex justify-center gap-3 max-w-2xl"></div>
+      </div>
+    </div>
+
+    <!-- ==================== 開場首頁彈窗 ==================== -->
+    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 text-center">
+      <div class="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div class="text-xs font-black tracking-widest text-cyan-400 uppercase mb-2">國小國語文・課文深究（最後 3～4 段）</div>
+        <h1 class="text-xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mb-2">
+          〈為生命找出口〉<br>🧑‍🎓 單人 30 題極速精熟挑戰賽
+        </h1>
+        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4">
+          全套升級 <b class="text-amber-400">30 題完整題庫</b>！<br>
+          聚焦燈下觀察小蜘蛛織網的最後兩大段：精熟 <span class="text-cyan-400 font-bold">聚精會神、興味盎然、精疲力盡</span><br>
+          與 <span class="text-emerald-400 font-bold">譬喻（高空飛人、長跑健將）、誇飾、設問</span> 修辭與生命啟示！<br>
+          <b class="text-amber-400">每完成 10 題</b> 即可解鎖一款高分獎勵手速小遊戲！
+        </p>
+
+        <!-- 規則卡片 (10 題一階段) -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-5 text-left">
+          <div class="p-2.5 sm:p-3 rounded-2xl bg-cyan-950/50 border border-cyan-500/50">
+            <div class="text-cyan-400 font-bold text-xs mb-1">🎯 第 1～10 題</div>
+            <div class="text-[11px] text-slate-300 leading-tight">三態是非診斷題<br>第10題後：射擊靶場</div>
+          </div>
+          <div class="p-2.5 sm:p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/50">
+            <div class="text-emerald-400 font-bold text-xs mb-1">📚 第 11～20 題</div>
+            <div class="text-[11px] text-slate-300 leading-tight">四選一單選題<br>第20題後：瘋狂打地鼠</div>
+          </div>
+          <div class="p-2.5 sm:p-3 rounded-2xl bg-lime-950/50 border border-lime-500/50">
+            <div class="text-lime-400 font-bold text-xs mb-1">🔗 第 21～30 題</div>
+            <div class="text-[11px] text-slate-300 leading-tight">2對2 連連看配對<br>第30題後：舞動草原</div>
+          </div>
+        </div>
+
+        <button id="btn-start-game" onclick="startGame()" class="w-full py-3.5 sm:py-4 rounded-2xl font-black text-base sm:text-xl tracking-widest text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:opacity-95 shadow-xl glow-cyan active:scale-95 transition-all">
+          🚀 解鎖音效・開始 30 題挑戰！
+        </button>
+
+        <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-center gap-2 flex-wrap">
+          <span class="text-xs text-amber-300 font-bold">🎮 直達獎勵小遊戲測試：</span>
+          <button onclick="startGame(); startMiniGameShooting();" class="px-2.5 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-300 text-xs font-bold border border-rose-600 active:scale-95">🎯 Q10 射擊靶場</button>
+          <button onclick="startGame(); startMiniGameWhack();" class="px-2.5 py-1 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 text-xs font-bold border border-emerald-600 active:scale-95">🔨 Q20 打地鼠</button>
+          <button onclick="startGame(); startMiniGameDance();" class="px-2.5 py-1 rounded-lg bg-lime-900/60 hover:bg-lime-800 text-lime-300 text-xs font-bold border border-lime-600 active:scale-95">💃 Q30 舞動草原</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 小遊戲結算戰報彈窗 ==================== -->
+    <div id="mg-result-modal" class="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="max-w-md w-full bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-6 shadow-2xl text-center">
+        <span class="text-xs uppercase font-black text-amber-400 font-num">BONUS STAGE CLEAR</span>
+        <h3 id="mg-result-title" class="text-xl sm:text-2xl font-black text-white mt-1 mb-3">獎勵關卡戰報</h3>
+        
+        <div class="p-4 rounded-2xl bg-cyan-950/60 border border-cyan-500/50 my-3">
+          <div class="text-xs text-cyan-300 font-bold">🧑‍🎓 本關獲得額外獎勵分</div>
+          <div id="mg-res-p1" class="text-3xl sm:text-4xl font-black text-cyan-400 font-num mt-1">+0</div>
+        </div>
+
+        <div id="mg-winner-announcement" class="text-xs sm:text-sm font-bold text-slate-200 mb-4 py-2 px-3 rounded-lg bg-slate-800">
+          手速獎勵分已正式加入你的總分！
+        </div>
+
+        <button id="btn-close-mg-result" class="w-full py-3 rounded-xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:opacity-95 shadow-lg active:scale-95 transition-transform">
+          繼續下一階段挑戰 ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 終局 30 題榮譽頒獎覆蓋層 ==================== -->
+    <div id="final-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 sm:p-8 text-center overflow-y-auto">
+      <div class="max-w-xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+        
+        <span class="text-xs font-black tracking-widest text-amber-400 uppercase">30-STAGE CHALLENGE COMPLETE</span>
+        <h2 id="final-champion-title" class="text-2xl sm:text-4xl font-black text-white mt-1 mb-4">🏆 30 題精熟挑戰完成！</h2>
+
+        <div class="p-5 sm:p-6 rounded-2xl bg-cyan-950/50 border-2 border-cyan-400 mb-5">
+          <div class="text-4xl mb-1">🧑‍🎓</div>
+          <h3 class="text-sm sm:text-base font-black text-cyan-400">最終挑戰總分</h3>
+          <div id="final-p1-total" class="text-4xl sm:text-6xl font-black text-cyan-300 font-num my-1">0</div>
+          <div class="flex items-center justify-center gap-4 text-xs sm:text-sm text-slate-300 font-mono mt-2">
+            <span>正答題數：<b id="final-p1-acc" class="text-cyan-300">0/30</b></span>
+            <span>最高連對：<b id="final-p1-maxstreak" class="text-amber-400">0</b> 題</span>
+          </div>
+        </div>
+
+        <div id="final-summary-quote" class="text-xs sm:text-sm font-bold text-slate-300 mb-5 bg-slate-800/70 p-3.5 rounded-xl leading-relaxed">
+          你就像燈下的小蜘蛛一樣，聚精會神、堅持到底完成了全部 30 道關卡！
+        </div>
+
+        <button onclick="location.reload()" class="px-8 py-3.5 rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:opacity-95 shadow-xl active:scale-95 transition-all">
+          🔄 重新挑戰 30 題精熟賽
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== 遊戲核心 JavaScript 邏輯 ==================== -->
+  <script>
+    /* ==========================================================================
+       1. 原生 Web Audio API 合成音效引擎 (SoundEngine)
+       ========================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.compressor = null;
+        this.isMuted = false;
+        this.bpm = 128;
+        this.bgmTimer = null;
+        this.step = 0;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+
+          this.compressor = this.ctx.createDynamicsCompressor();
+          this.compressor.threshold.setValueAtTime(-18, this.ctx.currentTime);
+          this.compressor.knee.setValueAtTime(10, this.ctx.currentTime);
+          this.compressor.ratio.setValueAtTime(5, this.ctx.currentTime);
+          this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+          this.compressor.release.setValueAtTime(0.2, this.ctx.currentTime);
+
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+
+          this.compressor.connect(this.masterGain);
+          this.masterGain.connect(this.ctx.destination);
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        this.startBgm();
+      }
+
+      setBpm(newBpm) {
+        this.bpm = newBpm;
+        if (this.bgmTimer) {
+          this.stopBgm();
+          this.startBgm();
+        }
+      }
+
+      startBgm() {
+        if (this.bgmTimer || !this.ctx) return;
+        const intervalMs = (60 / this.bpm / 4) * 1000;
+        this.bgmTimer = setInterval(() => {
+          if (this.isMuted) return;
+          this.playBgmStep(this.step);
+          this.step = (this.step + 1) % 16;
+        }, intervalMs);
+      }
+
+      stopBgm() {
+        if (this.bgmTimer) {
+          clearInterval(this.bgmTimer);
+          this.bgmTimer = null;
+        }
+      }
+
+      playBgmStep(s) {
+        if (!this.ctx || !this.compressor) return;
+        const t = this.ctx.currentTime;
+
+        if (s % 4 === 0) {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.frequency.setValueAtTime(160, t);
+          osc.frequency.exponentialRampToValueAtTime(35, t + 0.12);
+          gain.gain.setValueAtTime(0.35, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.13);
+        }
+
+        if (s === 4 || s === 12) {
+          const bufferSize = this.ctx.sampleRate * 0.08;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1400;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.18, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.compressor);
+          noise.start(t);
+        }
+
+        if (s % 2 === 1) {
+          const bufferSize = this.ctx.sampleRate * 0.025;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'highpass';
+          filter.frequency.value = 7500;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(s === 14 ? 0.09 : 0.05, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + (s === 14 ? 0.06 : 0.025));
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.compressor);
+          noise.start(t);
+        }
+      }
+
+      playCorrect() {
+        if (this.isMuted || !this.ctx) return;
+        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        freqs.forEach((freq, i) => {
+          const t = this.ctx.currentTime + i * 0.06;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.28);
+        });
+      }
+
+      playWrong() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, t);
+        osc.frequency.exponentialRampToValueAtTime(70, t + 0.35);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.36);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.38);
+      }
+
+      playGrab() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, t);
+        osc.frequency.setValueAtTime(1318.51, t + 0.04);
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.13);
+      }
+
+      playShoot() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(950, t);
+        osc.frequency.exponentialRampToValueAtTime(90, t + 0.11);
+        gain.gain.setValueAtTime(0.28, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      }
+
+      playHammer() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(190, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.14);
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      }
+
+      playStep(dirIndex = 0) {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const notes = [523.25, 587.33, 659.25, 783.99];
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(notes[dirIndex % 4], t);
+        osc.frequency.exponentialRampToValueAtTime(notes[dirIndex % 4] * 1.25, t + 0.08);
+        gain.gain.setValueAtTime(0.24, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.1);
+      }
+
+      playBeatPerfect() {
+        if (this.isMuted || !this.ctx) return;
+        const freqs = [587.33, 880, 1174.66];
+        freqs.forEach((f, idx) => {
+          const t = this.ctx.currentTime + idx * 0.04;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, t);
+          gain.gain.setValueAtTime(0.28, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.24);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /* ==========================================================================
+       2. 〈為生命找出口〉最後3~4段完整 30 題單人題庫
+          第 1~10 題：三態是非診斷題 (tf3)
+          第 11~20 題：四選一單選題 (mc)
+          第 21~30 題：2對2 連連看配對題 (match)
+       ========================================================================== */
+    const SOLO_QUESTION_BANK = [
+      // ==================== 1~10 題：三態是非診斷題 (tf3: 'correct', 'rule'[字音詞義], 'calc'[修辭文意]) ====================
+      {
+        round: 1, type: "tf3", badge: "三態是非題",
+        text: `【詞語解釋判斷】<br>課文：「我和父親兩人<span class="text-cyan-300">聚精會神</span>的看著小蜘蛛織網。」<br>👉 「聚精會神」是指集中精神，專心一意。`,
+        answer: "correct",
+        tip: "【完全正確】「聚精會神」的意思就是集中精神，專心一意，形容我和父親非常專注的觀察小蜘蛛！"
+      },
+      {
+        round: 2, type: "tf3", badge: "三態是非題",
+        text: `【詞語解釋判斷】<br>課文：「<span class="text-cyan-300">興味盎然</span>的看著小蜘蛛織網。」<br>👉 「興味盎然」是指興趣很高昂的樣子。`,
+        answer: "correct",
+        tip: "【完全正確】「興味盎然」就是興趣很高昂的樣子，「盎」讀作 ㄤˋ，字音與解釋皆正確！"
+      },
+      {
+        round: 3, type: "tf3", badge: "三態是非題",
+        text: `【多音字讀音診斷】<br>課文：「繞著架好的經度線一<span class="text-cyan-300">圈</span>圈向內跑。」<br>👉 句中的「圈」字讀作「ㄐㄩㄢˋ」，與「豬圈」同音。`,
+        answer: "rule",
+        tip: "【錯在字音詞義】大陷阱！「一圈圈、項圈、圈選」的「圈」都讀作「ㄑㄩㄢ」；關養牲畜的「豬圈、牛圈」才讀作「ㄐㄩㄢˋ」！"
+      },
+      {
+        round: 4, type: "tf3", badge: "三態是非題",
+        text: `【生字注音診斷】<br>課文語詞：「興味<span class="text-cyan-300">盎</span>然」與「精<span class="text-cyan-300">疲</span>力<span class="text-cyan-300">盡</span>」<br>👉 「盎」讀作「ㄧㄤ」，「疲」讀作「ㄆㄧˊ」，「盡」讀作「ㄐㄧㄣˋ」。`,
+        answer: "rule",
+        tip: "【錯在字音詞義】「疲（ㄆㄧˊ）」與「盡（ㄐㄧㄣˋ）」都對，但「興味盎然」的「盎」應該讀作「ㄤˋ」（第四聲），不是「ㄧㄤ」！"
+      },
+      {
+        round: 5, type: "tf3", badge: "三態是非題",
+        text: `【課文修辭判斷】<br>課文：「一開始，牠<span class="text-cyan-300">像是個藝高膽大的高空飛人</span>。」<br>👉 作者將小蜘蛛比喻成高空飛人，運用了「譬喻」修辭。`,
+        answer: "correct",
+        tip: "【完全正確】用「像是」把用絲索盪下來的小蜘蛛比喻成「藝高膽大的高空飛人」，是生動的譬喻修辭！"
+      },
+      {
+        round: 6, type: "tf3", badge: "三態是非題",
+        text: `【修辭與文意判斷】<br>課文：「看牠精疲力盡一動也不能動的樣子，<span class="text-cyan-300">真比跑了馬拉松還累呢！</span>」<br>👉 這句話運用了「設問」修辭。`,
+        answer: "calc",
+        tip: "【錯在修辭文意】這句話誇大形容小蜘蛛織完網後的疲憊程度，運用的是「誇飾」修辭，不是設問！"
+      },
+      {
+        round: 7, type: "tf3", badge: "三態是非題",
+        text: `【修辭與文意判斷】<br>課文最後一段：「望著這面小小的蛛網，我在想，<span class="text-cyan-300">我們是否也學到一些什麼呢？</span>」<br>👉 這句話運用了「誇飾」修辭。`,
+        answer: "calc",
+        tip: "【錯在修辭文意】作者在結尾提出疑問，引發讀者思考，運用的是「設問」修辭，不是誇飾！"
+      },
+      {
+        round: 8, type: "tf3", badge: "三態是非題",
+        text: `【織網順序文意】<br>👉 小蜘蛛織網時，先變成長跑健將「一圈圈向內跑」，接著才像高空飛人固定好四周的「經度線」。`,
+        answer: "calc",
+        tip: "【錯在修辭文意】順序顛倒囉！課文中是「一開始」像高空飛人固定四周的經度線，「接著」才變成長跑健將向內跑！"
+      },
+      {
+        round: 9, type: "tf3", badge: "三態是非題",
+        text: `【字詞解釋診斷】<br>課文語詞：「藝高<span class="text-cyan-300">膽</span>大」<br>👉 課本解釋「膽」是指「人體內負責消化的器官，與勇氣無關」。`,
+        answer: "rule",
+        tip: "【錯在字音詞義】課本解釋「膽」是指「勇氣，古人以為勇氣由膽發出」，所以「藝高膽大」是指技藝高超、勇氣十足！"
+      },
+      {
+        round: 10, type: "tf3", badge: "三態是非題",
+        text: `【課文主旨啟示】<br>👉 作者在最後一段問「我們是否也學到一些什麼呢？」，是希望我們學習小蜘蛛堅持到底、不輕言放棄的精神。`,
+        answer: "correct",
+        tip: "【完全正確】透過觀察小蜘蛛歷經艱辛仍堅持織好網的過程，啟發我們面對困難時要堅持到底、為生命找出路！"
+      },
+
+      // ==================== 11~20 題：四選一單選題 (mc) ====================
+      {
+        round: 11, type: "mc", badge: "四選一選擇題",
+        text: `下列哪一個課文語詞的注音「完全正確」？`,
+        options: [
+          `A. 興味「盎」然：ㄧㄤˋ`,
+          `B. 藝高「膽」大：ㄉㄢˇ`,
+          `C. 精「疲」力盡：ㄆㄧˇ`,
+          `D. 一「圈」圈：ㄐㄩㄢˋ`
+        ],
+        answer: 1,
+        tip: "【解析】「膽」讀作 ㄉㄢˇ！A 的「盎」應讀 ㄤˋ；C 的「疲」應讀 ㄆㄧˊ；D 的「圈」應讀 ㄑㄩㄢ。"
+      },
+      {
+        round: 12, type: "mc", badge: "四選一選擇題",
+        text: `下列哪一個詞語中的「圈」字，讀音與課文「一圈圈」的「圈」相同？`,
+        options: [
+          `A. 豬圈`,
+          `B. 牛圈`,
+          `C. 圈選`,
+          `D. 羊圈`
+        ],
+        answer: 2,
+        tip: "【解析】「一圈圈」與「圈選、項圈」的「圈」都讀作 ㄑㄩㄢ；豬圈、牛圈、羊圈的「圈」讀作 ㄐㄩㄢˋ。"
+      },
+      {
+        round: 13, type: "mc", badge: "四選一選擇題",
+        text: `課本中解釋為「指集中精神，專心一意」的是哪一個四字語詞？`,
+        options: [
+          `A. 興味盎然`,
+          `B. 藝高膽大`,
+          `C. 聚精會神`,
+          `D. 精疲力盡`
+        ],
+        answer: 2,
+        tip: "【解析】「聚精會神」是指集中精神，專心一意。"
+      },
+      {
+        round: 14, type: "mc", badge: "四選一選擇題",
+        text: `課本中解釋為「興趣很高昂的樣子」的是哪一個四字語詞？`,
+        options: [
+          `A. 興味盎然`,
+          `B. 聚精會神`,
+          `C. 精疲力盡`,
+          `D. 暗暗發急`
+        ],
+        answer: 0,
+        tip: "【解析】「興味盎然」是指興趣很高昂的樣子。"
+      },
+      {
+        round: 15, type: "mc", badge: "四選一選擇題",
+        text: `課文中「用絲索把自己從燈架的上端一次次盪下來」，作者把這時的小蜘蛛比喻成什麼？`,
+        options: [
+          `A. 長跑健將`,
+          `B. 高空飛人`,
+          `C. 馬拉松選手`,
+          `D. 建築工人`
+        ],
+        answer: 1,
+        tip: "【解析】課文寫道：「一開始，牠像是個藝高膽大的高空飛人，用絲索把自己從燈架的上端一次次盪下來。」"
+      },
+      {
+        round: 16, type: "mc", badge: "四選一選擇題",
+        text: `小蜘蛛「固定好四周的經度線」之後，接著又變成什麼角色繼續織網？`,
+        options: [
+          `A. 高空飛人`,
+          `B. 跳遠選手`,
+          `C. 長跑健將`,
+          `D. 體操國手`
+        ],
+        answer: 2,
+        tip: "【解析】課文寫道：「接著，又變成長跑健將，繞著架好的經度線一圈圈向內跑。」"
+      },
+      {
+        round: 17, type: "mc", badge: "四選一選擇題",
+        text: `下列哪一個句子「沒有」使用「譬喻」修辭？`,
+        options: [
+          `A. 牠像是個藝高膽大的高空飛人`,
+          `B. 接著，又變成長跑健將`,
+          `C. 我們是否也學到一些什麼呢？`,
+          `D. 弟弟跑起來像一陣風`
+        ],
+        answer: 2,
+        tip: "【解析】C 選項「我們是否也學到一些什麼呢？」是提出問題引發思考的「設問」修辭，其餘皆為譬喻修辭。"
+      },
+      {
+        round: 18, type: "mc", badge: "四選一選擇題",
+        text: `「看牠精疲力盡一動也不能動的樣子，真比跑了馬拉松還累呢！」這句話主要運用了哪一種修辭？`,
+        options: [
+          `A. 設問修辭`,
+          `B. 誇飾修辭`,
+          `C. 排比修辭`,
+          `D. 頂真修辭`
+        ],
+        answer: 1,
+        tip: "【解析】用「比跑了馬拉松還累」來誇大形容小蜘蛛的疲累程度，屬於「誇飾」修辭。"
+      },
+      {
+        round: 19, type: "mc", badge: "四選一選擇題",
+        text: `觀察小蜘蛛織網時，為什麼我和父親會「不由暗暗為牠發急」？`,
+        options: [
+          `A. 因為蜘蛛網被風吹破了`,
+          `B. 因為幾次看牠放緩腳步，以為牠跑不動了`,
+          `C. 因為燈架突然搖晃起來`,
+          `D. 因為小蜘蛛從絲索上掉下來`
+        ],
+        answer: 1,
+        tip: "【解析】課文寫道：「幾次看牠放緩腳步，以為牠跑不動了，不由暗暗為牠發急。」"
+      },
+      {
+        round: 20, type: "mc", badge: "四選一選擇題",
+        text: `綜合最後兩段課文，小蜘蛛能順利完成整面網最關鍵的原因是什麼？`,
+        options: [
+          `A. 有父親在旁邊幫忙拉絲線`,
+          `B. 即使幾次放緩腳步，仍然堅持下去不放棄`,
+          `C. 因為這面網非常小，不需要花任何力氣`,
+          `D. 因為牠先跑了馬拉松練習體力`
+        ],
+        answer: 1,
+        tip: "【解析】課文強調小蜘蛛「幾次看牠放緩腳步，以為牠跑不動了……但牠仍然堅持下去，直至整面網都織好」，毅力與堅持是關鍵！"
+      },
+
+      // ==================== 21~30 題：2對2連連看配對題 (match) ====================
+      {
+        round: 21, type: "match", badge: "2對2配對題",
+        text: "請將【課文語詞】與其【正確解釋】配對消除：",
+        left: [{ key: "L1", label: "① 聚精會神" }, { key: "L2", label: "② 興味盎然" }],
+        right: [{ key: "R1", label: "A. 集中精神，專心一意" }, { key: "R2", label: "B. 興趣很高昂的樣子" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】聚精會神＝集中精神，專心一意；興味盎然＝興趣很高昂的樣子！"
+      },
+      {
+        round: 22, type: "match", badge: "2對2配對題",
+        text: "請將【課文語詞】與其【正確解釋】配對消除：",
+        left: [{ key: "L1", label: "① 不由" }, { key: "L2", label: "② 健將" }],
+        right: [{ key: "R1", label: "A. 不禁、忍不住" }, { key: "R2", label: "B. 運動或其他活動的能手" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】不由＝不禁、忍不住；健將＝運動或其他活動的能手！"
+      },
+      {
+        round: 23, type: "match", badge: "2對2配對題",
+        text: "請將【多音字詞語】與其【正確讀音】配對消除：",
+        left: [{ key: "L1", label: "① 一「圈」圈（課文）" }, { key: "L2", label: "② 豬「圈」、牛「圈」" }],
+        right: [{ key: "R1", label: "A. ㄑㄩㄢ" }, { key: "R2", label: "B. ㄐㄩㄢˋ" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】一圈圈讀「ㄑㄩㄢ」；豬圈、牛圈讀「ㄐㄩㄢˋ」！"
+      },
+      {
+        round: 24, type: "match", badge: "2對2配對題",
+        text: "請將【課文生字】與其【正確注音】配對消除：",
+        left: [{ key: "L1", label: "① 興味「盎」然" }, { key: "L2", label: "② 藝高「膽」大" }],
+        right: [{ key: "R1", label: "A. ㄤˋ" }, { key: "R2", label: "B. ㄉㄢˇ" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】興味「盎」然讀 ㄤˋ；藝高「膽」大讀 ㄉㄢˇ！"
+      },
+      {
+        round: 25, type: "match", badge: "2對2配對題",
+        text: "請將【課文文句】與其【使用的修辭技巧】配對消除：",
+        left: [{ key: "L1", label: "① 牠像是個藝高膽大的高空飛人" }, { key: "L2", label: "② 我們是否也學到一些什麼呢？" }],
+        right: [{ key: "R1", label: "A. 譬喻修辭" }, { key: "R2", label: "B. 設問修辭" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】把小蜘蛛比喻為高空飛人是「譬喻」；結尾提問引發思考是「設問」！"
+      },
+      {
+        round: 26, type: "match", badge: "2對2配對題",
+        text: "請將【課文文句】與其【使用的修辭技巧】配對消除：",
+        left: [{ key: "L1", label: "① 接著，又變成長跑健將" }, { key: "L2", label: "② 真比跑了馬拉松還累呢！" }],
+        right: [{ key: "R1", label: "A. 譬喻修辭" }, { key: "R2", label: "B. 誇飾修辭" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】比喻成長跑健將是「譬喻」；比跑馬拉松還累是「誇飾」！"
+      },
+      {
+        round: 27, type: "match", badge: "2對2配對題",
+        text: "請將【小蜘蛛的動作】與其【比喻的角色】配對消除：",
+        left: [{ key: "L1", label: "① 用絲索從燈架上端一次次盪下" }, { key: "L2", label: "② 繞著架好的經度線一圈圈向內跑" }],
+        right: [{ key: "R1", label: "A. 高空飛人" }, { key: "R2", label: "B. 長跑健將" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】從燈架盪下像「高空飛人」；繞著經度線向內跑像「長跑健將」！"
+      },
+      {
+        round: 28, type: "match", badge: "2對2配對題",
+        text: "請將【課文語詞】與其【課本例句情境】配對消除：",
+        left: [{ key: "L1", label: "① 興味盎然" }, { key: "L2", label: "② 精疲力盡" }],
+        right: [{ key: "R1", label: "A. 看著地上的螞蟻，想像成其中一員" }, { key: "R2", label: "B. 登山路線難走，把大家弄得很疲憊" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】興味盎然的看螞蟻；登山路線難走讓人精疲力盡！"
+      },
+      {
+        round: 29, type: "match", badge: "2對2配對題",
+        text: "請將【我和父親的反應】與其【發生原因】配對消除：",
+        left: [{ key: "L1", label: "① 聚精會神、興味盎然" }, { key: "L2", label: "② 不由暗暗為牠發急" }],
+        right: [{ key: "R1", label: "A. 昨晚燈下看著小蜘蛛織網" }, { key: "R2", label: "B. 幾次看牠放緩腳步，以為跑不動了" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】因為小蜘蛛織網精彩所以聚精會神；因為放緩腳步所以暗暗發急！"
+      },
+      {
+        round: 30, type: "match", badge: "2對2配對題",
+        text: "請將【課文段落】與其【核心啟示重點】配對消除：",
+        left: [{ key: "L1", label: "① 第三段（燈下觀蛛織網）" }, { key: "L2", label: "② 第四段（望網省思）" }],
+        right: [{ key: "R1", label: "A. 描寫小蜘蛛克服困難、堅持織網的過程" }, { key: "R2", label: "B. 啟發我們面對困境時堅持到底、為生命找出路" }],
+        matches: { "L1": "R1", "L2": "R2" },
+        tip: "【解析】第三段敘寫小蜘蛛織網經過，第四段點出對我們的生命啟示！"
+      }
+    ];
+
+    /* ==========================================================================
+       3. 單人挑戰核心狀態機 (Solo State Engine)
+       ========================================================================== */
+    const SOLO_STATE = {
+      roundIndex: 0,
+      timer: 25,
+      maxTimer: 25,
+      timerInterval: null,
+      autoAdvanceTimer: null,
+      hasError: false,
+
+      score: 0,
+      correctCount: 0,
+      streak: 0,
+      maxStreak: 0,
+      answered: false,
+      answerVal: null,
+      selectedMatches: {},
+      selectedL: null,
+      selectedR: null,
+
+      currentMiniGame: 0,
+      mgTimer: 20.0,
+      mgInterval: null,
+      mgP1Score: 0
+    };
+
+    // DOM 快取
+    const elP1Total = document.getElementById('p1-total');
+    const elP1Acc = document.getElementById('p1-acc');
+    const elP1Streak = document.getElementById('p1-streak');
+    const elP1ScoreBox = document.getElementById('p1-score-box');
+    const elP1QText = document.getElementById('p1-q-text');
+    const elP1Interactive = document.getElementById('p1-interactive');
+    const elP1Analysis = document.getElementById('p1-analysis-card');
+    const elP1AnalysisText = document.getElementById('p1-analysis-text');
+    const elP1Status = document.getElementById('p1-status-stamp');
+    const elPhaseBadge = document.getElementById('phase-badge');
+    const elQCategoryTag = document.getElementById('q-category-tag');
+    const elShortcutHint = document.getElementById('shortcut-hint');
+
+    const elRoundIndicator = document.getElementById('round-indicator');
+    const elTimerText = document.getElementById('timer-text');
+    const elTimerBar = document.getElementById('timer-bar');
+    const elTeacherBar = document.getElementById('teacher-control-bar');
+
+    function startGame() {
+      try { sound.init(); } catch (e) {}
+      const sm = document.getElementById('start-modal');
+      if (sm) sm.classList.add('hidden');
+      loadSoloQuestion(0);
+    }
+    window.startGame = startGame;
+
+    function toggleMute() {
+      sound.isMuted = !sound.isMuted;
+      document.getElementById('sound-toggle').textContent = sound.isMuted ? '🔇' : '🔊';
+    }
+    window.toggleMute = toggleMute;
+
+    function loadSoloQuestion(index) {
+      if (index >= SOLO_QUESTION_BANK.length) {
+        showSoloVictory();
+        return;
+      }
+
+      if (mgActive) {
+        mgActive = false;
+        if (mgAnimId) cancelAnimationFrame(mgAnimId);
+        if (SOLO_STATE.mgInterval) clearInterval(SOLO_STATE.mgInterval);
+      }
+      elMgOverlay.classList.add('hidden');
+      document.getElementById('mg-result-modal').classList.add('hidden');
+
+      const qData = SOLO_QUESTION_BANK[index];
+      SOLO_STATE.maxTimer = (qData.type === 'match') ? 35 : 25;
+      SOLO_STATE.timer = SOLO_STATE.maxTimer;
+      SOLO_STATE.hasError = false;
+      if (SOLO_STATE.autoAdvanceTimer) clearTimeout(SOLO_STATE.autoAdvanceTimer);
+
+      // 重置單題作答狀態
+      SOLO_STATE.answered = false;
+      SOLO_STATE.answerVal = null;
+      SOLO_STATE.selectedMatches = {};
+      SOLO_STATE.selectedL = null;
+      SOLO_STATE.selectedR = null;
+
+      sound.setBpm(128);
+      updateSoloHUD();
+
+      elTeacherBar.classList.add('hidden');
+      elTeacherBar.classList.remove('flex');
+      elP1Analysis.classList.add('hidden');
+      elP1Analysis.classList.remove('flex');
+      elP1Status.classList.add('hidden');
+
+      elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
+      elRoundIndicator.textContent = `ROUND ${index + 1} / 30`;
+      elPhaseBadge.textContent = qData.badge;
+
+      if (qData.type === 'tf3') {
+        elQCategoryTag.textContent = '🎯 第 1～10 題：三態是非診斷';
+        elShortcutHint.textContent = '快捷鍵: 1 (完全正確) / 2 (字音詞義) / 3 (修辭文意)';
+      } else if (qData.type === 'mc') {
+        elQCategoryTag.textContent = '📚 第 11～20 題：四選一精熟選擇';
+        elShortcutHint.textContent = '快捷鍵: 1~4 或 A~D';
+      } else {
+        elQCategoryTag.textContent = '🔗 第 21～30 題：2對2 連連看配對';
+        elShortcutHint.textContent = '點擊左側題目再點擊右側對應答案';
+      }
+
+      elP1QText.innerHTML = qData.text;
+      renderSoloInteractive(qData.type, qData);
+      startSoloTimer();
+    }
+
+    function renderSoloInteractive(type, itemData) {
+      elP1Interactive.innerHTML = '';
+      elP1Interactive.classList.remove('pointer-events-none', 'opacity-60');
+
+      if (type === 'tf3') {
+        elP1Interactive.innerHTML = `
+          <div class="flex flex-col gap-2.5 h-full justify-center">
+            <button id="solo-btn-correct" class="w-full flex-1 min-h-[52px] sm:min-h-[58px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 hover:from-emerald-900 border-2 border-emerald-500/60 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn">
+              <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-emerald-300 pointer-events-none">
+                <span>⭕</span> <span>1. 完全正確</span>
+              </span>
+              <span class="text-xs text-slate-400 pointer-events-none hidden sm:inline">字音、詞義、修辭與文意皆無誤</span>
+            </button>
+            <button id="solo-btn-rule" class="w-full flex-1 min-h-[52px] sm:min-h-[58px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 hover:from-rose-900 border-2 border-rose-500/60 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn">
+              <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-rose-300 pointer-events-none">
+                <span>❌</span> <span>2. 錯在字音詞義</span>
+              </span>
+              <span class="text-xs text-slate-400 pointer-events-none hidden sm:inline">讀音標錯或語詞解釋不符</span>
+            </button>
+            <button id="solo-btn-calc" class="w-full flex-1 min-h-[52px] sm:min-h-[58px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 hover:from-amber-900 border-2 border-amber-500/60 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn">
+              <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-amber-300 pointer-events-none">
+                <span>💡</span> <span>3. 錯在修辭文意</span>
+              </span>
+              <span class="text-xs text-slate-400 pointer-events-none hidden sm:inline">修辭判斷有誤或情節文意不符</span>
+            </button>
+          </div>
+        `;
+
+        document.getElementById('solo-btn-correct').addEventListener('pointerdown', (e) => { e.preventDefault(); handleSoloAnswer('correct'); });
+        document.getElementById('solo-btn-rule').addEventListener('pointerdown', (e) => { e.preventDefault(); handleSoloAnswer('rule'); });
+        document.getElementById('solo-btn-calc').addEventListener('pointerdown', (e) => { e.preventDefault(); handleSoloAnswer('calc'); });
+      } else if (type === 'mc') {
+        let btns = '';
+        itemData.options.forEach((opt, idx) => {
+          btns += `
+            <button id="solo-mc-${idx}" class="w-full h-full min-h-[54px] text-left px-4 py-3 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-500/60 active:scale-[0.99] transition-all flex items-center justify-between text-sm sm:text-base font-bold shadow hover:bg-slate-800 touch-btn">
+              <span class="text-slate-100 break-words leading-snug pointer-events-none lesson-font">${opt}</span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded-lg bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
+            </button>
+          `;
+        });
+        elP1Interactive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 h-full">${btns}</div>`;
+        itemData.options.forEach((_, idx) => {
+          document.getElementById(`solo-mc-${idx}`).addEventListener('pointerdown', (e) => { e.preventDefault(); handleSoloAnswer(idx); });
+        });
+      } else if (type === 'match') {
+        let leftCols = '';
+        itemData.left.forEach(item => {
+          leftCols += `
+            <button id="solo-match-${item.key}" class="w-full flex-1 min-h-[56px] sm:min-h-[66px] px-4 py-2.5 rounded-2xl bg-slate-900/90 border-2 border-cyan-500/40 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow touch-btn">
+              <span class="w-full leading-snug break-words pointer-events-none lesson-font">${item.label}</span>
+            </button>
+          `;
+        });
+
+        const shuffledRight = [...itemData.right].sort(() => Math.random() - 0.5);
+        let rightCols = '';
+        shuffledRight.forEach(item => {
+          rightCols += `
+            <button id="solo-match-${item.key}" class="w-full flex-1 min-h-[56px] sm:min-h-[66px] px-4 py-2.5 rounded-2xl bg-slate-900/90 border-2 border-cyan-500/40 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow touch-btn">
+              <span class="w-full leading-snug break-words pointer-events-none lesson-font">${item.label}</span>
+            </button>
+          `;
+        });
+
+        elP1Interactive.innerHTML = `
+          <div class="grid grid-cols-2 gap-3 sm:gap-4 h-full items-stretch">
+            <div class="flex flex-col gap-3 h-full justify-between">${leftCols}</div>
+            <div class="flex flex-col gap-3 h-full justify-between">${rightCols}</div>
+          </div>
+        `;
+
+        itemData.left.forEach(item => {
+          document.getElementById(`solo-match-${item.key}`).addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            handleSoloMatchClick('L', item.key);
+          });
+        });
+        shuffledRight.forEach(item => {
+          document.getElementById(`solo-match-${item.key}`).addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            handleSoloMatchClick('R', item.key);
+          });
+        });
+      }
+    }
+
+    function handleSoloAnswer(val) {
+      if (SOLO_STATE.answered) return;
+
+      SOLO_STATE.answered = true;
+      SOLO_STATE.answerVal = val;
+      if (SOLO_STATE.timerInterval) clearInterval(SOLO_STATE.timerInterval);
+
+      const qData = SOLO_QUESTION_BANK[SOLO_STATE.roundIndex];
+      const isMatchType = (qData.type === 'match');
+
+      elP1Interactive.classList.add('pointer-events-none', 'opacity-65');
+      elP1Status.classList.remove('hidden');
+
+      const isCorrect = isMatchType ? (val === true) : (val === qData.answer);
+
+      if (isCorrect) {
+        sound.playCorrect();
+        SOLO_STATE.streak++;
+        if (SOLO_STATE.streak > SOLO_STATE.maxStreak) {
+          SOLO_STATE.maxStreak = SOLO_STATE.streak;
+        }
+        const timeBonus = Math.floor(SOLO_STATE.timer * 2.5);
+        const streakBonus = (SOLO_STATE.streak > 1) ? Math.min(50, SOLO_STATE.streak * 5) : 0;
+        const earned = 100 + timeBonus + streakBonus;
+
+        SOLO_STATE.score += earned;
+        SOLO_STATE.correctCount++;
+
+        elP1Status.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-emerald-950 border border-emerald-500 text-emerald-300 font-num';
+        elP1Status.textContent = streakBonus > 0 ? `✅ 正確 +${earned} (含連對+${streakBonus})` : `✅ 正確 +${earned}`;
+
+        updateSoloHUD();
+
+        // 答對：1.4 秒後自動前進下一題
+        elTeacherBar.classList.remove('hidden');
+        elTeacherBar.classList.add('flex');
+        elTeacherBar.style.borderColor = '#10b981';
+        elTeacherBar.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-base">🎉</span>
+            <span class="text-xs sm:text-sm font-bold text-emerald-400">答對了！1.4 秒後自動進入下一題...</span>
+          </div>
+        `;
+        SOLO_STATE.autoAdvanceTimer = setTimeout(() => {
+          advanceToNextStep();
+        }, 1400);
+
+      } else {
+        sound.playWrong();
+        SOLO_STATE.streak = 0;
+        SOLO_STATE.score -= 50;
+        SOLO_STATE.hasError = true;
+
+        elP1Status.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num';
+        elP1Status.textContent = isMatchType ? '❌ 配對錯誤 -50' : '❌ 錯誤 -50';
+
+        // 展開解析卡片並暫停倒數，讓學生看清楚解析再點擊繼續
+        elP1Analysis.classList.remove('hidden');
+        elP1Analysis.classList.add('flex');
+        elP1AnalysisText.innerHTML = qData.tip;
+
+        elTimerText.textContent = '⏸️ 暫停';
+        elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
+
+        updateSoloHUD();
+        showPauseControls(val === 'timeout' ? '時間到 (-50分)・閱讀解析後繼續' : '作答有誤 (-50分)・閱讀解析後繼續');
+      }
+    }
+
+    function showPauseControls(message) {
+      elTeacherBar.classList.remove('hidden');
+      elTeacherBar.classList.add('flex');
+      elTeacherBar.style.borderColor = '#ef4444';
+      elTeacherBar.innerHTML = `
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-base shrink-0">🚨</span>
+          <span class="text-xs sm:text-sm font-bold text-rose-300 truncate">${message}</span>
+        </div>
+        <button id="btn-next-question" class="shrink-0 px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow active:scale-95 transition-all flex items-center gap-1">
+          <span>我懂了・下一題 ➔</span>
+        </button>
+      `;
+      document.getElementById('btn-next-question').addEventListener('click', advanceToNextStep);
+    }
+
+    function handleSoloMatchClick(side, key) {
+      if (SOLO_STATE.answered) return;
+
+      if (!SOLO_STATE.selectedL && side === 'L') {
+        SOLO_STATE.selectedL = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      } else if (SOLO_STATE.selectedL && side === 'L') {
+        highlightMatchBtn(SOLO_STATE.selectedL, false);
+        SOLO_STATE.selectedL = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      } else if (!SOLO_STATE.selectedR && side === 'R') {
+        SOLO_STATE.selectedR = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      } else if (SOLO_STATE.selectedR && side === 'R') {
+        highlightMatchBtn(SOLO_STATE.selectedR, false);
+        SOLO_STATE.selectedR = key;
+        highlightMatchBtn(key, true);
+        sound.playGrab();
+      }
+
+      if (SOLO_STATE.selectedL && SOLO_STATE.selectedR) {
+        const qData = SOLO_QUESTION_BANK[SOLO_STATE.roundIndex];
+        const isPairCorrect = (qData.matches[SOLO_STATE.selectedL] === SOLO_STATE.selectedR);
+
+        if (isPairCorrect) {
+          sound.playCorrect();
+          SOLO_STATE.selectedMatches[SOLO_STATE.selectedL] = SOLO_STATE.selectedR;
+          eliminateSoloMatchPair(SOLO_STATE.selectedL, SOLO_STATE.selectedR);
+          SOLO_STATE.selectedL = null;
+          SOLO_STATE.selectedR = null;
+
+          if (Object.keys(SOLO_STATE.selectedMatches).length === 2) {
+            setTimeout(() => { handleSoloAnswer(true); }, 350);
+          }
+        } else {
+          const prevL = SOLO_STATE.selectedL;
+          const prevR = SOLO_STATE.selectedR;
+          SOLO_STATE.selectedL = null;
+          SOLO_STATE.selectedR = null;
+          markMatchBtnWrong(prevL);
+          markMatchBtnWrong(prevR);
+          handleSoloAnswer(false);
+        }
+      }
+    }
+
+    function highlightMatchBtn(key, active) {
+      const btn = document.getElementById(`solo-match-${key}`);
+      if (!btn) return;
+      if (active) {
+        btn.classList.add('border-amber-400', 'bg-amber-950/40', 'scale-[1.02]');
+      } else {
+        btn.classList.remove('border-amber-400', 'bg-amber-950/40', 'scale-[1.02]');
+      }
+    }
+
+    function markMatchBtnWrong(key) {
+      const btn = document.getElementById(`solo-match-${key}`);
+      if (!btn) return;
+      btn.classList.remove('border-amber-400', 'bg-amber-950/40', 'scale-[1.02]');
+      btn.classList.add('border-2', 'border-rose-500', 'bg-rose-950/80', 'text-rose-200');
+      if (!btn.querySelector('.wrong-pair-tag')) {
+        const tag = document.createElement('span');
+        tag.className = 'wrong-pair-tag ml-2 text-sm font-black text-rose-400 shrink-0';
+        tag.textContent = '❌';
+        btn.appendChild(tag);
+      }
+    }
+
+    function eliminateSoloMatchPair(lKey, rKey) {
+      const lBtn = document.getElementById(`solo-match-${lKey}`);
+      const rBtn = document.getElementById(`solo-match-${rKey}`);
+      [lBtn, rBtn].forEach(b => {
+        if (b) {
+          b.disabled = true;
+          b.classList.add('border-emerald-400', 'bg-emerald-600/40');
+          setTimeout(() => {
+            b.style.transition = 'all 0.35s ease-out';
+            b.style.opacity = '0';
+            b.style.transform = 'scale(0.85)';
+            b.style.pointerEvents = 'none';
+            b.style.visibility = 'hidden';
+          }, 200);
+        }
+      });
+    }
+
+    function handleSoloTimeout() {
+      if (!SOLO_STATE.answered) {
+        handleSoloAnswer('timeout');
+      }
+    }
+
+    function startSoloTimer() {
+      if (SOLO_STATE.timerInterval) clearInterval(SOLO_STATE.timerInterval);
+      const maxTimer = SOLO_STATE.maxTimer || 25;
+      const pctInit = Math.max(0, (SOLO_STATE.timer / maxTimer) * 100);
+      elTimerText.textContent = `${SOLO_STATE.timer}s`;
+      elTimerBar.style.width = `${pctInit}%`;
+
+      SOLO_STATE.timerInterval = setInterval(() => {
+        SOLO_STATE.timer--;
+        const pct = Math.max(0, (SOLO_STATE.timer / maxTimer) * 100);
+        elTimerBar.style.width = `${pct}%`;
+        elTimerText.textContent = `${SOLO_STATE.timer}s`;
+
+        if (SOLO_STATE.timer === 5) {
+          sound.setBpm(152);
+        }
+
+        if (SOLO_STATE.timer <= 0) {
+          clearInterval(SOLO_STATE.timerInterval);
+          handleSoloTimeout();
+        }
+      }, 1000);
+    }
+
+    function prevQuestion() {
+      if (SOLO_STATE.roundIndex > 0) {
+        if (SOLO_STATE.autoAdvanceTimer) clearTimeout(SOLO_STATE.autoAdvanceTimer);
+        SOLO_STATE.roundIndex--;
+        loadSoloQuestion(SOLO_STATE.roundIndex);
+      }
+    }
+    window.prevQuestion = prevQuestion;
+
+    function nextQuestion() {
+      if (mgActive) {
+        skipMiniGame();
+        return;
+      }
+      advanceToNextStep();
+    }
+    window.nextQuestion = nextQuestion;
+
+    function advanceToNextStep() {
+      if (SOLO_STATE.autoAdvanceTimer) clearTimeout(SOLO_STATE.autoAdvanceTimer);
+      elTeacherBar.classList.add('hidden');
+      elTeacherBar.classList.remove('flex');
+
+      const currentRoundNum = SOLO_STATE.roundIndex + 1;
+
+      // 每 10 題觸發 1 款單人手速獎勵小遊戲 (第 10 題、第 20 題、第 30 題)
+      if (currentRoundNum === 10 && SOLO_STATE.currentMiniGame < 1) {
+        SOLO_STATE.currentMiniGame = 1;
+        startMiniGameShooting();
+        return;
+      } else if (currentRoundNum === 20 && SOLO_STATE.currentMiniGame < 2) {
+        SOLO_STATE.currentMiniGame = 2;
+        startMiniGameWhack();
+        return;
+      } else if (currentRoundNum === 30 && SOLO_STATE.currentMiniGame < 3) {
+        SOLO_STATE.currentMiniGame = 3;
+        startMiniGameDance();
+        return;
+      }
+
+      SOLO_STATE.roundIndex++;
+      loadSoloQuestion(SOLO_STATE.roundIndex);
+    }
+
+    function updateSoloHUD() {
+      elP1Total.textContent = SOLO_STATE.score;
+      elP1Acc.textContent = `${SOLO_STATE.correctCount}/30`;
+      elP1Streak.textContent = SOLO_STATE.streak;
+
+      if (SOLO_STATE.score < 0) elP1ScoreBox.classList.add('negative-score');
+      else elP1ScoreBox.classList.remove('negative-score');
+    }
+
+    /* ==========================================================================
+       4. 單人全螢幕手速獎勵小遊戲（第10題射擊①、第20題打地鼠②、第30題舞動草原③）
+       ========================================================================== */
+    const elMgOverlay = document.getElementById('minigame-overlay');
+    const elMgTitle = document.getElementById('mg-title');
+    const elMgTimer = document.getElementById('mg-timer');
+    const elMgP1Pts = document.getElementById('mg-p1-pts');
+    const elMgHint = document.getElementById('mg-hint');
+    const elMgCtrl = document.getElementById('mg-ctrl');
+
+    const cvs = document.getElementById('mg-canvas');
+    const ctx = cvs.getContext('2d');
+
+    let mgActive = false;
+    let mgAnimId = null;
+
+    function openSoloMiniGameUI(title, hint) {
+      sound.setBpm(152);
+      elMgOverlay.classList.remove('hidden');
+      elMgTitle.textContent = title;
+      elMgHint.textContent = hint;
+
+      SOLO_STATE.mgTimer = 20.0;
+      SOLO_STATE.mgP1Score = 0;
+      elMgP1Pts.textContent = '0';
+      elMgTimer.textContent = '20.0s';
+      mgActive = true;
+
+      // 適配高解析度螢幕
+      const rect = cvs.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const w = rect.width || 720;
+      const h = rect.height || 380;
+      cvs.width = w * dpr;
+      cvs.height = h * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      cvs.style.width = `${w}px`;
+      cvs.style.height = `${h}px`;
+
+      elMgCtrl.innerHTML = '';
+
+      if (SOLO_STATE.mgInterval) clearInterval(SOLO_STATE.mgInterval);
+      const startTime = performance.now();
+      SOLO_STATE.mgInterval = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        const remain = Math.max(0, 20.0 - elapsed);
+        SOLO_STATE.mgTimer = remain;
+        elMgTimer.textContent = `${remain.toFixed(1)}s`;
+
+        if (remain <= 0) {
+          clearInterval(SOLO_STATE.mgInterval);
+          finishSoloMiniGame();
+        }
+      }, 100);
+    }
+
+    function finishSoloMiniGame() {
+      mgActive = false;
+      if (mgAnimId) cancelAnimationFrame(mgAnimId);
+      elMgOverlay.classList.add('hidden');
+
+      SOLO_STATE.score += SOLO_STATE.mgP1Score;
+      updateSoloHUD();
+
+      const modal = document.getElementById('mg-result-modal');
+      document.getElementById('mg-res-p1').textContent = `+${SOLO_STATE.mgP1Score}`;
+
+      const winEl = document.getElementById('mg-winner-announcement');
+      if (SOLO_STATE.mgP1Score >= 300) {
+        winEl.innerHTML = `🔥 太神啦！超級手速狂掃 <b class="text-amber-400">+${SOLO_STATE.mgP1Score}</b> 分！`;
+      } else {
+        winEl.innerHTML = `🎉 恭喜獲得 <b class="text-cyan-400">+${SOLO_STATE.mgP1Score}</b> 獎勵分，已加入總分！`;
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function skipMiniGame() {
+      mgActive = false;
+      if (mgAnimId) cancelAnimationFrame(mgAnimId);
+      if (SOLO_STATE.mgInterval) clearInterval(SOLO_STATE.mgInterval);
+      elMgOverlay.classList.add('hidden');
+      document.getElementById('mg-result-modal').classList.add('hidden');
+
+      if (SOLO_STATE.currentMiniGame === 3) {
+        showSoloVictory();
+      } else {
+        SOLO_STATE.roundIndex++;
+        loadSoloQuestion(SOLO_STATE.roundIndex);
+      }
+    }
+    window.skipMiniGame = skipMiniGame;
+
+    document.getElementById('btn-close-mg-result').addEventListener('click', () => {
+      document.getElementById('mg-result-modal').classList.add('hidden');
+      if (SOLO_STATE.currentMiniGame === 3) {
+        showSoloVictory();
+      } else {
+        SOLO_STATE.roundIndex++;
+        loadSoloQuestion(SOLO_STATE.roundIndex);
+      }
+    });
+
+    /* ==========================================================
+       【小遊戲 ①】（第10題後）：🎯 全螢幕極速射擊靶場
+       ========================================================== */
+    class SoloShooter {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.targets = [];
+        this.lasers = [];
+        this.effects = [];
+        this.initTargets();
+      }
+
+      initTargets() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        const types = [
+          { emoji: '🎯', pts: 25, r: 26, speed: 2.5 },
+          { emoji: '🕷️', pts: 50, r: 28, speed: 3.1 },
+          { emoji: '⭐', pts: 35, r: 22, speed: 2.1 },
+          { emoji: '💣', pts: -25, r: 24, speed: 2.4 }
+        ];
+
+        this.targets = [];
+        for (let i = 0; i < 7; i++) {
+          const t = types[Math.floor(Math.random() * types.length)];
+          this.targets.push({
+            x: 45 + Math.random() * (w - 90),
+            y: 45 + (i % 5) * ((h - 90) / 5),
+            emoji: t.emoji,
+            pts: t.pts,
+            r: t.r,
+            vx: (Math.random() > 0.5 ? 1 : -1) * t.speed,
+            minX: 35,
+            maxX: w - 35
+          });
+        }
+      }
+
+      shoot(x, y) {
+        sound.playShoot();
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        this.lasers.push({
+          startX: w * 0.5,
+          startY: h - 10,
+          endX: x,
+          endY: y,
+          color: 'rgba(6, 182, 212, 1)',
+          alpha: 1.0
+        });
+
+        let hit = false;
+        for (let i = this.targets.length - 1; i >= 0; i--) {
+          const tg = this.targets[i];
+          const dist = Math.hypot(x - tg.x, y - tg.y);
+          if (dist <= tg.r + 20) {
+            hit = true;
+            if (tg.emoji === '💣') {
+              sound.playWrong();
+              SOLO_STATE.mgP1Score = Math.max(0, SOLO_STATE.mgP1Score - 25);
+              this.effects.push({ x: tg.x, y: tg.y, text: '💥 -25', color: '#f87171', life: 25 });
+            } else {
+              sound.playCorrect();
+              SOLO_STATE.mgP1Score += tg.pts;
+              this.effects.push({ x: tg.x, y: tg.y, text: `+${tg.pts}`, color: '#38bdf8', life: 25 });
+            }
+            elMgP1Pts.textContent = SOLO_STATE.mgP1Score;
+
+            this.targets.splice(i, 1);
+            setTimeout(() => { this.respawnSingle(); }, 300);
+            break;
+          }
+        }
+
+        if (!hit) {
+          this.effects.push({ x, y, text: 'MISS', color: '#64748b', life: 15 });
+        }
+      }
+
+      respawnSingle() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+        const types = [
+          { emoji: '🎯', pts: 25, r: 26, speed: 2.5 },
+          { emoji: '🕷️', pts: 50, r: 28, speed: 3.1 },
+          { emoji: '⭐', pts: 35, r: 22, speed: 2.1 },
+          { emoji: '💣', pts: -25, r: 24, speed: 2.4 }
+        ];
+        const t = types[Math.floor(Math.random() * types.length)];
+
+        this.targets.push({
+          x: 45 + Math.random() * (w - 90),
+          y: 45 + Math.random() * (h - 90),
+          emoji: t.emoji,
+          pts: t.pts,
+          r: t.r,
+          vx: (Math.random() > 0.5 ? 1 : -1) * t.speed,
+          minX: 35,
+          maxX: w - 35
+        });
+      }
+
+      autoShootClosest() {
+        if (this.targets.length > 0) {
+          const goodTargets = this.targets.filter(t => t.emoji !== '💣');
+          const target = goodTargets.length > 0 ? goodTargets[0] : this.targets[0];
+          this.shoot(target.x, target.y);
+        }
+      }
+
+      update() {
+        this.targets.forEach(t => {
+          t.x += t.vx;
+          if (t.x < t.minX) { t.x = t.minX; t.vx *= -1; }
+          if (t.x > t.maxX) { t.x = t.maxX; t.vx *= -1; }
+        });
+
+        for (let i = this.lasers.length - 1; i >= 0; i--) {
+          this.lasers[i].alpha -= 0.15;
+          if (this.lasers[i].alpha <= 0) this.lasers.splice(i, 1);
+        }
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.2;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        this.ctx.fillStyle = '#060d1b';
+        this.ctx.fillRect(0, 0, w, h);
+
+        // 準心背景裝飾圈
+        this.ctx.strokeStyle = 'rgba(6, 182, 212, 0.18)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(w * 0.5, h * 0.5, Math.min(w, h) * 0.35, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.font = '32px sans-serif';
+
+        this.targets.forEach(t => this.ctx.fillText(t.emoji, t.x, t.y));
+
+        this.lasers.forEach(l => {
+          this.ctx.strokeStyle = l.color;
+          this.ctx.lineWidth = 4;
+          this.ctx.beginPath();
+          this.ctx.moveTo(l.startX, l.startY);
+          this.ctx.lineTo(l.endX, l.endY);
+          this.ctx.stroke();
+        });
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 22px sans-serif';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    let soloShooter = null;
+
+    function startMiniGameShooting() {
+      openSoloMiniGameUI(
+        "【第 10 題獎勵關】🎯 極速射擊靶場",
+        "直接點擊畫面中的目標射擊（小蜘蛛🕷️+50分，避開炸彈💣）！"
+      );
+
+      soloShooter = new SoloShooter(cvs, ctx);
+
+      cvs.onpointerdown = (e) => {
+        e.preventDefault();
+        const r = cvs.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        soloShooter.shoot(x, y);
+      };
+
+      elMgCtrl.innerHTML = `
+        <button id="btn-solo-shoot" class="w-full py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-black text-sm sm:text-base border-2 border-cyan-300 shadow-xl active:scale-95 touch-btn flex items-center justify-center gap-2">
+          <span>🎯 自動鎖定開火 [空白鍵 / A]</span>
+        </button>
+      `;
+
+      document.getElementById('btn-solo-shoot').onpointerdown = (e) => { e.preventDefault(); soloShooter.autoShootClosest(); };
+
+      function shootLoop() {
+        if (!mgActive) return;
+        soloShooter.update();
+        soloShooter.draw();
+        mgAnimId = requestAnimationFrame(shootLoop);
+      }
+      mgAnimId = requestAnimationFrame(shootLoop);
+    }
+    window.startMiniGameShooting = startMiniGameShooting;
+
+    /* ==========================================================
+       【小遊戲 ②】（第20題後）：🔨 全螢幕瘋狂打地鼠（3x3 九宮格地鼠洞）
+       ========================================================== */
+    class SoloWhack {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.holes = [];
+        this.effects = [];
+        this.popTimer = 0;
+        this.initHoles();
+      }
+
+      initHoles() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+        this.holes = [];
+
+        const cols = 3;
+        const rows = 3;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            this.holes.push({
+              x: (w / (cols + 1)) * (c + 1),
+              y: (h / (rows + 1)) * (r + 1) + 12,
+              rx: Math.min(68, w * 0.11),
+              ry: 24,
+              mole: null
+            });
+          }
+        }
+      }
+
+      spawnMole() {
+        const avail = this.holes.filter(h => !h.mole);
+        if (avail.length > 0 && Math.random() < 0.8) {
+          const h = avail[Math.floor(Math.random() * avail.length)];
+          const types = [
+            { emoji: '🐹', pts: 25 },
+            { emoji: '👑', pts: 50 },
+            { emoji: '💎', pts: 40 },
+            { emoji: '💣', pts: -25 }
+          ];
+          const m = types[Math.floor(Math.random() * types.length)];
+          h.mole = { emoji: m.emoji, pts: m.pts, life: 36, maxLife: 36 };
+        }
+      }
+
+      hit(x, y) {
+        sound.playHammer();
+        for (let i = 0; i < this.holes.length; i++) {
+          const h = this.holes[i];
+          if (h.mole) {
+            const dist = Math.hypot(x - h.x, y - (h.y - 12));
+            if (dist <= 54) {
+              const m = h.mole;
+              if (m.emoji === '💣') {
+                sound.playWrong();
+                SOLO_STATE.mgP1Score = Math.max(0, SOLO_STATE.mgP1Score - 25);
+                this.effects.push({ x: h.x, y: h.y - 25, text: '💥 -25', color: '#f87171', life: 25 });
+              } else {
+                sound.playCorrect();
+                SOLO_STATE.mgP1Score += m.pts;
+                this.effects.push({ x: h.x, y: h.y - 25, text: `🔨 +${m.pts}`, color: '#38bdf8', life: 25 });
+              }
+              elMgP1Pts.textContent = SOLO_STATE.mgP1Score;
+              h.mole = null;
+              break;
+            }
+          }
+        }
+      }
+
+      update() {
+        this.popTimer++;
+        if (this.popTimer % 14 === 0) {
+          this.spawnMole();
+        }
+
+        this.holes.forEach(h => {
+          if (h.mole) {
+            h.mole.life--;
+            if (h.mole.life <= 0) h.mole = null;
+          }
+        });
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.3;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+
+        this.ctx.fillStyle = '#06131a';
+        this.ctx.fillRect(0, 0, w, h);
+
+        this.holes.forEach(hole => {
+          this.ctx.fillStyle = '#0c2738';
+          this.ctx.beginPath();
+          this.ctx.ellipse(hole.x, hole.y, hole.rx, hole.ry, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          this.ctx.fillStyle = '#04090f';
+          this.ctx.beginPath();
+          this.ctx.ellipse(hole.x, hole.y, hole.rx * 0.85, hole.ry * 0.75, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          if (hole.mole) {
+            const ratio = Math.sin((hole.mole.life / hole.mole.maxLife) * Math.PI);
+            const moleY = hole.y - 12 - ratio * 20;
+            this.ctx.font = '38px sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(hole.mole.emoji, hole.x, moleY);
+          }
+        });
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 24px sans-serif';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    let soloWhack = null;
+
+    function startMiniGameWhack() {
+      openSoloMiniGameUI(
+        "【第 20 題獎勵關】🔨 瘋狂打地鼠擂台",
+        "快速點擊冒出來的地鼠🐹、皇冠👑與鑽石💎，小心別敲到炸彈💣！"
+      );
+
+      soloWhack = new SoloWhack(cvs, ctx);
+
+      cvs.onpointerdown = (e) => {
+        e.preventDefault();
+        const r = cvs.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        soloWhack.hit(x, y);
+      };
+
+      elMgCtrl.innerHTML = `
+        <div class="w-full bg-cyan-950/70 border border-cyan-700 px-4 py-2.5 rounded-2xl text-cyan-300 text-center text-xs sm:text-sm font-bold">
+          🔨 直接點擊畫面九宮格中的地鼠即可揮鎚敲擊！
+        </div>
+      `;
+
+      function whackLoop() {
+        if (!mgActive) return;
+        soloWhack.update();
+        soloWhack.draw();
+        mgAnimId = requestAnimationFrame(whackLoop);
+      }
+      mgAnimId = requestAnimationFrame(whackLoop);
+    }
+    window.startMiniGameWhack = startMiniGameWhack;
+
+    /* ==========================================================
+       【小遊戲 ③】（第30題壓軸）：💃 舞動草原（全螢幕單人舞步節拍挑戰）
+       ========================================================== */
+    class SoloDanceMeadow {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.dirs = [
+          { id: 'left', arrow: '⬅️', label: '左' },
+          { id: 'up', arrow: '⬆️', label: '上' },
+          { id: 'down', arrow: '⬇️', label: '下' },
+          { id: 'right', arrow: '➡️', label: '右' }
+        ];
+        this.st = {
+          seq: [],
+          stepIndex: 0,
+          beatPos: 0,
+          beatSpeed: 0.0095,
+          readyToStrike: false,
+          combo: 0,
+          bounce: 0,
+          poseDir: 'idle',
+          flashColor: null,
+          flashTimer: 0
+        };
+        this.effects = [];
+        this.clouds = [
+          { x: 0.15, y: 0.16, s: 1.1, v: 0.00025 },
+          { x: 0.50, y: 0.12, s: 0.95, v: 0.00018 },
+          { x: 0.82, y: 0.18, s: 1.2, v: 0.00022 }
+        ];
+        this.flowers = [];
+        for (let i = 0; i < 36; i++) {
+          this.flowers.push({
+            rx: (i * 0.028 + 0.02) % 0.98,
+            ry: 0.68 + ((i * 19) % 28) * 0.01,
+            color: i % 3 === 0 ? '#ffffff' : (i % 3 === 1 ? '#fde047' : '#fbcfe8')
+          });
+        }
+        this.generateSequence();
+      }
+
+      generateSequence() {
+        const st = this.st;
+        const len = Math.min(7, 4 + Math.floor(st.combo / 2));
+        st.seq = [];
+        for (let i = 0; i < len; i++) {
+          const d = this.dirs[Math.floor(Math.random() * 4)];
+          st.seq.push({ ...d, done: false });
+        }
+        st.stepIndex = 0;
+        st.readyToStrike = false;
+      }
+
+      inputDir(dirId) {
+        const st = this.st;
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+        const centerX = w * 0.5;
+        const charY = h * 0.68;
+
+        // 完成所有方向箭頭後，抓準節拍條綠色區間按下任意方向鍵
+        if (st.readyToStrike) {
+          this.judgeBeat(centerX, charY);
+          return;
+        }
+
+        const target = st.seq[st.stepIndex];
+        if (!target) return;
+
+        if (target.id === dirId) {
+          const dirIdx = this.dirs.findIndex(d => d.id === dirId);
+          sound.playStep(dirIdx);
+          target.done = true;
+          st.stepIndex++;
+          st.bounce = 16;
+          st.poseDir = dirId;
+
+          const stepPts = 15;
+          SOLO_STATE.mgP1Score += stepPts;
+          elMgP1Pts.textContent = SOLO_STATE.mgP1Score;
+
+          this.effects.push({
+            x: centerX + (Math.random() - 0.5) * 40,
+            y: charY - 50,
+            text: `${target.arrow} +${stepPts}`,
+            color: '#38bdf8',
+            life: 18
+          });
+
+          if (st.stepIndex >= st.seq.length) {
+            st.readyToStrike = true;
+          }
+        } else {
+          sound.playWrong();
+          st.combo = 0;
+          st.flashColor = 'rgba(239, 68, 68, 0.35)';
+          st.flashTimer = 10;
+          st.seq.forEach(s => s.done = false);
+          st.stepIndex = 0;
+          this.effects.push({
+            x: centerX,
+            y: charY - 50,
+            text: '舞步重來！',
+            color: '#f87171',
+            life: 18
+          });
+        }
+      }
+
+      judgeBeat(centerX, charY) {
+        const st = this.st;
+        const dist = Math.abs(st.beatPos - 0.78);
+        let bonus = 0;
+        let label = '';
+        let color = '#facc15';
+
+        if (dist <= 0.08) {
+          sound.playBeatPerfect();
+          st.combo++;
+          bonus = 80 + st.combo * 15;
+          label = `🌟 PERFECT! +${bonus}`;
+          color = '#fde047';
+          st.flashColor = 'rgba(74, 222, 128, 0.32)';
+          st.flashTimer = 12;
+        } else if (dist <= 0.16) {
+          sound.playCorrect();
+          st.combo++;
+          bonus = 50;
+          label = `✨ GREAT! +${bonus}`;
+          color = '#4ade80';
+        } else {
+          sound.playGrab();
+          st.combo = 0;
+          bonus = 25;
+          label = `🎵 GOOD! +${bonus}`;
+          color = '#38bdf8';
+        }
+
+        SOLO_STATE.mgP1Score += bonus;
+        elMgP1Pts.textContent = SOLO_STATE.mgP1Score;
+
+        st.bounce = 24;
+        st.poseDir = 'jump';
+        this.effects.push({
+          x: centerX,
+          y: charY - 60,
+          text: label,
+          color: color,
+          life: 26
+        });
+
+        st.beatPos = 0;
+        this.generateSequence();
+      }
+
+      update() {
+        this.clouds.forEach(c => {
+          c.x += c.v;
+          if (c.x > 1.15) c.x = -0.15;
+        });
+
+        const st = this.st;
+        st.beatPos += st.beatSpeed;
+        if (st.beatPos >= 1.0) {
+          st.beatPos = 0;
+          if (st.readyToStrike) {
+            SOLO_STATE.mgP1Score += 20;
+            elMgP1Pts.textContent = SOLO_STATE.mgP1Score;
+            this.generateSequence();
+          }
+        }
+        if (st.bounce > 0) st.bounce *= 0.82;
+        if (st.flashTimer > 0) st.flashTimer--;
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.3;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      drawRoundRect(x, y, w, h, r) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + r, y);
+        this.ctx.lineTo(x + w - r, y);
+        this.ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        this.ctx.lineTo(x + w, y + h - r);
+        this.ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        this.ctx.lineTo(x + r, y + h);
+        this.ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        this.ctx.lineTo(x, y + r);
+        this.ctx.quadraticCurveTo(x, y, x + r, y);
+        this.ctx.closePath();
+      }
+
+      drawPuppy(x, y, bounce, poseDir) {
+        const ctx = this.ctx;
+        ctx.save();
+        ctx.translate(x, y - bounce);
+
+        // 地面影子
+        ctx.fillStyle = 'rgba(20, 83, 45, 0.35)';
+        ctx.beginPath();
+        ctx.ellipse(0, 38 + bounce, 28 - bounce * 0.2, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        let tilt = 0;
+        if (poseDir === 'left') tilt = -0.2;
+        else if (poseDir === 'right') tilt = 0.2;
+        ctx.rotate(tilt);
+
+        const bodyColor = '#1e293b';
+        const earColor = '#0f172a';
+
+        // 身體
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath();
+        ctx.ellipse(0, 14, 18, 22, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 雙腳
+        ctx.fillStyle = earColor;
+        ctx.beginPath();
+        ctx.arc(-9, 34, 7, 0, Math.PI * 2);
+        ctx.arc(9, 34, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 雙手舞動
+        const armY = poseDir === 'up' || poseDir === 'jump' ? -8 : 8;
+        ctx.strokeStyle = bodyColor;
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-15, 7);
+        ctx.lineTo(-28, armY);
+        ctx.moveTo(15, 7);
+        ctx.lineTo(28, armY);
+        ctx.stroke();
+
+        // 頭部
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath();
+        ctx.arc(0, -16, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 大耳朵
+        ctx.fillStyle = earColor;
+        ctx.beginPath();
+        ctx.ellipse(-17, -35, 9, 15, -0.35, 0, Math.PI * 2);
+        ctx.ellipse(17, -35, 9, 15, 0.35, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 冠軍小皇冠
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.moveTo(-10, -36);
+        ctx.lineTo(-5, -45);
+        ctx.lineTo(0, -38);
+        ctx.lineTo(5, -45);
+        ctx.lineTo(10, -36);
+        ctx.closePath();
+        ctx.fill();
+
+        // 眼睛
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-8, -17, 4.2, 0, Math.PI * 2);
+        ctx.arc(8, -17, 4.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(-7.5, -17, 2.2, 0, Math.PI * 2);
+        ctx.arc(7.5, -17, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 鼻子
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath();
+        ctx.arc(0, -10, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      drawBeatBar(x, y, w, h) {
+        const ctx = this.ctx;
+        const st = this.st;
+        ctx.fillStyle = '#4a3b32';
+        this.drawRoundRect(x, y, w, h, h / 2);
+        ctx.fill();
+        ctx.strokeStyle = '#786254';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // 右側綠色完美節拍區間
+        const greenX = x + w * 0.70;
+        const greenW = w * 0.16;
+        ctx.fillStyle = st.readyToStrike ? 'rgba(74, 222, 128, 0.5)' : 'rgba(74, 222, 128, 0.25)';
+        ctx.fillRect(greenX, y + 3, greenW, h - 6);
+
+        const ticks = [0.68, 0.73, 0.78, 0.83, 0.88];
+        ticks.forEach((t, idx) => {
+          ctx.strokeStyle = (idx === 0 || idx === 4) ? '#f59e0b' : '#4ade80';
+          ctx.lineWidth = idx === 2 ? 3.5 : 2;
+          ctx.beginPath();
+          ctx.moveTo(x + w * t, y + 4);
+          ctx.lineTo(x + w * t, y + h - 4);
+          ctx.stroke();
+        });
+
+        const curX = x + 14 + (w - 28) * st.beatPos;
+        const curY = y + h / 2;
+        ctx.fillStyle = st.readyToStrike ? '#fde047' : '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(curX, curY - 10);
+        ctx.lineTo(curX + 9, curY);
+        ctx.lineTo(curX, curY + 10);
+        ctx.lineTo(curX - 9, curY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      draw() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        const w = rect.width || 720;
+        const h = rect.height || 380;
+        const centerX = w * 0.5;
+        const ctx = this.ctx;
+        const st = this.st;
+
+        // 1. 藍天白雲漸層背景
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.62);
+        skyGrad.addColorStop(0, '#4ea8de');
+        skyGrad.addColorStop(1, '#bae6fd');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, h * 0.62);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+        this.clouds.forEach(c => {
+          const cx = c.x * w;
+          const cy = c.y * h;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 24 * c.s, 0, Math.PI * 2);
+          ctx.arc(cx + 20 * c.s, cy - 7 * c.s, 28 * c.s, 0, Math.PI * 2);
+          ctx.arc(cx + 42 * c.s, cy, 22 * c.s, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // 遠方山丘
+        ctx.fillStyle = '#4d9058';
+        ctx.beginPath();
+        ctx.moveTo(0, h * 0.54);
+        for (let x = 0; x <= w; x += 60) {
+          ctx.quadraticCurveTo(x + 30, h * 0.44, x + 60, h * 0.54);
+        }
+        ctx.lineTo(w, h * 0.62);
+        ctx.lineTo(0, h * 0.62);
+        ctx.closePath();
+        ctx.fill();
+
+        // 2. 綠油油草原地面
+        const grassGrad = ctx.createLinearGradient(0, h * 0.58, 0, h);
+        grassGrad.addColorStop(0, '#84cc16');
+        grassGrad.addColorStop(1, '#4d7c0f');
+        ctx.fillStyle = grassGrad;
+        ctx.fillRect(0, h * 0.58, w, h * 0.42);
+
+        this.flowers.forEach(f => {
+          ctx.fillStyle = f.color;
+          ctx.beginPath();
+          ctx.arc(f.rx * w, f.ry * h, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // 3. 木頭柵欄
+        const fenceY = h * 0.46;
+        const fenceH = h * 0.16;
+        ctx.fillStyle = '#a16207';
+        ctx.fillRect(0, fenceY + fenceH * 0.28, w, 8);
+        ctx.fillRect(0, fenceY + fenceH * 0.68, w, 8);
+
+        const postGap = 34;
+        for (let px = 8; px < w; px += postGap) {
+          ctx.fillStyle = '#ca8a04';
+          ctx.beginPath();
+          ctx.moveTo(px, fenceY + fenceH);
+          ctx.lineTo(px, fenceY + 10);
+          ctx.lineTo(px + 10, fenceY);
+          ctx.lineTo(px + 20, fenceY + 10);
+          ctx.lineTo(px + 20, fenceY + fenceH);
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = '#713f12';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        if (st.flashTimer > 0 && st.flashColor) {
+          ctx.fillStyle = st.flashColor;
+          ctx.fillRect(0, 0, w, h);
+        }
+
+        // 4. 頂部連擊徽章與節拍判定條
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        this.drawRoundRect(centerX - 110, 10, 220, 28, 14);
+        ctx.fill();
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`💃 舞動草原 ・ 🔥 連擊 ${st.combo}`, centerX, 24);
+
+        const barW = Math.min(w - 48, 420);
+        this.drawBeatBar(centerX - barW / 2, 46, barW, 24);
+
+        // 5. 中央箭頭舞步指令框
+        const boxY = 80;
+        if (st.readyToStrike) {
+          ctx.fillStyle = 'rgba(22, 101, 52, 0.94)';
+          this.drawRoundRect(centerX - 145, boxY, 290, 42, 14);
+          ctx.fill();
+          ctx.strokeStyle = '#fde047';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+
+          ctx.fillStyle = '#fde047';
+          ctx.font = '900 16px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('⚡ 抓準綠色區間・按任意方向鍵！', centerX, boxY + 21);
+        } else {
+          const itemW = 42;
+          const gap = 8;
+          const totalW = st.seq.length * itemW + (st.seq.length - 1) * gap;
+          let startX = centerX - totalW / 2;
+
+          st.seq.forEach((step, sIdx) => {
+            const isCurrent = (sIdx === st.stepIndex);
+            ctx.fillStyle = step.done
+              ? 'rgba(34, 197, 94, 0.9)'
+              : (isCurrent ? 'rgba(254, 240, 138, 0.98)' : 'rgba(15, 23, 42, 0.82)');
+            this.drawRoundRect(startX, boxY, itemW, 42, 10);
+            ctx.fill();
+
+            ctx.strokeStyle = isCurrent ? '#f59e0b' : 'rgba(255,255,255,0.45)';
+            ctx.lineWidth = isCurrent ? 3 : 1.5;
+            ctx.stroke();
+
+            ctx.font = '22px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(step.done ? '✅' : step.arrow, startX + itemW / 2, boxY + 21);
+
+            startX += itemW + gap;
+          });
+        }
+
+        // 6. 中央跳舞小狗主角
+        this.drawPuppy(centerX, h * 0.72, st.bounce, st.poseDir);
+
+        // 7. 飄浮得分特效
+        this.effects.forEach(ef => {
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '900 20px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(ef.text, ef.x + 1.5, ef.y + 1.5);
+          ctx.fillStyle = ef.color;
+          ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    let soloDance = null;
+
+    function startMiniGameDance() {
+      sound.setBpm(148);
+      openSoloMiniGameUI(
+        "【第 30 題壓軸獎勵關】💃 舞動草原",
+        "依序按出箭頭舞步 ⬅️⬆️⬇️➡️，完成後抓準節拍條【綠色區間】再按一次！"
+      );
+
+      soloDance = new SoloDanceMeadow(cvs, ctx);
+      cvs.onpointerdown = null;
+
+      elMgCtrl.innerHTML = `
+        <div class="w-full flex items-center justify-center gap-2 sm:gap-3 p-1.5 rounded-2xl bg-slate-900/90 border-2 border-lime-500/60 shadow-xl">
+          <button id="solo-dance-left" class="flex-1 py-3 sm:py-3.5 rounded-xl bg-amber-100 hover:bg-white text-rose-600 font-black text-lg sm:text-2xl border-2 border-amber-500 shadow active:scale-90 touch-btn">⬅️<span class="text-[11px] block text-slate-600 leading-none">A / ←</span></button>
+          <button id="solo-dance-up" class="flex-1 py-3 sm:py-3.5 rounded-xl bg-amber-100 hover:bg-white text-rose-600 font-black text-lg sm:text-2xl border-2 border-amber-500 shadow active:scale-90 touch-btn">⬆️<span class="text-[11px] block text-slate-600 leading-none">W / ↑</span></button>
+          <button id="solo-dance-down" class="flex-1 py-3 sm:py-3.5 rounded-xl bg-amber-100 hover:bg-white text-rose-600 font-black text-lg sm:text-2xl border-2 border-amber-500 shadow active:scale-90 touch-btn">⬇️<span class="text-[11px] block text-slate-600 leading-none">S / ↓</span></button>
+          <button id="solo-dance-right" class="flex-1 py-3 sm:py-3.5 rounded-xl bg-amber-100 hover:bg-white text-rose-600 font-black text-lg sm:text-2xl border-2 border-amber-500 shadow active:scale-90 touch-btn">➡️<span class="text-[11px] block text-slate-600 leading-none">D / →</span></button>
+        </div>
+      `;
+
+      ['left', 'up', 'down', 'right'].forEach(dir => {
+        document.getElementById(`solo-dance-${dir}`).onpointerdown = (e) => {
+          e.preventDefault();
+          soloDance.inputDir(dir);
+        };
+      });
+
+      function danceLoop() {
+        if (!mgActive) return;
+        soloDance.update();
+        soloDance.draw();
+        mgAnimId = requestAnimationFrame(danceLoop);
+      }
+      mgAnimId = requestAnimationFrame(danceLoop);
+    }
+    window.startMiniGameDance = startMiniGameDance;
+
+    /* ==========================================================
+       5. 終局 30 題單人榮譽結算
+       ========================================================== */
+    function showSoloVictory() {
+      sound.stopBgm();
+      const finalModal = document.getElementById('final-modal');
+      finalModal.classList.remove('hidden');
+
+      document.getElementById('final-p1-total').textContent = SOLO_STATE.score;
+      document.getElementById('final-p1-acc').textContent = `${SOLO_STATE.correctCount}/30`;
+      document.getElementById('final-p1-maxstreak').textContent = SOLO_STATE.maxStreak;
+
+      const titleEl = document.getElementById('final-champion-title');
+      const quoteEl = document.getElementById('final-summary-quote');
+
+      if (SOLO_STATE.correctCount >= 27) {
+        titleEl.innerHTML = `👑 <span class="text-amber-400">國語文特級神算王</span> 👑`;
+        quoteEl.innerHTML = `太厲害了！答對 <b class="text-cyan-400">${SOLO_STATE.correctCount}/30</b> 題，總分高達 <b class="text-amber-400">${SOLO_STATE.score}</b> 分！完全精熟〈為生命找出口〉的字詞、修辭與精神！`;
+      } else if (SOLO_STATE.correctCount >= 20) {
+        titleEl.innerHTML = `🏆 <span class="text-cyan-400">毅力小蜘蛛挑戰大師</span> 🏆`;
+        quoteEl.innerHTML = `表現非常優秀！答對 <b class="text-cyan-400">${SOLO_STATE.correctCount}/30</b> 題，總分 <b class="text-amber-400">${SOLO_STATE.score}</b> 分！展現了堅持到底的學習態度！`;
+      } else {
+        titleEl.innerHTML = `🌟 <span class="text-emerald-400">勇敢闖關小勇士</span> 🌟`;
+        quoteEl.innerHTML = `已完成全部 30 題挑戰！答對 <b class="text-cyan-400">${SOLO_STATE.correctCount}/30</b> 題。再挑戰一次，把錯題觀念全部精熟吧！`;
+      }
+      sound.playCorrect();
+    }
+
+    /* ==========================================================
+       6. 鍵盤事件監聽 (單人操作：WASD / 方向鍵 / 1~4 / ABCD)
+       ========================================================== */
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '[' || e.key === 'PageUp') prevQuestion();
+      if (e.key === ']' || e.key === 'PageDown') nextQuestion();
+
+      // 小遊戲射擊快捷鍵
+      if (mgActive && SOLO_STATE.currentMiniGame === 1 && soloShooter) {
+        if (e.key === ' ' || e.key === 'a' || e.key === 'A') {
+          e.preventDefault();
+          soloShooter.autoShootClosest();
+        }
+        return;
+      }
+
+      // 小遊戲【舞動草原】快捷鍵 (WASD 與 方向鍵皆可操作)
+      if (mgActive && SOLO_STATE.currentMiniGame === 3 && soloDance) {
+        if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { e.preventDefault(); soloDance.inputDir('left'); }
+        if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { e.preventDefault(); soloDance.inputDir('up'); }
+        if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { e.preventDefault(); soloDance.inputDir('down'); }
+        if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { e.preventDefault(); soloDance.inputDir('right'); }
+        return;
+      }
+
+      const q = SOLO_QUESTION_BANK[SOLO_STATE.roundIndex];
+      if (!q || SOLO_STATE.answered) return;
+
+      if (q.type === 'tf3') {
+        if (e.key === '1') handleSoloAnswer('correct');
+        if (e.key === '2') handleSoloAnswer('rule');
+        if (e.key === '3') handleSoloAnswer('calc');
+      } else if (q.type === 'mc') {
+        if (e.key === '1' || e.key === 'a' || e.key === 'A') handleSoloAnswer(0);
+        if (e.key === '2' || e.key === 'b' || e.key === 'B') handleSoloAnswer(1);
+        if (e.key === '3' || e.key === 'c' || e.key === 'C') handleSoloAnswer(2);
+        if (e.key === '4' || e.key === 'd' || e.key === 'D') handleSoloAnswer(3);
+      }
+    });
+
+    window.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
+</body>
+</html>
