@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>國小五上數學【7-3 平均與 7-4 分配律】30關iPad與電腦響應特訓版</title>
+  <title>國小五上數學【7-3 平均與 7-4 分配律】30關星際電玩特訓版</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap');
@@ -23,19 +23,64 @@
       overflow: hidden;
       margin: 0;
       padding: 0;
-      background-color: #030712;
+      background-color: #040816;
       font-family: 'Noto Sans TC', sans-serif;
+    }
+
+    /* 動態星際網格背景 */
+    .cyber-bg {
+      background:
+        radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.16) 0%, transparent 42%),
+        radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #050a19 0%, #091229 50%, #040816 100%);
+    }
+
+    .cyber-grid {
+      background-image:
+        linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+      background-size: 36px 36px;
+      animation: gridMove 24s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 36px 36px; }
     }
 
     .font-num {
       font-family: 'Chakra Petch', sans-serif;
     }
 
-    .glow-cyan {
-      box-shadow: 0 0 30px rgba(6, 182, 212, 0.45);
-      border-color: #06b6d4;
+    .math-font {
+      font-family: 'Chakra Petch', 'Noto Sans TC', monospace, sans-serif;
+      letter-spacing: 0.02em;
     }
-    
+
+    /* 霓虹發光與立體按鈕質感 */
+    .glow-cyan {
+      box-shadow: 0 0 28px rgba(6, 182, 212, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .arcade-card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(9, 14, 28, 0.94));
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    }
+
+    .arcade-btn {
+      position: relative;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      box-shadow: 0 4px 0 rgba(2, 6, 23, 0.85), 0 6px 14px rgba(0, 0, 0, 0.35);
+    }
+    .arcade-btn:hover {
+      transform: translateY(-2px);
+    }
+    .arcade-btn:active {
+      transform: translateY(2px) scale(0.985);
+      box-shadow: 0 1px 0 rgba(2, 6, 23, 0.9);
+    }
+
     @keyframes alertPulse {
       0%, 100% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); }
       50% { border-color: #7f1d1d; box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
@@ -43,6 +88,37 @@
     .negative-score {
       animation: alertPulse 1.2s infinite;
       color: #f87171 !important;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(6deg); }
+    }
+    .float-symbol {
+      animation: floatSlow 6s ease-in-out infinite;
+    }
+
+    @keyframes popScore {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(0.7); }
+      30% { opacity: 1; transform: translate(-50%, -22px) scale(1.15); }
+      100% { opacity: 0; transform: translate(-50%, -52px) scale(0.95); }
+    }
+    .score-popup {
+      position: fixed;
+      pointer-events: none;
+      z-index: 60;
+      animation: popScore 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes shakeAnim {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .shake-panel {
+      animation: shakeAnim 0.38s ease-in-out;
     }
 
     ::-webkit-scrollbar {
@@ -53,7 +129,7 @@
       background: rgba(15, 23, 42, 0.6);
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.5);
+      background: rgba(56, 189, 248, 0.45);
       border-radius: 4px;
     }
 
@@ -64,208 +140,260 @@
       user-select: none !important;
       cursor: pointer;
     }
-
-    .math-font {
-      font-family: 'Chakra Petch', monospace, sans-serif;
-      letter-spacing: 0.03em;
-    }
   </style>
 </head>
-<body class="text-white flex flex-col h-[100dvh] w-screen relative select-none bg-slate-950 overflow-hidden">
+<body class="text-white flex flex-col h-[100dvh] w-screen relative select-none cyber-bg overflow-hidden">
 
-  <!-- ==================== 頂部 HUD 資訊列 (完美適應平板與電腦) ==================== -->
-  <header class="h-[68px] sm:h-[72px] bg-slate-900/98 border-b border-slate-700/80 px-3 sm:px-6 flex items-center justify-between z-20 shrink-0 shadow-xl gap-2">
+  <!-- 背景裝飾漂浮數學符號與網格 -->
+  <div class="fixed inset-0 cyber-grid pointer-events-none z-0"></div>
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-20 font-num font-black text-cyan-400">
+    <span class="float-symbol absolute top-[14%] left-[6%] text-3xl sm:text-5xl" style="animation-delay: 0s;">(a＋b)×c</span>
+    <span class="float-symbol absolute top-[22%] right-[8%] text-3xl sm:text-5xl text-emerald-400" style="animation-delay: 1.5s;">÷ N</span>
+    <span class="float-symbol absolute bottom-[16%] left-[8%] text-4xl sm:text-6xl text-amber-400" style="animation-delay: 2.8s;">∑</span>
+    <span class="float-symbol absolute bottom-[18%] right-[7%] text-3xl sm:text-5xl text-purple-400" style="animation-delay: 4s;">＝1000</span>
+  </div>
+
+  <!-- ==================== 頂部 HUD 資訊列 ==================== -->
+  <header class="h-[64px] sm:h-[70px] bg-slate-950/85 backdrop-blur-xl border-b border-cyan-500/30 px-3 sm:px-6 flex items-center justify-between z-20 shrink-0 shadow-[0_8px_25px_rgba(0,0,0,0.5)] gap-2">
     
-    <!-- 左側：身分與積分 -->
-    <div class="flex items-center gap-2 shrink-0">
-      <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-cyan-400 via-sky-500 to-blue-600 flex items-center justify-center text-lg sm:text-xl shadow-md border border-cyan-400/50">🧑‍🎓</div>
+    <!-- 左側：身分、積分與連擊 -->
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div class="relative w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center text-lg sm:text-xl shadow-lg border border-cyan-300/60">
+        🧑‍🚀
+        <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-slate-950 flex items-center justify-center text-[9px] text-slate-950 font-black">5</span>
+      </div>
       <div>
-        <div class="flex items-center gap-1">
-          <span class="font-black text-cyan-400 text-xs sm:text-sm tracking-wider">單人特訓戰</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-xs font-num">
-          <span id="score-box" class="px-2 py-0.5 rounded-lg font-bold text-cyan-300 bg-slate-800 border border-cyan-700/60 text-xs sm:text-sm">
-            積分: <span id="total-score">0</span>
+        <div class="flex items-center gap-1.5">
+          <span class="font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-sky-400 text-xs sm:text-sm tracking-wider">星際數學特訓</span>
+          <span id="combo-badge" class="hidden px-1.5 py-0.2 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white font-num font-black text-[10px] sm:text-xs shadow-md animate-bounce">
+            🔥 2連擊
           </span>
-          <span class="text-slate-400 text-[11px] sm:text-xs">正確: <b id="total-acc" class="text-cyan-400">0/30</b></span>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs font-num mt-0.5">
+          <span id="score-box" class="px-2 py-0.5 rounded-lg font-bold text-cyan-300 bg-slate-900/90 border border-cyan-500/50 text-xs sm:text-sm shadow-inner">
+            💎 <span id="total-score">0</span>
+          </span>
+          <span class="text-slate-300 text-[11px] sm:text-xs bg-slate-900/70 px-2 py-0.5 rounded-lg border border-slate-700/70">
+            答對 <b id="total-acc" class="text-emerald-400">0/30</b>
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- 中央：導航與倒數計時 -->
-    <div class="flex items-center justify-center gap-2 sm:gap-3 flex-1 max-w-[500px]">
-      <button id="btn-prev-q" onclick="prevQuestion()" title="上一題" class="touch-btn flex items-center justify-center p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-90 border border-slate-600 text-slate-100 font-bold shadow shrink-0">
-        <span class="text-sm">⏮️</span>
+    <!-- 中央：關卡導航與倒數計時 -->
+    <div class="flex items-center justify-center gap-1.5 sm:gap-3 flex-1 max-w-[520px]">
+      <button id="btn-prev-q" onclick="prevQuestion()" title="上一題" class="touch-btn arcade-btn flex items-center justify-center p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-600 text-slate-100 font-bold shrink-0">
+        <span class="text-xs sm:text-sm">⏮️</span>
       </button>
 
-      <div class="flex flex-col items-center justify-center text-center flex-1 min-w-[110px]">
-        <div class="flex items-center gap-1.5">
-          <span class="text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-amber-500/60 uppercase" id="phase-badge">⚡極速闖關</span>
-          <span class="text-xs sm:text-sm md:text-base font-black tracking-wider text-slate-100 font-num" id="round-indicator">ROUND 1 / 30</span>
-          <button id="sound-toggle" onclick="toggleMute()" class="text-xs text-slate-300 hover:text-white px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 active:scale-95" title="音效">🔊</button>
+      <div class="flex flex-col items-center justify-center text-center flex-1 min-w-[120px]">
+        <div class="flex items-center gap-1.5 flex-wrap justify-center">
+          <span class="text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/60" id="phase-badge">🎯 第一階段</span>
+          <span class="text-xs sm:text-sm md:text-base font-black tracking-wider text-white font-num" id="round-indicator">STAGE 1 / 30</span>
+          <button id="sound-toggle" onclick="toggleMute()" class="text-xs text-slate-200 hover:text-white px-1.5 py-0.5 bg-slate-800/90 rounded-lg border border-slate-600 active:scale-95" title="音效開關">🔊</button>
         </div>
         
-        <div class="w-full max-w-[200px] sm:max-w-[240px] mt-1 flex items-center gap-1.5">
-          <div class="text-[10px] sm:text-xs font-num font-black text-slate-400 w-7 text-center" id="timer-text">30s</div>
-          <div class="flex-1 h-2 sm:h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
-            <div id="timer-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200"></div>
+        <div class="w-full max-w-[210px] sm:max-w-[260px] mt-1 flex items-center gap-1.5">
+          <div class="text-[10px] sm:text-xs font-num font-black text-amber-300 w-8 text-center" id="timer-text">30s</div>
+          <div class="flex-1 h-2.5 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700/90 shadow-inner">
+            <div id="timer-bar" class="h-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-amber-400 rounded-full w-full transition-all duration-200"></div>
           </div>
         </div>
       </div>
 
-      <button id="btn-next-q" onclick="nextQuestion()" title="下一題" class="touch-btn flex items-center justify-center p-2 sm:px-3 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 active:scale-90 border border-emerald-400 text-white font-bold shadow shrink-0">
-        <span class="text-sm">⏭️</span>
+      <button id="btn-next-q" onclick="nextQuestion()" title="下一題" class="touch-btn arcade-btn flex items-center justify-center p-2 sm:px-3 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 border border-emerald-400 text-white font-bold shrink-0">
+        <span class="text-xs sm:text-sm">⏭️</span>
       </button>
     </div>
 
-    <!-- 右側：iPad/電腦提示 -->
-    <div class="hidden xl:flex items-center gap-2 shrink-0 text-right">
-      <div class="text-xs font-bold text-amber-300 bg-amber-950/60 px-3 py-1.5 rounded-xl border border-amber-600/50">
-        🎯 每 10 題解鎖手速遊樂場！
+    <!-- 右側：遊樂場快捷與進度提示 -->
+    <div class="hidden lg:flex items-center gap-2 shrink-0">
+      <div class="text-xs font-bold text-amber-200 bg-gradient-to-r from-amber-950/80 to-orange-950/80 px-3 py-1.5 rounded-xl border border-amber-500/50 shadow flex items-center gap-1.5">
+        <span class="text-sm">🕹️</span>
+        <span id="next-mg-hint">第 10 關解鎖雷射靶場</span>
       </div>
     </div>
 
   </header>
 
-  <!-- ==================== 主要對戰舞台 (適應 iPad 4:3 與電腦螢幕) ==================== -->
-  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-6 pb-12 overflow-hidden w-full">
+  <!-- ==================== 30 關星際進度條 ==================== -->
+  <div class="h-[26px] bg-slate-950/75 border-b border-slate-800/80 px-3 sm:px-6 flex items-center justify-center gap-2 z-10 shrink-0">
+    <div id="stage-map" class="w-full max-w-4xl flex items-center justify-between gap-0.5 sm:gap-1">
+      <!-- 由 JS 動態生成 30 關光點與 3 個遊樂場圖示 -->
+    </div>
+  </div>
+
+  <!-- ==================== 主要對戰舞台 ==================== -->
+  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 overflow-hidden w-full z-10">
     
-    <!-- 中央大題卡 (限制最大高寬，避免 iPad 直向溢出) -->
-    <section id="game-panel" class="w-full max-w-3xl max-h-full flex-1 flex flex-col justify-between gap-2.5 sm:gap-4 bg-slate-900/90 p-3.5 sm:p-6 rounded-3xl border-2 border-cyan-500/50 shadow-2xl relative overflow-hidden backdrop-blur-md">
+    <!-- 中央大題卡 -->
+    <section id="game-panel" class="w-full max-w-4xl h-full max-h-[660px] flex-1 flex flex-col justify-between gap-2.5 sm:gap-3.5 arcade-card p-3.5 sm:p-6 rounded-3xl border-2 border-cyan-500/45 relative overflow-hidden backdrop-blur-xl">
       
-      <!-- 頂部題號與狀態 -->
-      <div class="flex items-center justify-between text-xs font-bold text-cyan-400 shrink-0">
-        <span class="px-2.5 py-1 rounded-lg bg-cyan-950 border border-cyan-700 font-mono text-[11px] sm:text-xs">📚 國小五上數學・單元 7 核心特訓</span>
-        <div class="flex items-center gap-2">
-          <span id="status-stamp" class="text-xs font-black px-2 py-0.5 rounded-md hidden font-num"></span>
+      <!-- 頂部題型徽章與狀態印章 -->
+      <div class="flex items-center justify-between text-xs font-bold shrink-0 gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-cyan-950 to-blue-950 border border-cyan-500/60 text-cyan-300 font-bold text-[11px] sm:text-xs shadow">
+            📚 國小五上數學・單元 7
+          </span>
+          <span id="q-type-badge" class="px-2.5 py-1 rounded-xl bg-indigo-950/90 border border-indigo-400/50 text-indigo-300 text-[11px] sm:text-xs font-black">
+            三態是非題
+          </span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="status-stamp" class="text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl hidden font-num shadow-lg"></span>
         </div>
       </div>
 
-      <!-- 題目文字卡片 -->
-      <div class="bg-slate-900/98 rounded-2xl border-2 border-cyan-400/60 p-3 sm:p-5 flex flex-col justify-between shadow-xl relative shrink-0">
+      <!-- 題目顯示區 -->
+      <div class="bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-indigo-950/70 rounded-2xl border border-cyan-400/50 p-3.5 sm:p-5 flex flex-col justify-between shadow-[inset_0_2px_12px_rgba(6,182,212,0.12)] relative shrink-0">
         <div id="q-text" class="text-sm sm:text-lg md:text-xl font-bold text-white leading-snug sm:leading-relaxed math-font">
           題目載入中...
         </div>
-        <div class="text-[10px] sm:text-[11px] text-cyan-300 font-mono border-t border-slate-800/80 pt-1.5 mt-1.5 flex justify-between shrink-0">
-          <span>7-3 平均 ＝ 總和 ÷ 個數</span>
-          <span class="text-amber-300 font-bold hidden sm:inline">7-4 分配律：(甲 ± 乙) × 丙 ＝ 甲×丙 ± 乙×丙</span>
+        <div class="text-[10px] sm:text-xs text-cyan-300/90 font-mono border-t border-slate-700/70 pt-2 mt-2 flex flex-wrap justify-between gap-1 shrink-0">
+          <span class="flex items-center gap-1">📐 <b>7-3 平均</b> ＝ 總和 ÷ 個數</span>
+          <span class="text-amber-300 font-bold flex items-center gap-1">⚡ <b>7-4 分配律</b>：(甲 ± 乙) × 丙 ＝ 甲×丙 ± 乙×丙</span>
         </div>
       </div>
 
-      <!-- 互動答題區與盲點解析 -->
+      <!-- 互動答題區與解析卡 -->
       <div class="flex-1 flex flex-col gap-2 min-h-0 relative justify-center">
-        <div id="interactive-area" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone"></div>
+        <div id="interactive-area" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone relative"></div>
 
         <!-- 答錯深入解析卡片 -->
-        <div id="analysis-card" class="max-h-[85px] sm:max-h-[100px] rounded-xl bg-cyan-950/98 border-2 border-cyan-400 px-3 py-2 hidden flex-col justify-start text-cyan-200 shrink-0 shadow-xl overflow-y-auto">
-          <div class="text-xs font-black text-cyan-300 mb-1 flex items-center gap-1">
+        <div id="analysis-card" class="max-h-[92px] sm:max-h-[108px] rounded-2xl bg-gradient-to-r from-cyan-950/95 to-slate-900/95 border-2 border-cyan-400 px-3.5 py-2.5 hidden flex-col justify-start text-cyan-200 shrink-0 shadow-xl overflow-y-auto">
+          <div class="text-xs font-black text-amber-300 mb-0.5 flex items-center gap-1.5">
             <span>💡 觀念盲點深入解析：</span>
           </div>
-          <div id="analysis-text" class="text-xs font-medium leading-relaxed text-slate-100 pr-1">--</div>
+          <div id="analysis-text" class="text-xs sm:text-sm font-medium leading-relaxed text-slate-100 pr-1">--</div>
         </div>
       </div>
     </section>
 
     <!-- ==================== 答錯暫停與推進列 ==================== -->
-    <div id="teacher-control-bar" class="fixed top-[78px] sm:top-[82px] left-1/2 -translate-x-1/2 z-40 hidden items-center gap-3 bg-slate-900/98 border-2 border-amber-400 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md max-w-[96vw] transition-all text-xs">
+    <div id="teacher-control-bar" class="fixed top-[98px] sm:top-[104px] left-1/2 -translate-x-1/2 z-40 hidden items-center gap-3 bg-slate-900/98 border-2 border-amber-400 px-4 py-2 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl max-w-[95vw] transition-all text-xs">
       <div class="flex items-center gap-2">
         <span class="text-lg" id="ctrl-icon">🚨</span>
         <span id="ctrl-msg" class="text-xs sm:text-sm font-bold text-amber-300 whitespace-nowrap">作答有誤・倒數已停止</span>
       </div>
-      <button id="btn-next-question" class="shrink-0 px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:opacity-95 shadow-md active:scale-95 transition-all flex items-center gap-1">
-        <span>💡 確認觀念・繼續下一題 ➔</span>
+      <button id="btn-next-question" class="shrink-0 px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-300 hover:brightness-105 shadow-md active:scale-95 transition-all flex items-center gap-1">
+        <span>確認觀念・繼續下一題 ➔</span>
       </button>
     </div>
 
-    <!-- ==================== 小遊戲覆蓋層 (適應 iPad) ==================== -->
-    <div id="minigame-overlay" class="absolute inset-0 bg-slate-950 z-30 hidden flex flex-col p-2 sm:p-5">
-      <div class="h-12 sm:h-14 bg-slate-900 border border-slate-700 px-3 sm:px-5 flex items-center justify-between shrink-0 rounded-t-2xl">
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-black tracking-widest font-num">中場遊戲</span>
+    <!-- ==================== 小遊戲遊樂場覆蓋層 ==================== -->
+    <div id="minigame-overlay" class="absolute inset-0 bg-slate-950/98 z-30 hidden flex flex-col p-2 sm:p-4">
+      <div class="h-12 sm:h-14 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-amber-500/40 px-3 sm:px-5 flex items-center justify-between shrink-0 rounded-t-2xl shadow-lg">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black tracking-wider font-num shrink-0">BONUS GAME</span>
           <h2 id="mg-title" class="text-xs sm:text-base font-black text-amber-300 truncate">手速遊樂場</h2>
         </div>
-        <div class="flex items-center gap-3 sm:gap-5">
-          <div class="text-xs text-cyan-300">得分: <b id="mg-pts" class="text-cyan-400 font-num text-base sm:text-xl">0</b></div>
-          <div id="mg-timer" class="text-base sm:text-xl font-black text-amber-400 font-num">20.0s</div>
-          <button onclick="skipMiniGame()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-amber-300 active:scale-95 touch-btn">
+        <div class="flex items-center gap-2.5 sm:gap-4 shrink-0">
+          <div id="mg-combo-badge" class="hidden px-2 py-0.5 rounded-full bg-rose-600 text-white font-num font-black text-xs animate-pulse">
+            🔥 x2 FEVER
+          </div>
+          <div class="text-xs text-cyan-200 bg-slate-900/90 px-2.5 py-1 rounded-xl border border-cyan-500/40">
+            得分 <b id="mg-pts" class="text-cyan-400 font-num text-sm sm:text-lg ml-1">0</b>
+          </div>
+          <div id="mg-timer" class="text-sm sm:text-xl font-black text-amber-400 font-num bg-slate-900/90 px-2.5 py-0.5 rounded-xl border border-amber-500/40">22.0s</div>
+          <button onclick="skipMiniGame()" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200 active:scale-95 touch-btn">
             ⏭️ 跳過
           </button>
         </div>
       </div>
       
-      <div class="flex-1 relative flex flex-col items-center justify-between p-2.5 bg-slate-900/70 rounded-b-2xl overflow-hidden border border-slate-800 min-h-0">
-        <div id="mg-hint" class="text-xs font-bold text-amber-300 mb-1 text-center shrink-0">--</div>
-        <div class="flex-1 w-full relative flex items-center justify-center min-h-0">
-          <canvas id="mg-canvas" class="w-full h-full rounded-2xl bg-slate-950 border border-slate-700 shadow-inner"></canvas>
+      <div class="flex-1 relative flex flex-col items-center justify-between p-2 sm:p-3 bg-slate-900/80 rounded-b-2xl overflow-hidden border-x border-b border-slate-800 min-h-0">
+        <div id="mg-hint" class="text-xs sm:text-sm font-bold text-amber-200 mb-1.5 text-center shrink-0 bg-slate-950/70 px-3 py-1 rounded-full border border-amber-500/30">--</div>
+        <div id="mg-canvas-wrap" class="flex-1 w-full relative flex items-center justify-center min-h-0">
+          <canvas id="mg-canvas" class="w-full h-full rounded-2xl bg-slate-950 border-2 border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.15)]"></canvas>
         </div>
         <div id="mg-ctrl" class="w-full shrink-0 pt-2 flex justify-center gap-3 max-w-xl"></div>
       </div>
     </div>
 
     <!-- ==================== 開場首頁彈窗 ==================== -->
-    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
-      <div class="max-w-xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl relative my-auto">
-        <div class="text-[11px] sm:text-xs font-black tracking-widest text-cyan-400 uppercase mb-1">國小五年級數學・單元 7 整數四則計算</div>
-        <h1 class="text-xl sm:text-3xl font-black tracking-tight text-white mb-2 sm:mb-3">
-          7-3 平均問題 與 7-4 分配律<br>🧑‍🎓 30 關單人極速闖關特訓
+    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/92 backdrop-blur-xl flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
+      <div class="max-w-2xl w-full arcade-card border-2 border-cyan-400/50 rounded-3xl p-5 sm:p-8 shadow-2xl relative my-auto">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/50 text-cyan-300 text-[11px] sm:text-xs font-black tracking-widest mb-2">
+          <span>✨ 國小五年級上學期・數學第七單元</span>
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white mb-2 leading-tight">
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-teal-200 to-emerald-300">7-3 平均問題 &amp; 7-4 分配律</span><br>
+          <span class="text-xl sm:text-2xl text-amber-300">🚀 30 關星際電玩極速特訓</span>
         </h1>
-        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-4">
-          全面攻克 <span class="text-cyan-400 font-bold">7-3 平均問題（總和 ÷ 個數）</span> 與 <span class="text-emerald-400 font-bold">7-4 分配律湊整速算</span>！<br>
-          <span class="inline-block mt-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/60 text-amber-300 font-bold text-xs">
-            🎯 每完成 10 題解鎖刺激的手速遊樂場！
-          </span>
+        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-5 max-w-lg mx-auto">
+          掌握 <span class="text-cyan-300 font-bold">「總和 ÷ 個數」</span> 與 <span class="text-emerald-300 font-bold">「分配律湊整速算」</span>！<br>
+          連續答對可累積 <span class="text-rose-400 font-bold">🔥 連擊火焰加分</span>，每破 10 關解鎖豪華獎勵小遊戲！
         </p>
 
-        <!-- 規則說明 -->
-        <div class="grid grid-cols-3 gap-2.5 mb-5 text-left">
-          <div class="p-2.5 rounded-xl bg-cyan-950/50 border border-cyan-500/50">
-            <div class="text-cyan-400 font-bold text-xs mb-0.5">🎯 第 1~10 關</div>
-            <div class="text-[10px] sm:text-[11px] text-slate-300 leading-tight">三態是非題<br>解鎖射擊靶場</div>
+        <!-- 三大關卡與小遊戲卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-6 text-left">
+          <div class="p-3 rounded-2xl bg-gradient-to-br from-cyan-950/80 to-slate-900 border border-cyan-500/50 shadow-lg">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-cyan-300 font-black text-xs">STAGE 1~10</span>
+              <span class="text-lg">🎯</span>
+            </div>
+            <div class="font-bold text-white text-xs sm:text-sm mb-0.5">三態是非診斷戰</div>
+            <div class="text-[11px] text-cyan-200/80">通關解鎖：<b>極速雷射靶場</b></div>
           </div>
-          <div class="p-2.5 rounded-xl bg-emerald-950/50 border border-emerald-500/50">
-            <div class="text-emerald-400 font-bold text-xs mb-0.5">📚 第 11~20 關</div>
-            <div class="text-[10px] sm:text-[11px] text-slate-300 leading-tight">四選一選擇題<br>解鎖打地鼠</div>
+          <div class="p-3 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-slate-900 border border-emerald-500/50 shadow-lg">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-emerald-300 font-black text-xs">STAGE 11~20</span>
+              <span class="text-lg">🔨</span>
+            </div>
+            <div class="font-bold text-white text-xs sm:text-sm mb-0.5">四選一觀念突擊</div>
+            <div class="text-[11px] text-emerald-200/80">通關解鎖：<b>瘋狂打地鼠擂台</b></div>
           </div>
-          <div class="p-2.5 rounded-xl bg-rose-950/50 border border-rose-500/50">
-            <div class="text-rose-400 font-bold text-xs mb-0.5">🔗 第 21~30 關</div>
-            <div class="text-[10px] sm:text-[11px] text-slate-300 leading-tight">2對2連連看<br>解鎖太鼓達人</div>
+          <div class="p-3 rounded-2xl bg-gradient-to-br from-rose-950/80 to-slate-900 border border-rose-500/50 shadow-lg">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-rose-300 font-black text-xs">STAGE 21~30</span>
+              <span class="text-lg">🥁</span>
+            </div>
+            <div class="font-bold text-white text-xs sm:text-sm mb-0.5">光束 2對2 連連看</div>
+            <div class="text-[11px] text-rose-200/80">通關解鎖：<b>祭典太鼓狂熱夜</b></div>
           </div>
         </div>
 
-        <button id="btn-start-game" onclick="startGame()" class="w-full py-3.5 sm:py-4 rounded-2xl font-black text-base sm:text-lg tracking-widest text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:opacity-95 shadow-xl glow-cyan active:scale-95 transition-all">
-          🚀 解鎖音效・開始 30 關挑戰！
+        <button id="btn-start-game" onclick="startGame()" class="w-full py-3.5 sm:py-4 rounded-2xl font-black text-base sm:text-xl tracking-widest text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:brightness-105 shadow-xl glow-cyan active:scale-95 transition-all">
+          🎮 啟動音效・開始 30 關挑戰！
         </button>
       </div>
     </div>
 
     <!-- ==================== 小遊戲戰報彈窗 ==================== -->
-    <div id="mg-result-modal" class="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
-      <div class="max-w-md w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl text-center">
-        <span class="text-xs uppercase font-black text-amber-400 font-num">MINI-GAME SETTLEMENT</span>
-        <h3 class="text-xl font-black text-white mt-1 mb-3">手速遊樂場戰報</h3>
-        <div class="p-4 rounded-2xl bg-cyan-950/60 border border-cyan-500/50 my-4">
-          <div class="text-xs text-cyan-300 font-bold">獲得獎勵積分</div>
-          <div id="mg-res-score" class="text-3xl font-black text-cyan-400 font-num mt-1">+0</div>
+    <div id="mg-result-modal" class="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+      <div class="max-w-md w-full arcade-card border-2 border-amber-400/60 rounded-3xl p-6 shadow-2xl text-center">
+        <div class="text-4xl mb-1">🎉</div>
+        <span class="text-xs uppercase font-black tracking-widest text-amber-400 font-num">BONUS STAGE CLEAR</span>
+        <h3 class="text-xl sm:text-2xl font-black text-white mt-1 mb-3">手速遊樂場戰報</h3>
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-cyan-950/80 to-indigo-950/80 border border-cyan-400/50 my-4 shadow-inner">
+          <div class="text-xs text-cyan-200 font-bold">獲得獎勵積分</div>
+          <div id="mg-res-score" class="text-4xl font-black text-amber-300 font-num mt-1">+0</div>
         </div>
-        <button id="btn-close-mg-result" class="w-full py-3 rounded-xl font-black text-sm text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 active:scale-95">
-          返回 30 關數學特訓 ➔
+        <button id="btn-close-mg-result" class="w-full py-3.5 rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-300 hover:brightness-105 active:scale-95 shadow-lg">
+          繼續數學特訓挑戰 ➔
         </button>
       </div>
     </div>
 
     <!-- ==================== 終局結算彈窗 ==================== -->
-    <div id="final-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
-      <div class="max-w-lg w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl my-auto">
-        <span class="text-xs font-black tracking-widest text-amber-400 uppercase">VICTORY</span>
-        <h2 class="text-2xl sm:text-3xl font-black text-white mt-1 mb-4">🏆 30 關極速特訓圓滿通關！</h2>
-        <div class="p-5 rounded-2xl bg-cyan-950/50 border-2 border-cyan-400 mb-5">
-          <div class="text-3xl mb-1">🎓</div>
-          <h3 class="text-sm font-black text-cyan-400">總積分</h3>
-          <div id="final-total-score" class="text-4xl sm:text-5xl font-black text-cyan-300 font-num my-1">0</div>
-          <div class="text-xs text-slate-300 font-mono">30關正答數：<b id="final-acc" class="text-cyan-300">0/30</b></div>
+    <div id="final-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-xl hidden flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
+      <div class="max-w-lg w-full arcade-card border-2 border-amber-400/70 rounded-3xl p-6 sm:p-8 shadow-2xl my-auto">
+        <span class="text-xs font-black tracking-widest text-amber-400 uppercase font-num">MISSION ACCOMPLISHED</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white mt-1 mb-2">🏆 30 關極速特訓圓滿通關！</h2>
+        <div id="final-rank-title" class="inline-block px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400 text-amber-300 font-black text-xs sm:text-sm mb-4">
+          👑 數學超新星大師
         </div>
-        <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 active:scale-95">
-          🔄 再次挑戰紀錄
+        <div class="p-5 rounded-2xl bg-gradient-to-br from-cyan-950/70 to-indigo-950/70 border-2 border-cyan-400 mb-5 shadow-inner">
+          <div class="text-3xl mb-1">🎓</div>
+          <h3 class="text-xs font-black text-cyan-300 uppercase tracking-wider">最終總積分</h3>
+          <div id="final-total-score" class="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-300 font-num my-1">0</div>
+          <div class="flex justify-center gap-4 text-xs text-slate-300 font-mono mt-2 pt-2 border-t border-slate-700/70">
+            <span>正答題數：<b id="final-acc" class="text-emerald-400">0/30</b></span>
+            <span>最高連擊：<b id="final-max-combo" class="text-amber-400">0</b></span>
+          </div>
+        </div>
+        <button onclick="location.reload()" class="w-full py-3.5 rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:brightness-105 active:scale-95 shadow-xl">
+          🔄 再次挑戰更高紀錄
         </button>
       </div>
     </div>
@@ -274,6 +402,7 @@
 
   <!-- ==================== 核心 JavaScript ==================== -->
   <script>
+    /* ==================== 1. Web Audio 豪華音效引擎 ==================== */
     class SoundEngine {
       constructor() {
         this.ctx = null;
@@ -321,29 +450,57 @@
       playBgmStep(s) {
         if (!this.ctx || !this.compressor) return;
         const t = this.ctx.currentTime;
+        // 輕快電玩節拍底鼓與貝斯
         if (s % 4 === 0) {
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-          osc.frequency.setValueAtTime(160, t);
-          osc.frequency.exponentialRampToValueAtTime(35, t + 0.12);
-          gain.gain.setValueAtTime(0.3, t);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+          osc.frequency.setValueAtTime(145, t);
+          osc.frequency.exponentialRampToValueAtTime(36, t + 0.11);
+          gain.gain.setValueAtTime(0.22, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
           osc.connect(gain); gain.connect(this.compressor);
-          osc.start(t); osc.stop(t + 0.13);
+          osc.start(t); osc.stop(t + 0.12);
+        } else if (s % 4 === 2 && this.bpm >= 145) {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          const notes = [261.63, 329.63, 392.00, 523.25];
+          osc.frequency.setValueAtTime(notes[(s / 2) % notes.length], t);
+          gain.gain.setValueAtTime(0.08, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+          osc.connect(gain); gain.connect(this.compressor);
+          osc.start(t); osc.stop(t + 0.1);
         }
       }
 
-      playCorrect(isFirst = false) {
+      playCorrect(combo = 1) {
         if (this.isMuted || !this.ctx) return;
+        const pitchBoost = Math.min(1.35, 1 + (combo - 1) * 0.04);
         [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const t = this.ctx.currentTime + i * 0.045;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq * pitchBoost, t);
+          gain.gain.setValueAtTime(0.24, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.24);
+          osc.connect(gain); gain.connect(this.compressor);
+          osc.start(t); osc.stop(t + 0.26);
+        });
+      }
+
+      playFever() {
+        if (this.isMuted || !this.ctx) return;
+        [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
           const t = this.ctx.currentTime + i * 0.05;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(freq, t);
-          gain.gain.setValueAtTime(0.25, t);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+          gain.gain.setValueAtTime(0.16, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
           osc.connect(gain); gain.connect(this.compressor);
-          osc.start(t); osc.stop(t + 0.28);
+          osc.start(t); osc.stop(t + 0.32);
         });
       }
 
@@ -353,12 +510,12 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(320, t);
-        osc.frequency.exponentialRampToValueAtTime(70, t + 0.3);
-        gain.gain.setValueAtTime(0.25, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.31);
+        osc.frequency.setValueAtTime(290, t);
+        osc.frequency.exponentialRampToValueAtTime(65, t + 0.32);
+        gain.gain.setValueAtTime(0.24, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.33);
         osc.connect(gain); gain.connect(this.compressor);
-        osc.start(t); osc.stop(t + 0.32);
+        osc.start(t); osc.stop(t + 0.34);
       }
 
       playGrab() {
@@ -366,11 +523,11 @@
         const t = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.frequency.setValueAtTime(987.77, t);
-        gain.gain.setValueAtTime(0.2, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+        osc.frequency.setValueAtTime(920, t);
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
         osc.connect(gain); gain.connect(this.compressor);
-        osc.start(t); osc.stop(t + 0.11);
+        osc.start(t); osc.stop(t + 0.1);
       }
 
       playShoot() {
@@ -379,12 +536,12 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(900, t);
-        osc.frequency.exponentialRampToValueAtTime(80, t + 0.1);
-        gain.gain.setValueAtTime(0.25, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+        osc.frequency.setValueAtTime(1100, t);
+        osc.frequency.exponentialRampToValueAtTime(110, t + 0.11);
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
         osc.connect(gain); gain.connect(this.compressor);
-        osc.start(t); osc.stop(t + 0.11);
+        osc.start(t); osc.stop(t + 0.12);
       }
 
       playHammer() {
@@ -393,12 +550,26 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(180, t);
-        osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
-        gain.gain.setValueAtTime(0.3, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        osc.frequency.setValueAtTime(210, t);
+        osc.frequency.exponentialRampToValueAtTime(42, t + 0.13);
+        gain.gain.setValueAtTime(0.32, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
         osc.connect(gain); gain.connect(this.compressor);
-        osc.start(t); osc.stop(t + 0.13);
+        osc.start(t); osc.stop(t + 0.14);
+      }
+
+      playCrack() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1250, t);
+        osc.frequency.exponentialRampToValueAtTime(620, t + 0.08);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+        osc.connect(gain); gain.connect(this.compressor);
+        osc.start(t); osc.stop(t + 0.09);
       }
 
       playDon() {
@@ -406,11 +577,12 @@
         const t = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.frequency.setValueAtTime(160, t);
-        gain.gain.setValueAtTime(0.35, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.frequency.setValueAtTime(175, t);
+        osc.frequency.exponentialRampToValueAtTime(55, t + 0.16);
+        gain.gain.setValueAtTime(0.42, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
         osc.connect(gain); gain.connect(this.compressor);
-        osc.start(t); osc.stop(t + 0.16);
+        osc.start(t); osc.stop(t + 0.17);
       }
 
       playKa() {
@@ -419,8 +591,9 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'square';
-        osc.frequency.setValueAtTime(800, t);
-        gain.gain.setValueAtTime(0.2, t);
+        osc.frequency.setValueAtTime(880, t);
+        osc.frequency.exponentialRampToValueAtTime(440, t + 0.08);
+        gain.gain.setValueAtTime(0.24, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
         osc.connect(gain); gain.connect(this.compressor);
         osc.start(t); osc.stop(t + 0.09);
@@ -429,6 +602,7 @@
 
     const sound = new SoundEngine();
 
+    /* ==================== 2. 30 關核心題庫 ==================== */
     const QUESTION_BANK = [
       // 1~10 關：三態是非題
       {
@@ -471,7 +645,7 @@
         round: 7, type: "tf3", badge: "三態是非題",
         text: `【7-4 湊整速算】計算 <span class="text-cyan-300">184 × 840 ＋ 184 × 160</span>：<br><span class="text-cyan-300">＝ 184 × (840 ＋ 160) ＝ 184 × 1000 ＝ 18400</span>`,
         answer: "calc",
-        tip: "【錯在計算數值】湊整 1000 正確，但 184 × 1000 ＝ 184000！"
+        tip: "【錯在計算數值】湊整 1000 正確，但 184 × 1000 ＝ 184000（少寫一個 0）！"
       },
       {
         round: 8, type: "tf3", badge: "三態是非題",
@@ -498,28 +672,28 @@
         text: `【7-3 平均概念】關於「平均」的意義與計算方法，下列敘述哪一個正確？`,
         options: [`A. 拿多補少，把總和依個數平分`, `B. 最大數減最小數`, `C. 全部相加不用除以個數`, `D. 每一堆原本數量必須一樣`],
         answer: 0,
-        tip: "【解析】平均就是總和 ÷ 個數！"
+        tip: "【解析】平均就是把所有數量加總後，再除以個數（總和 ÷ 個數）！"
       },
       {
         round: 12, type: "mc", badge: "四選一選擇題",
         text: `【7-3 平均意義】凱西 4 次小考平均 91 分，這代表什麼意思？`,
         options: [`A. 把 4 次看成每次都考同分，每次都是 91 分`, `B. 每一次都考 91 分`, `C. 最高分是 91 分`, `D. 總分是 91 分`],
         answer: 0,
-        tip: "【解析】總分是 91 × 4 ＝ 364 分！"
+        tip: "【解析】總分是 91 × 4 ＝ 364 分，平均代表拉平後每次相當於 91 分！"
       },
       {
         round: 13, type: "mc", badge: "四選一選擇題",
         text: `【7-4 分配律填空】<span class="text-cyan-300">23 × 91 ＋ 23 × 9 ＝ 23 × ( □ ＋ 9 )</span>，□ 應填入？`,
         options: [`A. 91`, `B. 23`, `C. 100`, `D. 1`],
         answer: 0,
-        tip: "【解析】提出 23，括號內放入 91！"
+        tip: "【解析】提出共同乘數 23，括號內放入 91 ＋ 9 ＝ 100！"
       },
       {
         round: 14, type: "mc", badge: "四選一選擇題",
         text: `【7-4 分配律填空】<span class="text-cyan-300">45 × 99 ＋ 45 ＝ 45 × ( 99 ＋ □ )</span>，□ 應填入？`,
         options: [`A. 1`, `B. 45`, `C. 0`, `D. 100`],
         answer: 0,
-        tip: "【解析】後面的 45 視為 45 × 1！"
+        tip: "【解析】後面的 45 視為 45 × 1，提出 45 後括號內為 99 ＋ 1！"
       },
       {
         round: 15, type: "mc", badge: "四選一選擇題",
@@ -533,113 +707,113 @@
         text: `【7-4 減法分配律】<span class="text-cyan-300">58 × 25 － 58 × 17 ＝ □ × (25 － 17)</span>，□ 應填入？`,
         options: [`A. 58`, `B. 25`, `C. 17`, `D. 8`],
         answer: 0,
-        tip: "【解析】提出公因數 58！"
+        tip: "【解析】提出共同乘數 58，括號內相減為 25 － 17！"
       },
       {
         round: 17, type: "mc", badge: "四選一選擇題",
         text: `【7-4 應用】1 盆 65 元，昨天賣 48 盆，今天賣 36 盆，昨天比今天多賣幾元？`,
         options: [`A. 65 × (48 － 36) ＝ 780 (元)`, `B. 65 × (48 ＋ 36)`, `C. 65 × 48 ＋ 36`, `D. (65 － 48) × 36`],
         answer: 0,
-        tip: "【解析】65 × (48 － 36) ＝ 780 元！"
+        tip: "【解析】先算多賣幾盆 (48 － 36) ＝ 12 盆，再乘 65 元 ＝ 780 元！"
       },
       {
         round: 18, type: "mc", badge: "四選一選擇題",
         text: `【7-4 面積】長 65cm、寬 25cm 長方形，比邊長 25cm 正方形多幾平方公分？`,
         options: [`A. (65 － 25) × 25 ＝ 1000`, `B. (65 ＋ 25) × 25`, `C. 65 × 25 － 25`, `D. (65 － 25) × 4`],
         answer: 0,
-        tip: "【解析】(65 － 25) × 25 ＝ 1000 平方公分！"
+        tip: "【解析】65×25 － 25×25 ＝ (65 － 25) × 25 ＝ 40 × 25 ＝ 1000 平方公分！"
       },
       {
         round: 19, type: "mc", badge: "四選一選擇題",
         text: `【7-4 湊整速算】計算 <span class="text-cyan-300">199 × 123 ＋ 101 × 123</span> 最快方式？`,
         options: [`A. (199 ＋ 101) × 123 ＝ 300 × 123 ＝ 36900`, `B. (199 － 101) × 123`, `C. 199 × 224`, `D. 300 × 246`],
         answer: 0,
-        tip: "【解析】提出 123，將 199 ＋ 101 湊成 300！"
+        tip: "【解析】提出 123，將 199 ＋ 101 湊成整百 300，300 × 123 ＝ 36900！"
       },
       {
         round: 20, type: "mc", badge: "四選一選擇題",
         text: `【7-4 減法速算】計算 <span class="text-cyan-300">77 × 308 － 77 × 298</span> 最快方式？`,
         options: [`A. 77 × (308 － 298) ＝ 77 × 10 ＝ 770`, `B. 77 × 606`, `C. 0`, `D. 23418`],
         answer: 0,
-        tip: "【解析】提出 77，先算 308 － 298 ＝ 10！"
+        tip: "【解析】提出 77，先算 308 － 298 ＝ 10，77 × 10 ＝ 770！"
       },
 
       // 21~30 關：2對2連連看配對題
       {
-        round: 21, type: "match", badge: "2對2配對題",
-        text: "請將【平均情境】與【正確列式】配對：",
+        round: 21, type: "match", badge: "光束 2對2 配對",
+        text: "請點擊左右兩側，將【平均情境】與【正確列式】連在一起：",
         left: [{ key: "L1", label: "① 巧克力 16、20、24 顆求平均" }, { key: "L2", label: "② 小考 87、93、89、95 分求平均" }],
         right: [{ key: "R1", label: "A. (16 ＋ 20 ＋ 24) ÷ 3 ＝ 20" }, { key: "R2", label: "B. (87 ＋ 93 ＋ 89 ＋ 95) ÷ 4 ＝ 91" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】平均＝總和÷個數！"
+        tip: "【解析】平均＝總和÷個數！3 堆除以 3，4 次除以 4！"
       },
       {
-        round: 22, type: "match", badge: "2對2配對題",
-        text: "請將【加法分配律】與【等值合併式】配對：",
+        round: 22, type: "match", badge: "光束 2對2 配對",
+        text: "請將【加法分配律】與【等值合併式】配對連線：",
         left: [{ key: "L1", label: "① 5 × 7 ＋ 9 × 7" }, { key: "L2", label: "② 15 × 99 ＋ 15" }],
         right: [{ key: "R1", label: "A. (5 ＋ 9) × 7" }, { key: "R2", label: "B. 15 × (99 ＋ 1)" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】提出共同乘數！"
+        tip: "【解析】提出共同乘數！單獨的 15 視為 15 × 1！"
       },
       {
-        round: 23, type: "match", badge: "2對2配對題",
-        text: "請將【減法分配律】與【等值合併式】配對：",
+        round: 23, type: "match", badge: "光束 2對2 配對",
+        text: "請將【減法分配律】與【等值合併式】配對連線：",
         left: [{ key: "L1", label: "① 60 × 40 － 20 × 40" }, { key: "L2", label: "② 365 × 9 － 9" }],
         right: [{ key: "R1", label: "A. (60 － 20) × 40" }, { key: "R2", label: "B. (365 － 1) × 9" }],
         matches: { "L1": "R1", "L2": "R2" },
         tip: "【解析】減去的 9 視為 1 × 9！"
       },
       {
-        round: 24, type: "match", badge: "2對2配對題",
-        text: "請將【速算題目】與【最終答案】配對：",
+        round: 24, type: "match", badge: "光束 2對2 配對",
+        text: "請將【速算題目】與【最終答案】配對連線：",
         left: [{ key: "L1", label: "① 184 × 840 ＋ 184 × 160" }, { key: "L2", label: "② (48 ＋ 72) × 18" }],
         right: [{ key: "R1", label: "A. 184000" }, { key: "R2", label: "B. 2160 (塊)" }],
         matches: { "L1": "R1", "L2": "R2" },
         tip: "【解析】184 × 1000 ＝ 184000；120 × 18 ＝ 2160！"
       },
       {
-        round: 25, type: "match", badge: "2對2配對題",
-        text: "請將【減法速算】與【最終答案】配對：",
+        round: 25, type: "match", badge: "光束 2對2 配對",
+        text: "請將【減法速算】與【最終答案】配對連線：",
         left: [{ key: "L1", label: "① 250 × 754 － 150 × 754" }, { key: "L2", label: "② 65 × 25 － 25 × 25" }],
         right: [{ key: "R1", label: "A. 75400" }, { key: "R2", label: "B. 1000 (平方公分)" }],
         matches: { "L1": "R1", "L2": "R2" },
         tip: "【解析】100 × 754 ＝ 75400；40 × 25 ＝ 1000！"
       },
       {
-        round: 26, type: "match", badge: "2對2配對題",
-        text: "請將【應用情境】與【計算結果】配對：",
+        round: 26, type: "match", badge: "光束 2對2 配對",
+        text: "請將【應用情境】與【計算結果】配對連線：",
         left: [{ key: "L1", label: "① 總花費 669 元，3 人平均分" }, { key: "L2", label: "② 菜園高麗菜與白菜面積相差" }],
         right: [{ key: "R1", label: "A. 每人 223 元" }, { key: "R2", label: "B. 1600 平方公尺" }],
         matches: { "L1": "R1", "L2": "R2" },
         tip: "【解析】669 ÷ 3 ＝ 223 元；(60 － 20) × 40 ＝ 1600！"
       },
       {
-        round: 27, type: "match", badge: "2對2配對題",
-        text: "請將【分配律公式】與【標準式子】配對：",
+        round: 27, type: "match", badge: "光束 2對2 配對",
+        text: "請將【分配律公式】與【標準式子】配對連線：",
         left: [{ key: "L1", label: "① 乘法對加法分配律" }, { key: "L2", label: "② 乘法對減法分配律" }],
         right: [{ key: "R1", label: "A. (甲 ＋ 乙) × 丙 ＝ 甲 × 丙 ＋ 乙 × 丙" }, { key: "R2", label: "B. (甲 － 乙) × 丙 ＝ 甲 × 丙 － 乙 × 丙" }],
         matches: { "L1": "R1", "L2": "R2" },
         tip: "【解析】分配律括號內加減符號一致！"
       },
       {
-        round: 28, type: "match", badge: "2對2配對題",
-        text: "請將【左分配式子】與【展開結果】配對：",
+        round: 28, type: "match", badge: "光束 2對2 配對",
+        text: "請將【左分配式子】與【展開結果】配對連線：",
         left: [{ key: "L1", label: "① 甲 × (乙 ＋ 丙)" }, { key: "L2", label: "② 甲 × (乙 － 丙)" }],
         right: [{ key: "R1", label: "A. 甲 × 乙 ＋ 甲 × 丙" }, { key: "R2", label: "B. 甲 × 乙 － 甲 × 丙" }],
         matches: { "L1": "R1", "L2": "R2" },
         tip: "【解析】外面的甲分別乘進去！"
       },
       {
-        round: 29, type: "match", badge: "2對2配對題",
-        text: "請將【核心概念】與【解題心法】配對：",
+        round: 29, type: "match", badge: "光束 2對2 配對",
+        text: "請將【核心概念】與【解題心法】配對連線：",
         left: [{ key: "L1", label: "① 7-3 平均問題心法" }, { key: "L2", label: "② 7-4 分配律速算心法" }],
         right: [{ key: "R1", label: "A. 拿多補少，總和 ÷ 個數" }, { key: "R2", label: "B. 提出共同乘數，湊整百整千" }],
         matches: { "L1": "R1", "L2": "R2" },
         tip: "【解析】平均靠總和÷個數；分配律靠湊整數！"
       },
       {
-        round: 30, type: "match", badge: "2對2配對題",
-        text: "請將【綜合速算】與【答案】配對：",
+        round: 30, type: "match", badge: "光束 2對2 配對",
+        text: "請將【綜合速算】與【最終答案】配對連線：",
         left: [{ key: "L1", label: "① 480 × (10 － 6)" }, { key: "L2", label: "② (465 ＋ 135) × 40" }],
         right: [{ key: "R1", label: "A. 1920 (元)" }, { key: "R2", label: "B. 24000 (公克)" }],
         matches: { "L1": "R1", "L2": "R2" },
@@ -647,6 +821,7 @@
       }
     ];
 
+    /* ==================== 3. 遊戲狀態管理 ==================== */
     const STATE = {
       roundIndex: 0,
       timer: 30,
@@ -656,12 +831,15 @@
       hasError: false,
       score: 0,
       correctCount: 0,
+      combo: 0,
+      maxCombo: 0,
+      history: new Array(30).fill(null), // null | 'correct' | 'wrong'
       answered: false,
       selectedMatches: {},
       selectedL: null,
       selectedR: null,
       currentMiniGame: 0,
-      mgTimer: 20.0,
+      mgTimer: 22.0,
       mgInterval: null,
       mgScore: 0
     };
@@ -669,6 +847,12 @@
     const elTotalScore = document.getElementById('total-score');
     const elTotalAcc = document.getElementById('total-acc');
     const elScoreBox = document.getElementById('score-box');
+    const elComboBadge = document.getElementById('combo-badge');
+    const elPhaseBadge = document.getElementById('phase-badge');
+    const elQTypeBadge = document.getElementById('q-type-badge');
+    const elNextMgHint = document.getElementById('next-mg-hint');
+    const elStageMap = document.getElementById('stage-map');
+    const elGamePanel = document.getElementById('game-panel');
     const elQText = document.getElementById('q-text');
     const elInteractive = document.getElementById('interactive-area');
     const elAnalysisCard = document.getElementById('analysis-card');
@@ -680,9 +864,39 @@
     const elTeacherBar = document.getElementById('teacher-control-bar');
     const elCtrlMsg = document.getElementById('ctrl-msg');
 
+    /* ==================== 4. 30 關進度地圖渲染 ==================== */
+    function renderStageMap() {
+      let html = '';
+      for (let i = 0; i < 30; i++) {
+        const isCurrent = (i === STATE.roundIndex);
+        const status = STATE.history[i];
+        let cls = 'bg-slate-800 border-slate-700';
+        if (status === 'correct') cls = 'bg-emerald-400 border-emerald-200 shadow-[0_0_6px_rgba(52,211,153,0.7)]';
+        else if (status === 'wrong') cls = 'bg-rose-500 border-rose-300';
+        if (isCurrent) cls = 'bg-cyan-300 border-white scale-125 shadow-[0_0_10px_#22d3ee]';
+
+        html += `<div title="第 ${i + 1} 關" class="h-2 flex-1 rounded-full border transition-all duration-300 ${cls}"></div>`;
+        if (i === 9) html += `<span class="text-[11px] mx-0.5" title="第10關後：雷射靶場">🎯</span>`;
+        if (i === 19) html += `<span class="text-[11px] mx-0.5" title="第20關後：打地鼠">🔨</span>`;
+        if (i === 29) html += `<span class="text-[11px] ml-0.5" title="第30關後：太鼓達人">🥁</span>`;
+      }
+      elStageMap.innerHTML = html;
+    }
+
+    function spawnFloatingPopup(text, colorClass = 'text-amber-300') {
+      const div = document.createElement('div');
+      div.className = `score-popup font-num font-black text-xl sm:text-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] ${colorClass}`;
+      div.style.left = '50%';
+      div.style.top = '38%';
+      div.textContent = text;
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 1000);
+    }
+
     function startGame() {
       try { sound.init(); } catch (e) {}
       document.getElementById('start-modal').classList.add('hidden');
+      renderStageMap();
       loadQuestion(0);
     }
     window.startGame = startGame;
@@ -719,15 +933,30 @@
 
       sound.setBpm(128);
       updateHUD();
+      renderStageMap();
 
+      // 依據階段更新主題色提示
+      if (index < 10) {
+        elPhaseBadge.textContent = '🎯 第一階段';
+        elNextMgHint.textContent = '第 10 關解鎖雷射靶場';
+      } else if (index < 20) {
+        elPhaseBadge.textContent = '🔨 第二階段';
+        elNextMgHint.textContent = '第 20 關解鎖打地鼠擂台';
+      } else {
+        elPhaseBadge.textContent = '🥁 壓軸階段';
+        elNextMgHint.textContent = '第 30 關解鎖太鼓達人';
+      }
+
+      elQTypeBadge.textContent = qData.badge;
       elTeacherBar.classList.add('hidden');
       elTeacherBar.classList.remove('flex');
       elAnalysisCard.classList.add('hidden');
       elAnalysisCard.classList.remove('flex');
       elStatusStamp.classList.add('hidden');
+      elGamePanel.classList.remove('shake-panel');
 
-      elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
-      elRoundIndicator.textContent = `ROUND ${index + 1} / 30`;
+      elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-amber-400 rounded-full w-full transition-all duration-200';
+      elRoundIndicator.textContent = `STAGE ${index + 1} / 30`;
       elQText.innerHTML = qData.text;
       renderInteractive(qData.type, qData);
       startTimer();
@@ -735,22 +964,31 @@
 
     function renderInteractive(type, itemData) {
       elInteractive.innerHTML = '';
-      elInteractive.classList.remove('pointer-events-none', 'opacity-60');
+      elInteractive.classList.remove('pointer-events-none', 'opacity-70');
 
       if (type === 'tf3') {
         elInteractive.innerHTML = `
-          <div class="flex flex-col gap-2.5 h-full justify-center max-w-xl mx-auto w-full">
-            <button id="btn-correct" class="w-full py-3 px-4 rounded-xl bg-slate-900 border border-emerald-500/60 flex items-center justify-between active:scale-98 transition-all touch-btn shadow">
-              <span class="flex items-center gap-2 text-sm sm:text-base font-black text-emerald-300 pointer-events-none">⭕ 完全正確</span>
-              <span class="text-xs text-slate-400 pointer-events-none">算則計算皆無誤</span>
+          <div class="flex flex-col gap-2.5 sm:gap-3 h-full justify-center max-w-2xl mx-auto w-full">
+            <button id="btn-correct" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 to-slate-900 hover:from-emerald-900/90 border-2 border-emerald-500/60 flex items-center justify-between touch-btn">
+              <span class="flex items-center gap-2.5 text-sm sm:text-base font-black text-emerald-300 pointer-events-none">
+                <span class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-sm">⭕</span>
+                完全正確
+              </span>
+              <span class="text-xs text-emerald-200/75 pointer-events-none">算則與計算數值皆無誤</span>
             </button>
-            <button id="btn-rule" class="w-full py-3 px-4 rounded-xl bg-slate-900 border border-rose-500/60 flex items-center justify-between active:scale-98 transition-all touch-btn shadow">
-              <span class="flex items-center gap-2 text-sm sm:text-base font-black text-rose-300 pointer-events-none">❌ 錯在算則符號</span>
-              <span class="text-xs text-slate-400 pointer-events-none">括號內誤寫除或加</span>
+            <button id="btn-rule" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-950/90 to-slate-900 hover:from-rose-900/90 border-2 border-rose-500/60 flex items-center justify-between touch-btn">
+              <span class="flex items-center gap-2.5 text-sm sm:text-base font-black text-rose-300 pointer-events-none">
+                <span class="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-400/50 flex items-center justify-center text-sm">❌</span>
+                錯在算則符號
+              </span>
+              <span class="text-xs text-rose-200/75 pointer-events-none">加減號誤寫或漏乘括號內數字</span>
             </button>
-            <button id="btn-calc" class="w-full py-3 px-4 rounded-xl bg-slate-900 border border-amber-500/60 flex items-center justify-between active:scale-98 transition-all touch-btn shadow">
-              <span class="flex items-center gap-2 text-sm sm:text-base font-black text-amber-300 pointer-events-none">💡 錯在計算數值</span>
-              <span class="text-xs text-slate-400 pointer-events-none">算則對但算錯數字</span>
+            <button id="btn-calc" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-950/90 to-slate-900 hover:from-amber-900/90 border-2 border-amber-500/60 flex items-center justify-between touch-btn">
+              <span class="flex items-center gap-2.5 text-sm sm:text-base font-black text-amber-300 pointer-events-none">
+                <span class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-sm">💡</span>
+                錯在計算數值
+              </span>
+              <span class="text-xs text-amber-200/75 pointer-events-none">列式算則對但最後算錯數字</span>
             </button>
           </div>
         `;
@@ -758,25 +996,42 @@
         document.getElementById('btn-rule').onpointerdown = (e) => { e.preventDefault(); handleAnswer('rule'); };
         document.getElementById('btn-calc').onpointerdown = (e) => { e.preventDefault(); handleAnswer('calc'); };
       } else if (type === 'mc') {
+        // 隨機打亂選項順序並追蹤正確索引，讓每次挑戰更有新鮮感！
+        const indexedOpts = itemData.options.map((text, idx) => ({
+          cleanText: text.replace(/^[A-D]\.\s*/, ''),
+          isCorrect: idx === itemData.answer
+        })).sort(() => Math.random() - 0.5);
+
+        const labels = ['A', 'B', 'C', 'D'];
+        const badgeColors = [
+          'bg-cyan-500/20 text-cyan-300 border-cyan-400/60',
+          'bg-emerald-500/20 text-emerald-300 border-emerald-400/60',
+          'bg-amber-500/20 text-amber-300 border-amber-400/60',
+          'bg-purple-500/20 text-purple-300 border-purple-400/60'
+        ];
+
         let btns = '';
-        itemData.options.forEach((opt, idx) => {
+        indexedOpts.forEach((opt, idx) => {
           btns += `
-            <button id="mc-${idx}" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 active:scale-98 transition-all flex items-center justify-between text-xs sm:text-sm font-bold shadow hover:bg-slate-800 touch-btn">
-              <span class="text-slate-100 break-words leading-tight pointer-events-none math-font">${opt}</span>
-              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
+            <button id="mc-${idx}" data-correct="${opt.isCorrect}" class="arcade-btn w-full text-left px-3.5 py-3 rounded-2xl bg-slate-900/95 hover:bg-slate-800 border-2 border-slate-700/90 hover:border-cyan-400/60 flex items-center justify-between text-xs sm:text-sm font-bold touch-btn">
+              <span class="text-slate-100 break-words leading-snug pointer-events-none math-font">${labels[idx]}. ${opt.cleanText}</span>
+              <span class="text-xs font-num font-black px-2 py-0.5 rounded-lg border shrink-0 ml-2 pointer-events-none ${badgeColors[idx]}">${labels[idx]}</span>
             </button>
           `;
         });
-        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 h-full items-center">${btns}</div>`;
-        itemData.options.forEach((_, idx) => {
-          document.getElementById(`mc-${idx}`).onpointerdown = (e) => { e.preventDefault(); handleAnswer(idx); };
+        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 h-full items-center">${btns}</div>`;
+        indexedOpts.forEach((opt, idx) => {
+          document.getElementById(`mc-${idx}`).onpointerdown = (e) => {
+            e.preventDefault();
+            handleMCAnswer(idx, opt.isCorrect);
+          };
         });
       } else if (type === 'match') {
         let leftCols = '';
         itemData.left.forEach(item => {
           leftCols += `
-            <button id="match-${item.key}" class="w-full flex-1 min-h-[46px] px-3 py-2 rounded-xl bg-slate-900 border border-cyan-500/40 active:scale-98 transition-all flex items-center justify-start text-xs sm:text-sm font-bold shadow touch-btn">
-              <span class="w-full leading-tight break-words pointer-events-none math-font">${item.label}</span>
+            <button id="match-${item.key}" class="arcade-btn w-full flex-1 min-h-[50px] px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-slate-900 to-cyan-950/50 border-2 border-cyan-500/45 flex items-center justify-start text-xs sm:text-sm md:text-base font-bold touch-btn">
+              <span class="w-full leading-tight break-words pointer-events-none math-font text-cyan-100">${item.label}</span>
             </button>
           `;
         });
@@ -784,15 +1039,18 @@
         let rightCols = '';
         shuffledRight.forEach(item => {
           rightCols += `
-            <button id="match-${item.key}" class="w-full flex-1 min-h-[46px] px-3 py-2 rounded-xl bg-slate-900 border border-cyan-500/40 active:scale-98 transition-all flex items-center justify-start text-xs sm:text-sm font-bold shadow touch-btn">
-              <span class="w-full leading-tight break-words pointer-events-none math-font">${item.label}</span>
+            <button id="match-${item.key}" class="arcade-btn w-full flex-1 min-h-[50px] px-3.5 py-2.5 rounded-2xl bg-gradient-to-l from-slate-900 to-indigo-950/50 border-2 border-indigo-500/45 flex items-center justify-start text-xs sm:text-sm md:text-base font-bold touch-btn">
+              <span class="w-full leading-tight break-words pointer-events-none math-font text-indigo-100">${item.label}</span>
             </button>
           `;
         });
         elInteractive.innerHTML = `
-          <div class="grid grid-cols-2 gap-3 h-full items-stretch">
-            <div class="flex flex-col gap-2.5 h-full justify-between">${leftCols}</div>
-            <div class="flex flex-col gap-2.5 h-full justify-between">${rightCols}</div>
+          <div id="match-wrapper" class="relative w-full h-full flex items-center">
+            <svg id="match-svg" class="absolute inset-0 w-full h-full pointer-events-none z-20"></svg>
+            <div class="grid grid-cols-2 gap-4 sm:gap-8 w-full h-full items-stretch relative z-10">
+              <div class="flex flex-col gap-3 h-full justify-between">${leftCols}</div>
+              <div class="flex flex-col gap-3 h-full justify-between">${rightCols}</div>
+            </div>
           </div>
         `;
         itemData.left.forEach(item => {
@@ -804,34 +1062,62 @@
       }
     }
 
+    function handleMCAnswer(clickedIdx, isCorrect) {
+      if (STATE.answered) return;
+      // 高亮正確選項與錯誤選項
+      const allBtns = elInteractive.querySelectorAll('button');
+      allBtns.forEach((btn, i) => {
+        if (btn.dataset.correct === 'true') {
+          btn.classList.add('border-emerald-400', 'bg-emerald-950/80', 'shadow-[0_0_15px_rgba(52,211,153,0.4)]');
+        } else if (i === clickedIdx && !isCorrect) {
+          btn.classList.add('border-rose-500', 'bg-rose-950/80');
+        }
+      });
+      handleAnswer(isCorrect ? QUESTION_BANK[STATE.roundIndex].answer : -1);
+    }
+
     function handleAnswer(val) {
       if (STATE.answered) return;
       STATE.answered = true;
-      elInteractive.classList.add('pointer-events-none', 'opacity-60');
+      elInteractive.classList.add('pointer-events-none');
       elStatusStamp.classList.remove('hidden');
 
       const qData = QUESTION_BANK[STATE.roundIndex];
       const isCorrect = (qData.type === 'match') ? (val === true) : (val === qData.answer);
 
       if (isCorrect) {
-        sound.playCorrect(true);
+        STATE.combo++;
+        if (STATE.combo > STATE.maxCombo) STATE.maxCombo = STATE.combo;
+        sound.playCorrect(STATE.combo);
+
         const timeBonus = Math.floor(STATE.timer * 3);
-        const earned = 100 + timeBonus;
+        const comboBonus = (STATE.combo >= 2) ? (STATE.combo - 1) * 15 : 0;
+        const earned = 100 + timeBonus + comboBonus;
         STATE.score += earned;
         STATE.correctCount++;
-        elStatusStamp.className = 'text-xs font-black px-2 py-0.5 rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300 font-num';
-        elStatusStamp.textContent = `✅ 正確 +${earned}`;
+        STATE.history[STATE.roundIndex] = 'correct';
+
+        elStatusStamp.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-emerald-950/90 border border-emerald-400 text-emerald-300 font-num shadow-lg';
+        elStatusStamp.textContent = comboBonus > 0 ? `✅ +${earned} (含連擊+${comboBonus})` : `✅ 正確 +${earned}`;
+        spawnFloatingPopup(STATE.combo >= 2 ? `🔥 ${STATE.combo}連擊! +${earned}` : `✨ +${earned}`, 'text-emerald-300');
+
         updateHUD();
+        renderStageMap();
         checkCompletion();
       } else {
         sound.playWrong();
+        STATE.combo = 0;
         STATE.score -= 50;
         STATE.hasError = true;
+        STATE.history[STATE.roundIndex] = 'wrong';
+
+        elGamePanel.classList.add('shake-panel');
         if (STATE.timerInterval) clearInterval(STATE.timerInterval);
         elTimerText.textContent = '⏸️ 暫停';
         elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
-        elStatusStamp.className = 'text-xs font-black px-2 py-0.5 rounded-lg bg-rose-950 border border-rose-500 text-rose-300 font-num';
+        elStatusStamp.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-rose-950/90 border border-rose-500 text-rose-300 font-num shadow-lg';
         elStatusStamp.textContent = '❌ 錯誤 -50';
+        spawnFloatingPopup('❌ -50', 'text-rose-400');
 
         elAnalysisCard.classList.remove('hidden');
         elAnalysisCard.classList.add('flex');
@@ -840,9 +1126,38 @@
         elTeacherBar.classList.remove('hidden');
         elTeacherBar.classList.add('flex');
         elTeacherBar.style.borderColor = '#ef4444';
-        elCtrlMsg.textContent = '🚨 作答有誤・已停止！請老師指導後點擊繼續 ➔';
+        elCtrlMsg.textContent = '🚨 作答有誤・已暫停！查看下方解析後點擊繼續 ➔';
         updateHUD();
+        renderStageMap();
       }
+    }
+
+    function drawMatchBeam(lKey, rKey, color = '#34d399') {
+      const wrap = document.getElementById('match-wrapper');
+      const svg = document.getElementById('match-svg');
+      const btnL = document.getElementById(`match-${lKey}`);
+      const btnR = document.getElementById(`match-${rKey}`);
+      if (!wrap || !svg || !btnL || !btnR) return;
+
+      const wRect = wrap.getBoundingClientRect();
+      const lRect = btnL.getBoundingClientRect();
+      const rRect = btnR.getBoundingClientRect();
+
+      const x1 = lRect.right - wRect.left;
+      const y1 = lRect.top + lRect.height / 2 - wRect.top;
+      const x2 = rRect.left - wRect.left;
+      const y2 = rRect.top + rRect.height / 2 - wRect.top;
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', color);
+      line.setAttribute('stroke-width', '5');
+      line.setAttribute('stroke-linecap', 'round');
+      line.style.filter = `drop-shadow(0 0 8px ${color})`;
+      svg.appendChild(line);
     }
 
     function handleMatchClick(side, key) {
@@ -861,16 +1176,18 @@
         const qData = QUESTION_BANK[STATE.roundIndex];
         const isPairCorrect = (qData.matches[STATE.selectedL] === STATE.selectedR);
         if (isPairCorrect) {
-          sound.playCorrect();
+          sound.playCorrect(1);
           STATE.selectedMatches[STATE.selectedL] = STATE.selectedR;
+          drawMatchBeam(STATE.selectedL, STATE.selectedR, '#34d399');
           eliminateMatchPair(STATE.selectedL, STATE.selectedR);
           STATE.selectedL = null; STATE.selectedR = null;
           if (Object.keys(STATE.selectedMatches).length === 2) {
-            setTimeout(() => { handleAnswer(true); }, 350);
+            setTimeout(() => { handleAnswer(true); }, 420);
           }
         } else {
           const prevL = STATE.selectedL; const prevR = STATE.selectedR;
           STATE.selectedL = null; STATE.selectedR = null;
+          drawMatchBeam(prevL, prevR, '#f43f5e');
           shakeMatchBtn(prevL); shakeMatchBtn(prevR);
           handleAnswer(false);
         }
@@ -880,25 +1197,27 @@
     function highlightMatchBtn(key, active) {
       const btn = document.getElementById(`match-${key}`);
       if (!btn) return;
-      if (active) btn.classList.add('border-amber-400', 'bg-amber-950/50');
-      else btn.classList.remove('border-amber-400', 'bg-amber-950/50');
+      if (active) btn.classList.add('border-amber-400', 'bg-amber-950/60', 'scale-[1.02]');
+      else btn.classList.remove('border-amber-400', 'bg-amber-950/60', 'scale-[1.02]');
     }
 
     function shakeMatchBtn(key) {
       const btn = document.getElementById(`match-${key}`);
       if (!btn) return;
-      btn.classList.add('border-rose-500', 'bg-rose-950/60');
-      setTimeout(() => { btn.classList.remove('border-rose-500', 'bg-rose-950/60'); }, 500);
+      btn.classList.add('border-rose-500', 'bg-rose-950/70');
+      setTimeout(() => { btn.classList.remove('border-rose-500', 'bg-rose-950/70'); }, 500);
     }
 
     function eliminateMatchPair(lKey, rKey) {
       [document.getElementById(`match-${lKey}`), document.getElementById(`match-${rKey}`)].forEach(b => {
         if (b) {
           b.disabled = true;
+          b.classList.remove('border-amber-400', 'bg-amber-950/60');
           b.classList.add('border-emerald-400', 'bg-emerald-600/40');
           setTimeout(() => {
-            b.style.opacity = '0'; b.style.transform = 'scale(0.85)'; b.style.pointerEvents = 'none';
-          }, 200);
+            b.style.opacity = '0.35';
+            b.style.pointerEvents = 'none';
+          }, 260);
         }
       });
     }
@@ -908,8 +1227,8 @@
       elTeacherBar.classList.remove('hidden');
       elTeacherBar.classList.add('flex');
       elTeacherBar.style.borderColor = '#10b981';
-      elCtrlMsg.textContent = '🎉 答題正確！1.6 秒後自動進入下一關...';
-      STATE.autoAdvanceTimer = setTimeout(() => { advanceStep(); }, 1600);
+      elCtrlMsg.textContent = '🎉 答題正確！1.4 秒後自動進入下一關...';
+      STATE.autoAdvanceTimer = setTimeout(() => { advanceStep(); }, 1400);
     }
 
     function handleTimeout() {
@@ -917,7 +1236,7 @@
       STATE.hasError = true;
       if (STATE.timerInterval) clearInterval(STATE.timerInterval);
       handleAnswer('timeout');
-      elCtrlMsg.textContent = '⌛ 時間到・已暫停！請指導後點擊繼續 ➔';
+      elCtrlMsg.textContent = '⌛ 時間到・已暫停！查看解析後點擊繼續 ➔';
       elTeacherBar.classList.remove('hidden');
       elTeacherBar.classList.add('flex');
     }
@@ -933,6 +1252,9 @@
         const pct = Math.max(0, (STATE.timer / maxTimer) * 100);
         elTimerBar.style.width = `${pct}%`;
         elTimerText.textContent = `${STATE.timer}s`;
+        if (STATE.timer <= 8) {
+          elTimerBar.className = 'h-full bg-gradient-to-r from-rose-500 to-amber-400 rounded-full transition-all duration-200';
+        }
         if (STATE.timer <= 0) {
           clearInterval(STATE.timerInterval);
           handleTimeout();
@@ -980,13 +1302,21 @@
       elTotalAcc.textContent = `${STATE.correctCount}/30`;
       if (STATE.score < 0) elScoreBox.classList.add('negative-score');
       else elScoreBox.classList.remove('negative-score');
+
+      if (STATE.combo >= 2) {
+        elComboBadge.classList.remove('hidden');
+        elComboBadge.textContent = `🔥 ${STATE.combo}連擊`;
+      } else {
+        elComboBadge.classList.add('hidden');
+      }
     }
 
-    /* ==================== 手速遊樂場 ==================== */
+    /* ==================== 5. 豪華手速遊樂場系統 ==================== */
     const elMgOverlay = document.getElementById('minigame-overlay');
     const elMgTitle = document.getElementById('mg-title');
     const elMgTimer = document.getElementById('mg-timer');
     const elMgPts = document.getElementById('mg-pts');
+    const elMgComboBadge = document.getElementById('mg-combo-badge');
     const elMgHint = document.getElementById('mg-hint');
     const elMgCtrl = document.getElementById('mg-ctrl');
     const cvs = document.getElementById('mg-canvas');
@@ -994,32 +1324,47 @@
 
     let mgActive = false;
     let mgAnimId = null;
+    let mgW = 600;
+    let mgH = 300;
 
-    function openMiniGameUI(title, hint) {
+    function resizeMiniGameCanvas() {
+      const wrap = document.getElementById('mg-canvas-wrap');
+      if (!wrap) return;
+      const rect = wrap.getBoundingClientRect();
+      mgW = Math.max(300, rect.width || 600);
+      mgH = Math.max(200, rect.height || 300);
+      const dpr = window.devicePixelRatio || 1;
+      cvs.width = mgW * dpr;
+      cvs.height = mgH * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      cvs.style.width = `${mgW}px`;
+      cvs.style.height = `${mgH}px`;
+    }
+
+    window.addEventListener('resize', () => {
+      if (mgActive) resizeMiniGameCanvas();
+    });
+
+    function openMiniGameUI(title, hint, duration = 22.0) {
       sound.setBpm(152);
       elMgOverlay.classList.remove('hidden');
       elMgTitle.textContent = title;
       elMgHint.textContent = hint;
-      STATE.mgTimer = 20.0;
+      STATE.mgTimer = duration;
       STATE.mgScore = 0;
       elMgPts.textContent = '0';
-      elMgTimer.textContent = '20.0s';
+      elMgTimer.textContent = `${duration.toFixed(1)}s`;
+      elMgComboBadge.classList.add('hidden');
       mgActive = true;
 
-      const rect = cvs.parentElement.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      cvs.width = (rect.width || 600) * dpr;
-      cvs.height = (rect.height || 280) * dpr;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
-      cvs.style.width = `${rect.width || 600}px`;
-      cvs.style.height = `${rect.height || 280}px`;
-
+      resizeMiniGameCanvas();
       elMgCtrl.innerHTML = '';
+
       if (STATE.mgInterval) clearInterval(STATE.mgInterval);
       const startTime = performance.now();
       STATE.mgInterval = setInterval(() => {
-        const remain = Math.max(0, 20.0 - (performance.now() - startTime) / 1000);
+        const remain = Math.max(0, duration - (performance.now() - startTime) / 1000);
         STATE.mgTimer = remain;
         elMgTimer.textContent = `${remain.toFixed(1)}s`;
         if (remain <= 0) {
@@ -1037,6 +1382,7 @@
       updateHUD();
       document.getElementById('mg-res-score').textContent = `+${STATE.mgScore}`;
       document.getElementById('mg-result-modal').classList.remove('hidden');
+      sound.playCorrect(3);
     }
 
     function skipMiniGame() {
@@ -1056,253 +1402,905 @@
       else { STATE.roundIndex++; loadQuestion(STATE.roundIndex); }
     };
 
-    /* ① 射擊靶場 */
+    /* -------------------- ① 遊戲一：星際雷射靶場 (升級版) -------------------- */
     class Shooter {
-      constructor(canvas, ctx) {
-        this.canvas = canvas; this.ctx = ctx;
-        this.targets = []; this.lasers = []; this.effects = [];
-        this.initTargets();
+      constructor(ctx) {
+        this.ctx = ctx;
+        this.targets = [];
+        this.lasers = [];
+        this.particles = [];
+        this.effects = [];
+        this.aimX = mgW / 2;
+        this.aimY = mgH / 2;
+        this.combo = 0;
+        this.feverTimer = 0;
+        this.shake = 0;
+        this.stars = Array.from({ length: 35 }, () => ({
+          x: Math.random() * mgW,
+          y: Math.random() * mgH,
+          r: Math.random() * 1.8 + 0.5,
+          spd: Math.random() * 0.6 + 0.2
+        }));
+        for (let i = 0; i < 6; i++) this.spawnTarget(true);
       }
-      initTargets() {
-        const w = this.canvas.parentElement.clientWidth || 600;
-        const h = this.canvas.parentElement.clientHeight || 280;
-        this.targets = [
-          { x: w*0.2, y: h*0.3, emoji: '🎯', pts: 25, r: 22, vx: 2 },
-          { x: w*0.5, y: h*0.5, emoji: '🦅', pts: 50, r: 24, vx: 2.5 },
-          { x: w*0.8, y: h*0.3, emoji: '⭐', pts: 30, r: 20, vx: -2 },
-          { x: w*0.4, y: h*0.7, emoji: '💣', pts: -25, r: 22, vx: -2 }
-        ];
+
+      spawnTarget(initial = false) {
+        const roll = Math.random();
+        let cfg;
+        if (roll < 0.16) {
+          cfg = { kind: 'ufo', emoji: '🛸', pts: 65, r: 24, spd: 3.4, wave: 28, ring: '#facc15' };
+        } else if (roll < 0.30) {
+          cfg = { kind: 'gem', emoji: '💎', pts: 45, r: 21, spd: 2.8, wave: 14, ring: '#38bdf8' };
+        } else if (roll < 0.48) {
+          cfg = { kind: 'bomb', emoji: '💣', pts: -30, r: 22, spd: 2.3, wave: 10, ring: '#ef4444' };
+        } else {
+          cfg = { kind: 'target', emoji: '🎯', pts: 25, r: 23, spd: 2.2 + Math.random() * 1.2, wave: 0, ring: '#34d399' };
+        }
+        const fromLeft = Math.random() > 0.5;
+        const baseY = 45 + Math.random() * (mgH - 115);
+        this.targets.push({
+          ...cfg,
+          x: initial ? (60 + Math.random() * (mgW - 120)) : (fromLeft ? -25 : mgW + 25),
+          baseY,
+          y: baseY,
+          vx: (fromLeft ? 1 : -1) * cfg.spd,
+          phase: Math.random() * Math.PI * 2
+        });
       }
+
+      addParticles(x, y, color, count = 14) {
+        for (let i = 0; i < count; i++) {
+          const ang = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+          const spd = 2 + Math.random() * 4.5;
+          this.particles.push({
+            x, y,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd,
+            color,
+            life: 22 + Math.floor(Math.random() * 10)
+          });
+        }
+      }
+
       shoot(x, y) {
+        this.aimX = x;
+        this.aimY = y;
         sound.playShoot();
-        const w = this.canvas.parentElement.clientWidth || 600;
-        const h = this.canvas.parentElement.clientHeight || 280;
-        this.lasers.push({ startX: w/2, startY: h, endX: x, endY: y, alpha: 1.0 });
+
+        const turretX = mgW / 2;
+        const turretY = mgH - 18;
+        const isFever = this.feverTimer > 0;
+        this.lasers.push({
+          x1: turretX, y1: turretY,
+          x2: x, y2: y,
+          color: isFever ? '#facc15' : '#22d3ee',
+          alpha: 1.0
+        });
+
+        let hitAny = false;
         for (let i = this.targets.length - 1; i >= 0; i--) {
           const tg = this.targets[i];
-          if (Math.hypot(x - tg.x, y - tg.y) <= tg.r + 18) {
-            if (tg.emoji === '💣') {
-              sound.playWrong(); STATE.mgScore = Math.max(0, STATE.mgScore - 25);
-              this.effects.push({ x: tg.x, y: tg.y, text: '💥 -25', color: '#f87171', life: 25 });
+          if (Math.hypot(x - tg.x, y - tg.y) <= tg.r + 20) {
+            hitAny = true;
+            if (tg.kind === 'bomb') {
+              sound.playWrong();
+              this.combo = 0;
+              this.feverTimer = 0;
+              this.shake = 12;
+              STATE.mgScore = Math.max(0, STATE.mgScore + tg.pts);
+              this.addParticles(tg.x, tg.y, '#ef4444', 20);
+              this.effects.push({ x: tg.x, y: tg.y, text: `💥 ${tg.pts}`, color: '#f87171', life: 28 });
             } else {
-              sound.playCorrect(); STATE.mgScore += tg.pts;
-              this.effects.push({ x: tg.x, y: tg.y, text: `+${tg.pts}`, color: '#38bdf8', life: 25 });
+              this.combo++;
+              if (tg.kind === 'gem' || (this.combo >= 5 && this.feverTimer <= 0)) {
+                this.feverTimer = 240; // 4 秒狂熱
+                sound.playFever();
+              } else {
+                sound.playCorrect(Math.min(6, this.combo));
+              }
+              const mult = (this.feverTimer > 0) ? 2 : 1;
+              const gain = tg.pts * mult;
+              STATE.mgScore += gain;
+              this.addParticles(tg.x, tg.y, tg.ring, 16);
+              const label = mult > 1 ? `🔥 +${gain}` : (this.combo >= 3 ? `${this.combo}連擊! +${gain}` : `+${gain}`);
+              this.effects.push({ x: tg.x, y: tg.y, text: label, color: mult > 1 ? '#facc15' : '#38bdf8', life: 28 });
             }
             elMgPts.textContent = STATE.mgScore;
             this.targets.splice(i, 1);
-            setTimeout(() => {
-              const w = this.canvas.parentElement.clientWidth || 600;
-              const h = this.canvas.parentElement.clientHeight || 280;
-              this.targets.push({ x: Math.random()*w*0.8+50, y: Math.random()*h*0.6+30, emoji: '🎯', pts: 25, r: 22, vx: 2 });
-            }, 300);
+            setTimeout(() => { if (mgActive) this.spawnTarget(false); }, 220);
             break;
           }
         }
+
+        if (!hitAny) {
+          this.combo = 0;
+          this.addParticles(x, y, '#64748b', 5);
+        }
+
+        if (this.feverTimer > 0) {
+          elMgComboBadge.classList.remove('hidden');
+          elMgComboBadge.textContent = '🔥 2X 雙倍雷射';
+        } else if (this.combo >= 3) {
+          elMgComboBadge.classList.remove('hidden');
+          elMgComboBadge.textContent = `⚡ ${this.combo} 連擊`;
+        } else {
+          elMgComboBadge.classList.add('hidden');
+        }
       }
+
       update() {
-        const w = this.canvas.parentElement.clientWidth || 600;
-        this.targets.forEach(t => {
-          t.x += t.vx; if (t.x < 30 || t.x > w - 30) t.vx *= -1;
+        if (this.feverTimer > 0) {
+          this.feverTimer--;
+          if (this.feverTimer === 0) elMgComboBadge.classList.add('hidden');
+        }
+        if (this.shake > 0) this.shake--;
+
+        this.stars.forEach(s => {
+          s.x -= s.spd;
+          if (s.x < 0) s.x = mgW;
         });
-        this.lasers.forEach(l => l.alpha -= 0.2);
+
+        while (this.targets.length < 6) this.spawnTarget(false);
+
+        this.targets.forEach(t => {
+          t.phase += 0.06;
+          t.x += t.vx;
+          t.y = t.baseY + Math.sin(t.phase) * t.wave;
+          if (t.x < -35 || t.x > mgW + 35) t.vx *= -1;
+        });
+
+        this.lasers.forEach(l => l.alpha -= 0.14);
         this.lasers = this.lasers.filter(l => l.alpha > 0);
-        this.effects.forEach(ef => { ef.y -= 1; ef.life--; });
+
+        this.particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.12;
+          p.life--;
+        });
+        this.particles = this.particles.filter(p => p.life > 0);
+
+        this.effects.forEach(ef => { ef.y -= 1.2; ef.life--; });
         this.effects = this.effects.filter(ef => ef.life > 0);
       }
+
       draw() {
-        const w = this.canvas.parentElement.clientWidth || 600;
-        const h = this.canvas.parentElement.clientHeight || 280;
-        this.ctx.fillStyle = '#060d1b'; this.ctx.fillRect(0, 0, w, h);
-        this.ctx.font = '26px sans-serif'; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle';
-        this.targets.forEach(t => this.ctx.fillText(t.emoji, t.x, t.y));
+        const c = this.ctx;
+        c.save();
+        if (this.shake > 0) {
+          c.translate((Math.random() - 0.5) * this.shake, (Math.random() - 0.5) * this.shake);
+        }
+
+        // 深空背景與三條軌道線
+        c.fillStyle = this.feverTimer > 0 ? '#161129' : '#050b1a';
+        c.fillRect(0, 0, mgW, mgH);
+
+        this.stars.forEach(s => {
+          c.fillStyle = 'rgba(186, 230, 253, 0.55)';
+          c.beginPath(); c.arc(s.x, s.y, s.r, 0, Math.PI * 2); c.fill();
+        });
+
+        c.strokeStyle = 'rgba(56, 189, 248, 0.14)';
+        c.lineWidth = 1;
+        [0.25, 0.5, 0.75].forEach(ratio => {
+          c.beginPath(); c.moveTo(0, mgH * ratio); c.lineTo(mgW, mgH * ratio); c.stroke();
+        });
+
+        // 目標與發光外環
+        this.targets.forEach(t => {
+          c.strokeStyle = t.ring;
+          c.lineWidth = 2.5;
+          c.beginPath();
+          c.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+          c.stroke();
+
+          c.font = '28px sans-serif';
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          c.fillText(t.emoji, t.x, t.y + 1);
+        });
+
+        // 雷射光束
         this.lasers.forEach(l => {
-          this.ctx.strokeStyle = '#06b6d4'; this.ctx.lineWidth = 3;
-          this.ctx.beginPath(); this.ctx.moveTo(l.startX, l.startY); this.ctx.lineTo(l.endX, l.endY); this.ctx.stroke();
+          c.save();
+          c.globalAlpha = l.alpha;
+          c.strokeStyle = l.color;
+          c.lineWidth = 5;
+          c.shadowColor = l.color;
+          c.shadowBlur = 12;
+          c.beginPath();
+          c.moveTo(l.x1, l.y1);
+          c.lineTo(l.x2, l.y2);
+          c.stroke();
+          c.restore();
         });
+
+        // 爆炸粒子
+        this.particles.forEach(p => {
+          c.fillStyle = p.color;
+          c.beginPath();
+          c.arc(p.x, p.y, 3, 0, Math.PI * 2);
+          c.fill();
+        });
+
+        // 底部旋轉雷射砲台
+        const tx = mgW / 2;
+        const ty = mgH - 14;
+        const angle = Math.atan2(this.aimY - ty, this.aimX - tx);
+        c.save();
+        c.translate(tx, ty);
+        c.rotate(angle);
+        c.fillStyle = this.feverTimer > 0 ? '#facc15' : '#06b6d4';
+        c.fillRect(0, -6, 28, 12);
+        c.restore();
+
+        c.fillStyle = '#0f172a';
+        c.strokeStyle = '#38bdf8';
+        c.lineWidth = 3;
+        c.beginPath(); c.arc(tx, ty, 18, Math.PI, 0); c.fill(); c.stroke();
+
+        // 準星
+        c.strokeStyle = 'rgba(250, 204, 21, 0.75)';
+        c.lineWidth = 2;
+        c.beginPath(); c.arc(this.aimX, this.aimY, 14, 0, Math.PI * 2); c.stroke();
+
+        // 浮動得分文字
         this.effects.forEach(ef => {
-          this.ctx.fillStyle = ef.color; this.ctx.font = 'bold 18px sans-serif'; this.ctx.fillText(ef.text, ef.x, ef.y);
+          c.fillStyle = ef.color;
+          c.font = '900 18px "Chakra Petch", sans-serif';
+          c.textAlign = 'center';
+          c.fillText(ef.text, ef.x, ef.y);
         });
+
+        c.restore();
       }
     }
 
     let shooterObj = null;
     function startMiniGameShooting() {
-      openMiniGameUI("【第 10 關後手速戰】🎯 極速射擊靶場", "點擊畫面射擊目標 (避開炸彈💣)");
-      shooterObj = new Shooter(cvs, ctx);
+      openMiniGameUI("【第 10 關獎勵戰】🎯 星際雷射靶場", "點擊射擊飛碟🛸與寶石💎開啟 2倍雷射！千萬別射炸彈💣！");
+      shooterObj = new Shooter(ctx);
       cvs.onpointerdown = (e) => {
         e.preventDefault();
         const r = cvs.getBoundingClientRect();
         shooterObj.shoot(e.clientX - r.left, e.clientY - r.top);
       };
-      function loop() { if (!mgActive) return; shooterObj.update(); shooterObj.draw(); mgAnimId = requestAnimationFrame(loop); }
+      function loop() {
+        if (!mgActive) return;
+        shooterObj.update();
+        shooterObj.draw();
+        mgAnimId = requestAnimationFrame(loop);
+      }
       mgAnimId = requestAnimationFrame(loop);
     }
 
-    /* ② 打地鼠 */
+    /* -------------------- ② 遊戲二：瘋狂打地鼠擂台 (升級版) -------------------- */
     class Whack {
-      constructor(canvas, ctx) {
-        this.canvas = canvas; this.ctx = ctx;
-        this.holes = []; this.effects = []; this.popTimer = 0;
+      constructor(ctx) {
+        this.ctx = ctx;
+        this.holes = [];
+        this.effects = [];
+        this.hammers = [];
+        this.particles = [];
+        this.popTimer = 0;
+        this.combo = 0;
+        this.feverTimer = 0;
+        this.shake = 0;
         this.initHoles();
       }
+
       initHoles() {
-        const w = this.canvas.parentElement.clientWidth || 600;
-        const h = this.canvas.parentElement.clientHeight || 280;
-        this.holes = [
-          { x: w*0.25, y: h*0.35, mole: null }, { x: w*0.5, y: h*0.35, mole: null }, { x: w*0.75, y: h*0.35, mole: null },
-          { x: w*0.35, y: h*0.7, mole: null }, { x: w*0.65, y: h*0.7, mole: null }
-        ];
+        const cols = [0.22, 0.5, 0.78];
+        const rows = [0.34, 0.72];
+        this.holes = [];
+        rows.forEach(ry => {
+          cols.forEach(cx => {
+            this.holes.push({ rx: cx, ry, mole: null });
+          });
+        });
       }
+
       spawn() {
         const avail = this.holes.filter(h => !h.mole);
-        if (avail.length > 0 && Math.random() < 0.65) {
-          const h = avail[Math.floor(Math.random() * avail.length)];
-          const m = Math.random() > 0.2 ? { emoji: '🐹', pts: 25 } : { emoji: '💣', pts: -25 };
-          h.mole = { emoji: m.emoji, pts: m.pts, life: 28 };
+        if (avail.length === 0) return;
+        const h = avail[Math.floor(Math.random() * avail.length)];
+        const isFever = this.feverTimer > 0;
+        const r = Math.random();
+
+        if (isFever || r < 0.18) {
+          h.mole = { kind: 'gold', emoji: '👑', sub: '🐹', pts: 65, hp: 1, life: 42, maxLife: 42, dizzy: 0 };
+        } else if (r < 0.36) {
+          h.mole = { kind: 'helmet', emoji: '⛑️', sub: '🐹', pts: 45, hp: 2, life: 55, maxLife: 55, dizzy: 0 };
+        } else if (r < 0.54) {
+          h.mole = { kind: 'bomb', emoji: '💣', sub: '', pts: -30, hp: 1, life: 45, maxLife: 45, dizzy: 0 };
+        } else {
+          h.mole = { kind: 'normal', emoji: '🐹', sub: '', pts: 25, hp: 1, life: 46, maxLife: 46, dizzy: 0 };
         }
       }
+
+      addParticles(x, y, color) {
+        for (let i = 0; i < 12; i++) {
+          const ang = (Math.PI * 2 * i) / 12;
+          const spd = 2 + Math.random() * 3.5;
+          this.particles.push({ x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, color, life: 20 });
+        }
+      }
+
       hit(x, y) {
-        sound.playHammer();
+        this.hammers.push({ x, y, angle: -0.9, life: 12 });
+        let hitTarget = false;
+
         this.holes.forEach(h => {
-          if (h.mole && Math.hypot(x - h.x, y - h.y) <= 45) {
-            if (h.mole.emoji === '💣') {
-              sound.playWrong(); STATE.mgScore = Math.max(0, STATE.mgScore - 25);
-              this.effects.push({ x: h.x, y: h.y - 15, text: '💥 -25', color: '#f87171', life: 20 });
+          const hx = h.rx * mgW;
+          const hy = h.ry * mgH;
+          if (h.mole && h.mole.dizzy <= 0 && Math.hypot(x - hx, y - hy) <= 54) {
+            hitTarget = true;
+            const m = h.mole;
+            if (m.kind === 'bomb') {
+              sound.playWrong();
+              this.combo = 0;
+              this.feverTimer = 0;
+              this.shake = 14;
+              STATE.mgScore = Math.max(0, STATE.mgScore + m.pts);
+              this.addParticles(hx, hy - 15, '#ef4444');
+              this.effects.push({ x: hx, y: hy - 25, text: '💥 -30!', color: '#f87171', life: 24 });
+              h.mole = null;
+            } else if (m.hp > 1) {
+              sound.playCrack();
+              m.hp--;
+              m.emoji = '💫';
+              STATE.mgScore += 15;
+              this.addParticles(hx, hy - 15, '#94a3b8');
+              this.effects.push({ x: hx, y: hy - 25, text: '破盔! +15', color: '#cbd5e1', life: 18 });
             } else {
-              sound.playCorrect(); STATE.mgScore += h.mole.pts;
-              this.effects.push({ x: h.x, y: h.y - 15, text: `+${h.mole.pts}`, color: '#38bdf8', life: 20 });
+              this.combo++;
+              if (this.combo >= 5 && this.feverTimer <= 0) {
+                this.feverTimer = 240;
+                sound.playFever();
+              } else {
+                sound.playHammer();
+                sound.playCorrect(Math.min(5, this.combo));
+              }
+              const mult = this.feverTimer > 0 ? 1.5 : 1;
+              const gain = Math.round(m.pts * mult);
+              STATE.mgScore += gain;
+              m.dizzy = 12;
+              this.addParticles(hx, hy - 15, m.kind === 'gold' ? '#facc15' : '#38bdf8');
+              this.effects.push({
+                x: hx, y: hy - 25,
+                text: m.kind === 'gold' ? `👑 黃金大獎 +${gain}` : `+${gain}`,
+                color: m.kind === 'gold' ? '#facc15' : '#34d399',
+                life: 24
+              });
             }
             elMgPts.textContent = STATE.mgScore;
-            h.mole = null;
           }
         });
+
+        if (!hitTarget) {
+          sound.playHammer();
+          this.combo = 0;
+        }
+
+        if (this.feverTimer > 0) {
+          elMgComboBadge.classList.remove('hidden');
+          elMgComboBadge.textContent = '👑 黃金地鼠狂熱';
+        } else if (this.combo >= 3) {
+          elMgComboBadge.classList.remove('hidden');
+          elMgComboBadge.textContent = `🔨 ${this.combo} 連敲`;
+        } else {
+          elMgComboBadge.classList.add('hidden');
+        }
       }
+
       update() {
+        if (this.feverTimer > 0) {
+          this.feverTimer--;
+          if (this.feverTimer === 0) elMgComboBadge.classList.add('hidden');
+        }
+        if (this.shake > 0) this.shake--;
+
         this.popTimer++;
-        if (this.popTimer % 18 === 0) this.spawn();
-        this.holes.forEach(h => { if (h.mole) { h.mole.life--; if (h.mole.life <= 0) h.mole = null; } });
-        this.effects.forEach(ef => { ef.y -= 1; ef.life--; });
+        const spawnInterval = this.feverTimer > 0 ? 12 : 17;
+        if (this.popTimer % spawnInterval === 0) {
+          this.spawn();
+          if (this.feverTimer > 0) this.spawn();
+        }
+
+        this.holes.forEach(h => {
+          if (h.mole) {
+            if (h.mole.dizzy > 0) {
+              h.mole.dizzy--;
+              if (h.mole.dizzy <= 0) h.mole = null;
+            } else {
+              h.mole.life--;
+              if (h.mole.life <= 0) h.mole = null;
+            }
+          }
+        });
+
+        this.hammers.forEach(hm => { hm.angle += 0.14; hm.life--; });
+        this.hammers = this.hammers.filter(hm => hm.life > 0);
+
+        this.particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life--; });
+        this.particles = this.particles.filter(p => p.life > 0);
+
+        this.effects.forEach(ef => { ef.y -= 1.2; ef.life--; });
         this.effects = this.effects.filter(ef => ef.life > 0);
       }
+
       draw() {
-        const w = this.canvas.parentElement.clientWidth || 600;
-        const h = this.canvas.parentElement.clientHeight || 280;
-        this.ctx.fillStyle = '#06131a'; this.ctx.fillRect(0, 0, w, h);
+        const c = this.ctx;
+        c.save();
+        if (this.shake > 0) {
+          c.translate((Math.random() - 0.5) * this.shake, (Math.random() - 0.5) * this.shake);
+        }
+
+        // 草地電玩舞台背景
+        const grad = c.createLinearGradient(0, 0, 0, mgH);
+        grad.addColorStop(0, this.feverTimer > 0 ? '#291d05' : '#06201c');
+        grad.addColorStop(1, '#040d14');
+        c.fillStyle = grad;
+        c.fillRect(0, 0, mgW, mgH);
+
         this.holes.forEach(hole => {
-          this.ctx.fillStyle = '#0c2738';
-          this.ctx.beginPath(); this.ctx.ellipse(hole.x, hole.y, 42, 18, 0, 0, Math.PI * 2); this.ctx.fill();
+          const hx = hole.rx * mgW;
+          const hy = hole.ry * mgH;
+
+          // 地洞後緣
+          c.fillStyle = '#020617';
+          c.beginPath();
+          c.ellipse(hx, hy, 48, 20, 0, 0, Math.PI * 2);
+          c.fill();
+
           if (hole.mole) {
-            this.ctx.font = '34px sans-serif'; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(hole.mole.emoji, hole.x, hole.y - 10);
+            const m = hole.mole;
+            const progress = Math.min(1, (m.maxLife - m.life) / 8);
+            const popOffset = m.dizzy > 0 ? 8 : (1 - Math.sin(progress * Math.PI * 0.5)) * 22;
+
+            c.font = '38px sans-serif';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            if (m.sub) {
+              c.fillText(m.sub, hx, hy - 14 + popOffset);
+              c.font = '24px sans-serif';
+              c.fillText(m.emoji, hx, hy - 34 + popOffset);
+            } else {
+              c.fillText(m.emoji, hx, hy - 16 + popOffset);
+            }
           }
+
+          // 地洞發光前緣
+          c.strokeStyle = this.feverTimer > 0 ? '#facc15' : '#10b981';
+          c.lineWidth = 3;
+          c.beginPath();
+          c.ellipse(hx, hy, 48, 20, 0, 0, Math.PI);
+          c.stroke();
         });
+
+        // 粒子與敲擊大槌動畫
+        this.particles.forEach(p => {
+          c.fillStyle = p.color;
+          c.beginPath(); c.arc(p.x, p.y, 3.5, 0, Math.PI * 2); c.fill();
+        });
+
+        this.hammers.forEach(hm => {
+          c.save();
+          c.translate(hm.x + 15, hm.y - 10);
+          c.rotate(hm.angle);
+          c.font = '42px sans-serif';
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          c.fillText('🔨', -15, -10);
+          c.restore();
+        });
+
         this.effects.forEach(ef => {
-          this.ctx.fillStyle = ef.color; this.ctx.font = 'bold 20px sans-serif'; this.ctx.fillText(ef.text, ef.x, ef.y);
+          c.fillStyle = ef.color;
+          c.font = '900 18px "Chakra Petch", sans-serif';
+          c.textAlign = 'center';
+          c.fillText(ef.text, ef.x, ef.y);
         });
+
+        c.restore();
       }
     }
 
     let whackObj = null;
     function startMiniGameWhack() {
-      openMiniGameUI("【第 20 關後手速戰】🔨 瘋狂打地鼠擂台", "點擊冒出來的地鼠快速敲擊！");
-      whackObj = new Whack(cvs, ctx);
+      openMiniGameUI("【第 20 關獎勵戰】🔨 瘋狂打地鼠擂台", "狂敲黃金王冠鼠👑！鋼盔鼠⛑️需敲兩下，連敲 5 次啟動黃金狂熱！");
+      whackObj = new Whack(ctx);
       cvs.onpointerdown = (e) => {
         e.preventDefault();
         const r = cvs.getBoundingClientRect();
         whackObj.hit(e.clientX - r.left, e.clientY - r.top);
       };
-      function loop() { if (!mgActive) return; whackObj.update(); whackObj.draw(); mgAnimId = requestAnimationFrame(loop); }
+      function loop() {
+        if (!mgActive) return;
+        whackObj.update();
+        whackObj.draw();
+        mgAnimId = requestAnimationFrame(loop);
+      }
       mgAnimId = requestAnimationFrame(loop);
     }
 
-    /* ③ 太鼓達人 */
+    /* -------------------- ③ 遊戲三：祭典太鼓狂熱夜 (紅咚藍咔色彩統一修正版) -------------------- */
     class Taiko {
-      constructor(canvas, ctx) {
-        this.canvas = canvas; this.ctx = ctx;
-        this.notes = []; this.effects = []; this.spawnTick = 0;
+      constructor(ctx) {
+        this.ctx = ctx;
+        this.notes = [];
+        this.effects = [];
+        this.particles = [];
+        this.ripples = [];
+        this.spawnTick = 0;
+        this.combo = 0;
+        this.donFlash = 0;
+        this.kaFlash = 0;
+        this.ringPulse = 0;
       }
+
       spawn() {
-        const w = this.canvas.parentElement.clientWidth || 600;
-        const n = Math.random() > 0.5 ? { type: 'don', color: '#ef4444', label: '🔴咚', pts: 30 } : { type: 'ka', color: '#0284c7', label: '🔵咔', pts: 30 };
-        this.notes.push({ x: w + 20, y: 90, ...n, speed: 5 });
+        const roll = Math.random();
+        let note;
+        // 統一顏色定義：咚(don)一律為正紅色(#ef4444)、咔(ka)一律為亮藍色(#0ea5e9)，大音符以尺寸與雙白圈區隔
+        if (roll < 0.16) {
+          note = {
+            type: 'don', big: true,
+            color: '#ef4444', gradTop: '#f87171', gradBot: '#b91c1c', glow: '#ef4444',
+            label: '大咚', pts: 60, r: 29
+          };
+        } else if (roll < 0.30) {
+          note = {
+            type: 'ka', big: true,
+            color: '#0ea5e9', gradTop: '#38bdf8', gradBot: '#0369a1', glow: '#0ea5e9',
+            label: '大咔', pts: 60, r: 29
+          };
+        } else if (roll < 0.65) {
+          note = {
+            type: 'don', big: false,
+            color: '#ef4444', gradTop: '#f87171', gradBot: '#dc2626', glow: '#ef4444',
+            label: '咚', pts: 30, r: 21
+          };
+        } else {
+          note = {
+            type: 'ka', big: false,
+            color: '#0ea5e9', gradTop: '#38bdf8', gradBot: '#0284c7', glow: '#0ea5e9',
+            label: '咔', pts: 30, r: 21
+          };
+        }
+        const speed = 5.2 + Math.min(2.2, this.combo * 0.12);
+        this.notes.push({ x: mgW + 30, ...note, speed });
       }
+
+      addParticles(x, y, palette, count = 14) {
+        for (let i = 0; i < count; i++) {
+          const ang = (Math.PI * 2 * i) / count + Math.random() * 0.25;
+          const spd = 2.5 + Math.random() * 4.2;
+          const color = palette[i % palette.length];
+          this.particles.push({ x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, color, life: 22 });
+        }
+      }
+
+      flashButton(type) {
+        const btn = document.getElementById(type === 'don' ? 'taiko-don' : 'taiko-ka');
+        if (!btn) return;
+        const ringClass = type === 'don' ? 'ring-red-300' : 'ring-sky-300';
+        btn.classList.add('ring-4', ringClass, 'brightness-125', 'scale-95');
+        setTimeout(() => {
+          btn.classList.remove('ring-4', ringClass, 'brightness-125', 'scale-95');
+        }, 110);
+      }
+
       hit(type) {
-        if (type === 'don') sound.playDon(); else sound.playKa();
-        const judgeX = 80;
-        let judged = false;
+        const isDon = (type === 'don');
+        if (isDon) { sound.playDon(); this.donFlash = 12; }
+        else { sound.playKa(); this.kaFlash = 12; }
+        this.ringPulse = 12;
+        this.flashButton(type);
+
+        const judgeX = Math.min(115, mgW * 0.2);
+        const trackY = mgH * 0.56;
+        const hitColor = isDon ? '#ef4444' : '#38bdf8';
+
+        // 無論是否命中音符，打擊時都產生對應紅/藍擴散波紋
+        this.ripples.push({ x: judgeX, y: trackY, r: isDon ? 22 : 34, color: hitColor, alpha: 0.9 });
+
         for (let i = 0; i < this.notes.length; i++) {
           const n = this.notes[i];
-          if (Math.abs(n.x - judgeX) < 50) {
-            judged = true;
+          const dist = Math.abs(n.x - judgeX);
+          if (dist < 62) {
             if (n.type === type) {
-              STATE.mgScore += n.pts; elMgPts.textContent = STATE.mgScore;
-              sound.playCorrect();
-              this.effects.push({ x: judgeX, y: 90, text: `良! +${n.pts}`, color: '#facc15', life: 15 });
+              this.combo++;
+              const isPerfect = dist < 26;
+              const isFever = this.combo >= 8;
+              const mult = isFever ? 1.5 : 1;
+              const gain = Math.round((isPerfect ? n.pts : Math.floor(n.pts * 0.7)) * mult);
+              STATE.mgScore += gain;
+              elMgPts.textContent = STATE.mgScore;
+
+              if (this.combo === 8) sound.playFever();
+              else sound.playCorrect(Math.min(6, this.combo));
+
+              // 火花與判定文字顏色與該音符（紅咚/藍咔）完全同步
+              const sparkPalette = isDon
+                ? ['#ef4444', '#fca5a5', '#ffffff']
+                : ['#0ea5e9', '#7dd3fc', '#ffffff'];
+              this.addParticles(judgeX, trackY, sparkPalette, n.big ? 22 : 14);
+              this.effects.push({
+                x: judgeX, y: trackY - 42,
+                text: isPerfect ? `良! +${gain}` : `可 +${gain}`,
+                color: isDon ? '#fca5a5' : '#7dd3fc',
+                stroke: isDon ? '#b91c1c' : '#0369a1',
+                life: 22
+              });
             } else {
+              this.combo = 0;
               sound.playWrong();
-              this.effects.push({ x: judgeX, y: 90, text: '錯!', color: '#ef4444', life: 12 });
+              this.effects.push({
+                x: judgeX, y: trackY - 42,
+                text: n.type === 'don' ? '要打🔴紅咚!' : '要打🔵藍咔!',
+                color: '#fde047',
+                stroke: '#991b1b',
+                life: 22
+              });
             }
             this.notes.splice(i, 1);
-            break;
+            this.updateComboUI();
+            return;
           }
         }
       }
+
+      updateComboUI() {
+        if (this.combo >= 8) {
+          elMgComboBadge.classList.remove('hidden');
+          elMgComboBadge.textContent = `🔥 祭典狂熱 ${this.combo}連擊`;
+        } else if (this.combo >= 2) {
+          elMgComboBadge.classList.remove('hidden');
+          elMgComboBadge.textContent = `🥁 ${this.combo} 連擊`;
+        } else {
+          elMgComboBadge.classList.add('hidden');
+        }
+      }
+
       update() {
         this.spawnTick++;
-        if (this.spawnTick % 18 === 0) this.spawn();
+        if (this.spawnTick % 19 === 0) this.spawn();
+        if (this.donFlash > 0) this.donFlash--;
+        if (this.kaFlash > 0) this.kaFlash--;
+        if (this.ringPulse > 0) this.ringPulse--;
+
+        const judgeX = Math.min(115, mgW * 0.2);
         this.notes.forEach(n => n.x -= n.speed);
-        this.notes = this.notes.filter(n => n.x > -20);
-        this.effects.forEach(ef => { ef.y -= 1; ef.life--; });
+        for (let i = this.notes.length - 1; i >= 0; i--) {
+          if (this.notes[i].x < judgeX - 65) {
+            this.notes.splice(i, 1);
+            this.combo = 0;
+            this.updateComboUI();
+          }
+        }
+
+        this.ripples.forEach(rp => { rp.r += 2.6; rp.alpha -= 0.06; });
+        this.ripples = this.ripples.filter(rp => rp.alpha > 0);
+
+        this.particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life--; });
+        this.particles = this.particles.filter(p => p.life > 0);
+
+        this.effects.forEach(ef => { ef.y -= 1.2; ef.life--; });
         this.effects = this.effects.filter(ef => ef.life > 0);
       }
-      draw() {
-        const w = this.canvas.parentElement.clientWidth || 600;
-        const h = this.canvas.parentElement.clientHeight || 280;
-        this.ctx.fillStyle = '#080d19'; this.ctx.fillRect(0, 0, w, h);
-        this.ctx.fillStyle = '#0f2231'; this.ctx.fillRect(0, 50, w, 80);
-        this.ctx.strokeStyle = '#facc15'; this.ctx.lineWidth = 4;
-        this.ctx.beginPath(); this.ctx.arc(80, 90, 24, 0, Math.PI * 2); this.ctx.stroke();
 
-        this.notes.forEach(n => {
-          this.ctx.fillStyle = n.color;
-          this.ctx.beginPath(); this.ctx.arc(n.x, n.y, 18, 0, Math.PI * 2); this.ctx.fill();
-          this.ctx.strokeStyle = '#fff'; this.ctx.lineWidth = 2; this.ctx.stroke();
-          this.ctx.fillStyle = '#fff'; this.ctx.font = 'bold 11px sans-serif'; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle';
-          this.ctx.fillText(n.label, n.x, n.y);
+      draw() {
+        const c = this.ctx;
+        const isFever = this.combo >= 8;
+        const judgeX = Math.min(115, mgW * 0.2);
+        const trackY = mgH * 0.56;
+
+        // 祭典夜空背景
+        const bgGrad = c.createLinearGradient(0, 0, 0, mgH);
+        bgGrad.addColorStop(0, isFever ? '#2e0918' : '#080e21');
+        bgGrad.addColorStop(1, '#040711');
+        c.fillStyle = bgGrad;
+        c.fillRect(0, 0, mgW, mgH);
+
+        // 頂部魂之量表 (Soul Gauge)
+        const gaugeW = Math.min(340, mgW * 0.6);
+        const gx = (mgW - gaugeW) / 2;
+        c.fillStyle = '#1e293b';
+        c.fillRect(gx, 14, gaugeW, 11);
+        const fillPct = Math.min(1, this.combo / 10);
+        c.fillStyle = isFever ? '#f43f5e' : '#38bdf8';
+        c.fillRect(gx, 14, gaugeW * fillPct, 11);
+        c.strokeStyle = '#94a3b8';
+        c.lineWidth = 1.5;
+        c.strokeRect(gx, 14, gaugeW, 11);
+        c.fillStyle = '#f8fafc';
+        c.font = 'bold 11px sans-serif';
+        c.textAlign = 'left';
+        c.fillText(isFever ? '🔥 祭典狂熱 MAX (1.5倍得分)' : `魂之量表 (${this.combo}/8)`, gx, 38);
+
+        // 太鼓軌道
+        c.fillStyle = 'rgba(15, 23, 42, 0.92)';
+        c.fillRect(0, trackY - 46, mgW, 92);
+        c.strokeStyle = isFever ? '#f43f5e' : '#334155';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.moveTo(0, trackY - 46); c.lineTo(mgW, trackY - 46);
+        c.moveTo(0, trackY + 46); c.lineTo(mgW, trackY + 46);
+        c.stroke();
+
+        // 左側視覺化太鼓判定區：外圈＝藍色(咔)、內圈＝紅色(咚)
+        // 1. 外圈藍色鼓邊 (咔)
+        c.save();
+        if (this.kaFlash > 0) {
+          c.shadowColor = '#38bdf8';
+          c.shadowBlur = 18;
+        }
+        c.fillStyle = this.kaFlash > 0 ? 'rgba(14, 165, 233, 0.45)' : 'rgba(14, 165, 233, 0.14)';
+        c.strokeStyle = this.kaFlash > 0 ? '#7dd3fc' : '#0ea5e9';
+        c.lineWidth = this.kaFlash > 0 ? 7 : 4.5;
+        c.beginPath();
+        c.arc(judgeX, trackY, 36 + (this.kaFlash > 0 ? 2 : 0), 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+        c.restore();
+
+        // 2. 內圈紅色鼓面 (咚)
+        c.save();
+        if (this.donFlash > 0) {
+          c.shadowColor = '#ef4444';
+          c.shadowBlur = 18;
+        }
+        c.fillStyle = this.donFlash > 0 ? 'rgba(239, 68, 68, 0.72)' : 'rgba(239, 68, 68, 0.25)';
+        c.strokeStyle = this.donFlash > 0 ? '#fca5a5' : '#ef4444';
+        c.lineWidth = this.donFlash > 0 ? 5 : 3.5;
+        c.beginPath();
+        c.arc(judgeX, trackY, 22 + (this.donFlash > 0 ? 2 : 0), 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+        c.restore();
+
+        // 鼓面下方色彩標示小標籤
+        c.font = 'bold 10px sans-serif';
+        c.textAlign = 'center';
+        c.fillStyle = '#fca5a5';
+        c.fillText('內紅咚', judgeX - 22, trackY + 58);
+        c.fillStyle = '#7dd3fc';
+        c.fillText('外藍咔', judgeX + 24, trackY + 58);
+
+        // 打擊擴散波紋
+        this.ripples.forEach(rp => {
+          c.save();
+          c.globalAlpha = rp.alpha;
+          c.strokeStyle = rp.color;
+          c.lineWidth = 3.5;
+          c.beginPath();
+          c.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+          c.stroke();
+          c.restore();
         });
+
+        // 音符繪製（純紅咚 / 純藍咔，保持高辨識度）
+        this.notes.forEach(n => {
+          c.save();
+          if (n.big) {
+            c.shadowColor = n.glow;
+            c.shadowBlur = 14;
+          }
+          const grad = c.createRadialGradient(n.x - 5, trackY - 6, 3, n.x, trackY, n.r);
+          grad.addColorStop(0, n.gradTop);
+          grad.addColorStop(1, n.gradBot);
+          c.fillStyle = grad;
+          c.beginPath();
+          c.arc(n.x, trackY, n.r, 0, Math.PI * 2);
+          c.fill();
+
+          // 純白外框，大音符加畫第二層白內圈
+          c.strokeStyle = '#ffffff';
+          c.lineWidth = n.big ? 3.5 : 2.5;
+          c.stroke();
+
+          if (n.big) {
+            c.beginPath();
+            c.arc(n.x, trackY, n.r - 5, 0, Math.PI * 2);
+            c.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+            c.lineWidth = 1.5;
+            c.stroke();
+          }
+
+          c.fillStyle = '#ffffff';
+          c.font = `900 ${n.big ? 14 : 13}px sans-serif`;
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          c.fillText(n.label, n.x, trackY + 0.5);
+          c.restore();
+        });
+
+        // 粒子與判定文字
+        this.particles.forEach(p => {
+          c.fillStyle = p.color;
+          c.beginPath();
+          c.arc(p.x, p.y, 3.8, 0, Math.PI * 2);
+          c.fill();
+        });
+
         this.effects.forEach(ef => {
-          this.ctx.fillStyle = ef.color; this.ctx.font = 'bold 20px sans-serif'; this.ctx.fillText(ef.text, ef.x, ef.y);
+          c.save();
+          c.font = '900 19px "Chakra Petch", "Noto Sans TC", sans-serif';
+          c.textAlign = 'center';
+          c.lineWidth = 4;
+          c.strokeStyle = ef.stroke || '#0f172a';
+          c.strokeText(ef.text, ef.x, ef.y);
+          c.fillStyle = ef.color;
+          c.fillText(ef.text, ef.x, ef.y);
+          c.restore();
         });
       }
     }
 
     let taikoObj = null;
     function startMiniGameTaiko() {
-      sound.setBpm(168);
-      openMiniGameUI("【第 30 關壓軸】🥁 太鼓達人節奏特訓", "點擊下方 紅咚 與 藍咔 打擊！");
-      taikoObj = new Taiko(cvs, ctx);
+      sound.setBpm(164);
+      openMiniGameUI("【第 30 關壓軸祭典】🥁 太鼓達人狂熱夜", "🔴紅音符點【紅色 咚】、🔵藍音符點【藍色 咔】！（電腦可用 F/J 紅咚、D/K 藍咔）");
+      taikoObj = new Taiko(ctx);
+
+      // 支援直接點擊畫面上的太鼓（點內圈打紅咚、點外圈打藍咔）
+      cvs.onpointerdown = (e) => {
+        e.preventDefault();
+        const r = cvs.getBoundingClientRect();
+        const px = e.clientX - r.left;
+        const py = e.clientY - r.top;
+        const judgeX = Math.min(115, mgW * 0.2);
+        const trackY = mgH * 0.56;
+        const dist = Math.hypot(px - judgeX, py - trackY);
+        if (dist <= 24) taikoObj.hit('don');
+        else taikoObj.hit('ka');
+      };
+
       elMgCtrl.innerHTML = `
-        <div class="flex gap-3 w-full max-w-sm mx-auto">
-          <button id="taiko-don" class="flex-1 py-3.5 rounded-2xl bg-red-600 text-white font-black text-sm active:scale-95 touch-btn shadow">🔴 咚</button>
-          <button id="taiko-ka" class="flex-1 py-3.5 rounded-2xl bg-sky-600 text-white font-black text-sm active:scale-95 touch-btn shadow">🔵 咔</button>
+        <div class="flex gap-3 sm:gap-5 w-full max-w-md mx-auto">
+          <button id="taiko-don" class="arcade-btn flex-1 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-b from-red-500 to-red-700 border-2 border-red-300 text-white font-black text-base sm:text-lg transition-all touch-btn">
+            🔴 咚 (紅鼓面)
+          </button>
+          <button id="taiko-ka" class="arcade-btn flex-1 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-b from-sky-500 to-blue-700 border-2 border-sky-300 text-white font-black text-base sm:text-lg transition-all touch-btn">
+            🔵 咔 (藍鼓邊)
+          </button>
         </div>
       `;
       document.getElementById('taiko-don').onpointerdown = (e) => { e.preventDefault(); taikoObj.hit('don'); };
       document.getElementById('taiko-ka').onpointerdown = (e) => { e.preventDefault(); taikoObj.hit('ka'); };
 
-      function loop() { if (!mgActive) return; taikoObj.update(); taikoObj.draw(); mgAnimId = requestAnimationFrame(loop); }
+      function loop() {
+        if (!mgActive) return;
+        taikoObj.update();
+        taikoObj.draw();
+        mgAnimId = requestAnimationFrame(loop);
+      }
       mgAnimId = requestAnimationFrame(loop);
     }
 
+    /* ==================== 6. 終局結算與鍵盤支援 ==================== */
     function showVictory() {
       sound.stopBgm();
       document.getElementById('final-modal').classList.remove('hidden');
       document.getElementById('final-total-score').textContent = STATE.score;
       document.getElementById('final-acc').textContent = `${STATE.correctCount}/30`;
-      sound.playCorrect(true);
+      document.getElementById('final-max-combo').textContent = `${STATE.maxCombo} 連擊`;
+
+      const rankEl = document.getElementById('final-rank-title');
+      if (STATE.correctCount >= 27) rankEl.textContent = '👑 傳說級・星際數學超新星';
+      else if (STATE.correctCount >= 20) rankEl.textContent = '⭐ 菁英級・神算小達人';
+      else rankEl.textContent = '🚀 勇氣級・潛力數學冒險家';
+
+      sound.playFever();
     }
 
     window.addEventListener('keydown', (e) => {
+      if (mgActive && taikoObj) {
+        const k = e.key.toLowerCase();
+        if (k === 'f' || k === 'j') { taikoObj.hit('don'); return; }
+        if (k === 'd' || k === 'k') { taikoObj.hit('ka'); return; }
+      }
       if (e.key === '[' || e.key === 'PageUp') prevQuestion();
       if (e.key === ']' || e.key === 'PageDown') nextQuestion();
     });
