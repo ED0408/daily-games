@@ -1,0 +1,2751 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>平四三角梯形面積與高｜單人30題挑戰版</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #080c16;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    .font-num {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    /* 霓虹發光樣式 */
+    .glow-cyan {
+      box-shadow: 0 0 25px rgba(0, 245, 212, 0.42);
+      border-color: #00F5D4;
+    }
+    .glow-gold {
+      box-shadow: 0 0 35px rgba(255, 215, 0, 0.7);
+    }
+    
+    /* 負分紅色呼吸警示燈 */
+    @keyframes alertPulse {
+      0%, 100% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); }
+      50% { border-color: #7f1d1d; box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+    }
+    .negative-score {
+      animation: alertPulse 1.2s infinite;
+      color: #f87171 !important;
+    }
+
+    /* 抽抽樂寶箱晃動與開獎動畫 */
+    @keyframes chestShake {
+      0%, 100% { transform: rotate(0deg) scale(1.05); }
+      20% { transform: rotate(-6deg) scale(1.07); }
+      40% { transform: rotate(6deg) scale(1.07); }
+      60% { transform: rotate(-4deg) scale(1.07); }
+      80% { transform: rotate(4deg) scale(1.07); }
+    }
+    .chest-shaking {
+      animation: chestShake 0.28s infinite ease-in-out;
+      border-color: #fbbf24 !important;
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.8);
+    }
+
+    @keyframes popReveal {
+      0% { transform: scale(0.75); opacity: 0.4; }
+      65% { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .prize-pop {
+      animation: popReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* 平滑滾動條 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.5);
+      border-radius: 4px;
+    }
+
+    /* 幾何圖形容器：同時適配 iPad 直向/橫向與桌面電腦 */
+    .geo-diagram-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 14px;
+      width: 100%;
+    }
+    .geo-diagram-wrap svg {
+      max-height: 112px;
+      width: auto;
+      max-width: 100%;
+      display: block;
+    }
+    @media (min-height: 760px) {
+      .geo-diagram-wrap svg {
+        max-height: 138px;
+      }
+    }
+    @media (min-width: 1024px) and (min-height: 820px) {
+      .geo-diagram-wrap svg {
+        max-height: 152px;
+      }
+    }
+    
+    /* 觸控與滑鼠雙重操作優化（消除 iPad Safari 延遲與誤觸） */
+    .touch-btn {
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+    canvas {
+      touch-action: none !important;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="text-white flex flex-col relative select-none">
+
+  <!-- ==================== 頂部 HUD 資訊列 (適配電腦與 iPad 螢幕寬度) ==================== -->
+  <header class="h-[68px] sm:h-[74px] bg-slate-900/95 border-b border-slate-700/80 px-3 sm:px-6 flex items-center justify-between z-20 shrink-0 shadow-lg gap-2">
+    
+    <!-- 左側：單人玩家資訊與即時積分 -->
+    <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+      <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-cyan-400 via-teal-500 to-indigo-600 flex items-center justify-center text-xl shadow-md border border-cyan-300/50">🧭</div>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-black text-cyan-300 text-sm sm:text-base tracking-wider">幾何探險家</span>
+          <span id="streak-badge" class="hidden text-[11px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-400/50 font-num font-bold">🔥 0連勝</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs mt-0.5 font-num">
+          <span id="player-score-box" class="px-2 py-0.5 rounded-lg font-bold text-amber-300 bg-slate-800 border border-slate-600 transition-all text-xs sm:text-sm">
+            總積分: <span id="player-total">0</span>
+          </span>
+          <span class="text-slate-300 text-xs sm:text-sm">答對: <b id="player-acc" class="text-emerald-400">0/30</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中央與右側：題號進度、倒數計時與上一題/下一題中控鈕 -->
+    <div class="flex items-center justify-end gap-2 sm:gap-3 flex-1 max-w-[660px]">
+      
+      <!-- 上一題按鈕 -->
+      <button id="btn-prev-q" onclick="prevQuestion()" title="回到上一題 (快捷鍵: [ 或 PageUp)" class="touch-btn flex items-center justify-center gap-1 px-2.5 sm:px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 border-2 border-slate-600 text-slate-100 font-black shadow-md transition-all shrink-0 hover:border-slate-400">
+        <span class="text-base sm:text-lg">⏮️</span>
+        <span class="text-xs sm:text-sm hidden md:inline">上一題</span>
+      </button>
+
+      <!-- 進度與倒數計時條 -->
+      <div class="flex flex-col items-center justify-center text-center flex-1 min-w-[120px] max-w-[280px]">
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <span class="text-[11px] font-black px-2 py-0.5 rounded-full bg-indigo-900/90 text-indigo-300 border border-indigo-500 tracking-wider hidden lg:inline" id="stage-badge">第 1 階段・平行四邊形</span>
+          <span class="text-xs sm:text-sm md:text-base font-black tracking-wider text-slate-100 font-num" id="round-indicator">第 1 / 30 題</span>
+          <button id="sound-toggle" onclick="toggleMute()" class="touch-btn text-xs text-slate-300 hover:text-white px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700 active:scale-95" title="音效開關">🔊</button>
+        </div>
+        
+        <div class="w-full mt-1 flex items-center gap-1.5">
+          <div class="text-[11px] sm:text-xs font-num font-black text-amber-300 w-10 text-right shrink-0" id="timer-text">25s</div>
+          <div class="flex-1 h-2.5 sm:h-3 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+            <div id="timer-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下一題按鈕 -->
+      <button id="btn-next-q" onclick="nextQuestion()" title="跳至下一題 (快捷鍵: ] 或 PageDown)" class="touch-btn flex items-center justify-center gap-1 px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 border-2 border-emerald-300 text-white font-black shadow-lg transition-all shrink-0">
+        <span class="text-xs sm:text-sm hidden md:inline">下一題</span>
+        <span class="text-base sm:text-lg">⏭️</span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ==================== 主要單人遊戲工作區 (響應式居中容器，完美支援電腦與 iPad 橫/直向) ==================== -->
+  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950/30">
+    
+    <div class="w-full max-w-5xl h-full flex flex-col px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 gap-2.5 sm:gap-3.5">
+      
+      <!-- 上半部：題目敘述與幾何圖形卡片 -->
+      <section class="flex-1 min-h-0 bg-slate-900/95 rounded-2xl sm:rounded-3xl border-2 border-cyan-500/40 p-3.5 sm:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cyan-400 shrink-0 mb-1">
+          <div class="flex items-center gap-2">
+            <span id="q-type-badge" class="px-2.5 py-0.5 rounded-lg bg-cyan-950/90 border border-cyan-700 text-cyan-300">幾何診斷題</span>
+            <span id="q-milestone-hint" class="text-[11px] sm:text-xs text-amber-300/90 font-num">距離小遊戲還有 10 題</span>
+          </div>
+          <span class="text-slate-400 font-num hidden sm:inline" id="q-hotkey-hint">支援觸控點擊 或 鍵盤 1 / 2 / 3</span>
+        </div>
+
+        <div id="q-text" class="flex-1 overflow-y-auto text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-100 leading-[1.6] py-1 break-words pr-1 flex flex-col justify-center">
+          題目載入中...
+        </div>
+
+        <div class="flex items-center justify-between text-xs sm:text-sm text-slate-400 font-mono shrink-0 pt-2 border-t border-slate-800/90 gap-2">
+          <span class="truncate">📐 認明垂直直角記號 ∟，小心干擾斜邊！</span>
+          <div id="player-status-stamp" class="shrink-0 text-xs sm:text-sm md:text-base font-black px-3 py-0.5 rounded-lg hidden font-num"></div>
+        </div>
+      </section>
+
+      <!-- 下半部：作答互動區 + 觀念解析卡片 -->
+      <section class="flex-1 min-h-0 flex flex-col gap-2.5">
+        <div id="player-interactive" class="flex-1 min-h-0 flex flex-col justify-center"></div>
+
+        <!-- 答錯／觀念解析面板 (Analysis Box) -->
+        <div id="player-analysis-card" class="shrink-0 max-h-[46%] rounded-2xl bg-rose-950/95 border-2 border-rose-500/70 p-3 sm:p-4 hidden flex-col justify-start text-rose-100 shadow-xl">
+          <div class="flex items-center gap-1.5 text-xs sm:text-sm md:text-base font-black text-amber-300 mb-1 shrink-0">
+            <span>💡 幾何觀念解析：</span>
+          </div>
+          <div id="player-analysis-text" class="text-xs sm:text-sm md:text-base font-medium leading-relaxed text-slate-100 overflow-y-auto pr-1">
+            --
+          </div>
+        </div>
+      </section>
+
+      <!-- 底部內嵌式控制橫幅（絕不遮擋題目與選項，完美適配 iPad 觸控） -->
+      <div id="control-bar" class="shrink-0 hidden items-center justify-between gap-3 bg-slate-900/95 border-2 border-amber-400 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-2xl shadow-2xl">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-lg sm:text-xl shrink-0" id="ctrl-icon">🚨</span>
+          <span id="ctrl-msg" class="text-xs sm:text-sm md:text-base font-bold text-rose-300 truncate">作答有誤・已停止計時</span>
+        </div>
+        <button id="btn-advance-step" class="touch-btn shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm md:text-base text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow-lg active:scale-95 transition-all flex items-center gap-1.5">
+          <span id="btn-advance-label">💡 我已理解，下一題 ➔</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==================== 單人手速小遊戲覆蓋層 (全螢幕自適應遊樂場) ==================== -->
+    <div id="minigame-overlay" class="absolute inset-0 bg-slate-950 z-30 hidden flex flex-col p-2.5 sm:p-4">
+      <div class="max-w-5xl w-full mx-auto flex-1 flex flex-col min-h-0">
+        <!-- 小遊戲頂部標題列 -->
+        <div class="h-14 sm:h-16 bg-slate-900 border border-slate-700 px-3 sm:px-6 flex items-center justify-between shrink-0 rounded-t-2xl gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-[11px] sm:text-xs px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-black tracking-wider font-num shrink-0">中場遊樂場</span>
+            <h2 id="mg-title" class="text-sm sm:text-base md:text-lg font-black text-amber-300 truncate">手速小遊戲</h2>
+          </div>
+          <div class="flex items-center gap-2.5 sm:gap-5 shrink-0">
+            <div class="text-xs sm:text-sm md:text-base text-slate-200 font-bold">
+              🧭 得分: <b id="mg-pts" class="text-cyan-400 font-num text-base sm:text-xl">0</b>
+            </div>
+            <div id="mg-timer" class="text-lg sm:text-2xl font-black text-rose-400 font-num tracking-wider">20.0s</div>
+            <button id="btn-skip-mg" onclick="skipMiniGame()" class="touch-btn px-2.5 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs sm:text-sm font-bold text-amber-300 shadow active:scale-95 transition-all">
+              ⏭️ 跳過
+            </button>
+          </div>
+        </div>
+        
+        <!-- 單人寬敞遊樂場畫布區 -->
+        <div class="flex-1 relative flex flex-col items-center justify-between p-2.5 sm:p-4 bg-slate-900/80 rounded-b-2xl overflow-hidden border-x border-b border-slate-800 min-h-0">
+          <div class="text-xs sm:text-sm font-bold text-cyan-300 mb-1.5 flex items-center gap-1.5 shrink-0 text-center">
+            <span id="mg-hint">--</span>
+          </div>
+          <div id="mg-canvas-wrap" class="flex-1 w-full relative flex items-center justify-center min-h-0">
+            <canvas id="mg-canvas" class="w-full h-full rounded-2xl bg-slate-950 border-2 border-cyan-500/40 shadow-inner"></canvas>
+          </div>
+          <div id="mg-ctrl" class="w-full shrink-0 pt-2.5 flex justify-center gap-2.5 sm:gap-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 開場首頁覆蓋層 ==================== -->
+    <div id="start-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-y-auto">
+      <div class="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl relative my-auto">
+        <div class="text-xs font-black tracking-widest text-indigo-400 uppercase mb-1.5">翰林國小五年級數學 (五上) 第八單元・單人闖關版</div>
+        <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white mb-3">
+          平四三角梯形面積與高
+        </h1>
+        <p class="text-slate-300 text-xs sm:text-sm md:text-base leading-relaxed mb-5">
+          支援 <b class="text-cyan-300">桌面電腦</b> 與 <b class="text-cyan-300">Apple iPad 觸控</b>！精選 <b class="text-amber-400">30 道幾何視覺圖解關卡</b>（平行四邊形、三角形、梯形的底與高、干擾斜邊陷阱、面積公式與逆推計算），每 <b class="text-emerald-400">10 題</b> 穿插一次 <b class="text-amber-300">遊樂場手速挑戰</b>！<br>
+          <span class="text-emerald-400 font-bold">答對享極速加成（最高 +150 分）</span>，<span class="text-rose-400 font-bold">答錯倒扣 -50 分！通關後還可開啟【🎁 幸運抽抽樂】！</span>
+        </p>
+
+        <!-- 三階段闖關路線卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-6 text-left">
+          <div class="p-3 rounded-2xl bg-slate-800/80 border border-cyan-500/40">
+            <div class="text-cyan-300 font-black text-xs sm:text-sm mb-1">第 1～10 題</div>
+            <p class="text-xs text-slate-300 leading-snug">
+              三態幾何診斷題<br>
+              <span class="text-amber-300 font-bold">➔ 第10題後：🎯 射擊靶場</span>
+            </p>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-800/80 border border-indigo-500/40">
+            <div class="text-indigo-300 font-black text-xs sm:text-sm mb-1">第 11～20 題</div>
+            <p class="text-xs text-slate-300 leading-snug">
+              四選一面積計算題<br>
+              <span class="text-amber-300 font-bold">➔ 第20題後：🔨 瘋狂打地鼠</span>
+            </p>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-800/80 border border-emerald-500/40">
+            <div class="text-emerald-300 font-black text-xs sm:text-sm mb-1">第 21～30 題</div>
+            <p class="text-xs text-slate-300 leading-snug">
+              3對3 觀念配對消除<br>
+              <span class="text-amber-300 font-bold">➔ 第30題後：🥁 極速太鼓達人</span>
+            </p>
+          </div>
+        </div>
+
+        <button id="btn-start-game" class="touch-btn w-full py-4 rounded-2xl font-black text-lg sm:text-xl tracking-widest text-slate-950 bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 hover:opacity-95 shadow-xl glow-cyan active:scale-95 transition-all">
+          🚀 開始 30 題幾何大挑戰
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 小遊戲結算單關戰報彈窗 ==================== -->
+    <div id="mg-result-modal" class="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-sm hidden flex items-center justify-center p-4 sm:p-6">
+      <div class="max-w-md w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl text-center">
+        <span class="text-xs uppercase font-black text-amber-400 font-num">MINI-GAME BONUS</span>
+        <h3 id="mg-result-title" class="text-2xl font-black text-white mt-1 mb-4">手速遊樂場戰報</h3>
+        
+        <div class="p-4 rounded-2xl bg-cyan-950/50 border-2 border-cyan-500/60 my-4">
+          <div class="text-xs sm:text-sm text-cyan-300 font-bold">🧭 遊樂場額外獎勵積分</div>
+          <div id="mg-res-pts" class="text-4xl sm:text-5xl font-black text-amber-300 font-num mt-1">+0</div>
+        </div>
+
+        <div id="mg-winner-announcement" class="text-xs sm:text-sm font-bold text-slate-200 mb-6 py-2.5 px-3 rounded-xl bg-slate-800">
+          手速獎勵分數已自動累加至您的總積分！
+        </div>
+
+        <button id="btn-close-mg-result" class="touch-btn w-full py-3.5 rounded-xl font-black text-base text-slate-950 bg-gradient-to-r from-amber-400 to-yellow-300 hover:opacity-95 shadow-lg active:scale-95 transition-transform">
+          繼續下一階段挑戰 ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 終局結算與滿分神話頒獎 + 幸運抽抽樂覆蓋層 ==================== -->
+    <div id="final-modal" class="absolute inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-3 sm:p-5 text-center overflow-y-auto">
+      <div class="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-5 sm:p-6 shadow-2xl relative my-auto">
+        
+        <div id="perfect-banner" class="hidden mb-3 py-2 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-slate-950 font-black text-sm sm:text-base tracking-wider shadow-2xl glow-gold animate-bounce">
+          💯 恭喜達成 30 題全部答對滿分神話！幾何大師降臨！
+        </div>
+
+        <span class="text-[11px] font-black tracking-widest text-indigo-400 uppercase">CHALLENGE COMPLETE</span>
+        <h2 class="text-xl sm:text-3xl font-black text-white mt-0.5 mb-4">平四三角梯形面積與高・闖關結算</h2>
+
+        <!-- 單人成績總覽面板 -->
+        <div class="grid grid-cols-3 gap-2.5 sm:gap-4 mb-4 text-center">
+          <div class="p-3 sm:p-4 rounded-2xl bg-slate-800/90 border-2 border-amber-400/70">
+            <div class="text-xs text-slate-400 font-bold">最終總積分</div>
+            <div id="final-total" class="text-2xl sm:text-4xl font-black text-amber-300 font-num my-1">0</div>
+            <div class="text-[11px] text-amber-200/80 font-mono">含小遊戲加成</div>
+          </div>
+
+          <div class="p-3 sm:p-4 rounded-2xl bg-slate-800/90 border-2 border-emerald-400/70">
+            <div class="text-xs text-slate-400 font-bold">30 題答對數</div>
+            <div id="final-acc" class="text-2xl sm:text-4xl font-black text-emerald-400 font-num my-1">0 / 30</div>
+            <div id="final-rate" class="text-[11px] text-emerald-200/80 font-mono">正確率 0%</div>
+          </div>
+
+          <div class="p-3 sm:p-4 rounded-2xl bg-slate-800/90 border-2 border-cyan-400/70">
+            <div class="text-xs text-slate-400 font-bold">稱號評級</div>
+            <div id="final-rank" class="text-2xl sm:text-4xl font-black text-cyan-300 font-num my-1">S</div>
+            <div id="final-max-streak" class="text-[11px] text-cyan-200/80 font-mono">最高 0 連勝</div>
+          </div>
+        </div>
+
+        <div id="final-summary-quote" class="text-xs sm:text-sm md:text-base font-bold text-slate-200 mb-4 bg-slate-800/70 py-2.5 px-4 rounded-xl leading-relaxed border border-slate-700">
+          恭喜完成全部 30 道幾何圖解挑戰！
+        </div>
+
+        <!-- ==================== 通關幸運抽抽樂區塊 ==================== -->
+        <div id="winner-raffle-section" class="mb-5 p-4 rounded-2xl bg-gradient-to-b from-indigo-950/90 via-slate-900 to-purple-950/80 border-2 border-amber-400/80 shadow-xl">
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 mb-3">
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs tracking-wider">🎁 通關幸運抽抽樂</span>
+            <h3 id="raffle-subtitle" class="text-sm sm:text-base font-black text-amber-200">
+              請點擊任一幸運寶箱開啟您的專屬獎勵！
+            </h3>
+          </div>
+
+          <!-- 三選一神秘盲盒網格 -->
+          <div id="raffle-boxes" class="grid grid-cols-3 gap-2.5 sm:gap-4">
+            <button id="raffle-box-0" onclick="triggerRaffle(0)" class="touch-btn group relative py-4 px-2 sm:py-5 sm:px-3 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-amber-400/60 hover:border-amber-300 hover:scale-[1.03] active:scale-95 transition-all flex flex-col items-center justify-center shadow-lg">
+              <span class="text-3xl sm:text-4xl mb-1.5 group-hover:animate-bounce pointer-events-none">🎁</span>
+              <span class="text-xs sm:text-sm font-black text-amber-300 tracking-wider pointer-events-none">幸運寶箱 1</span>
+              <span class="text-[10px] text-slate-400 mt-0.5 pointer-events-none">點擊開啟</span>
+            </button>
+
+            <button id="raffle-box-1" onclick="triggerRaffle(1)" class="touch-btn group relative py-4 px-2 sm:py-5 sm:px-3 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-amber-400/60 hover:border-amber-300 hover:scale-[1.03] active:scale-95 transition-all flex flex-col items-center justify-center shadow-lg">
+              <span class="text-3xl sm:text-4xl mb-1.5 group-hover:animate-bounce pointer-events-none">🎁</span>
+              <span class="text-xs sm:text-sm font-black text-amber-300 tracking-wider pointer-events-none">幸運寶箱 2</span>
+              <span class="text-[10px] text-slate-400 mt-0.5 pointer-events-none">點擊開啟</span>
+            </button>
+
+            <button id="raffle-box-2" onclick="triggerRaffle(2)" class="touch-btn group relative py-4 px-2 sm:py-5 sm:px-3 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-amber-400/60 hover:border-amber-300 hover:scale-[1.03] active:scale-95 transition-all flex flex-col items-center justify-center shadow-lg">
+              <span class="text-3xl sm:text-4xl mb-1.5 group-hover:animate-bounce pointer-events-none">🎁</span>
+              <span class="text-xs sm:text-sm font-black text-amber-300 tracking-wider pointer-events-none">幸運寶箱 3</span>
+              <span class="text-[10px] text-slate-400 mt-0.5 pointer-events-none">點擊開啟</span>
+            </button>
+          </div>
+
+          <!-- 開獎結果公告橫幅 -->
+          <div id="raffle-result-banner" class="hidden mt-3 py-2 px-3 rounded-xl bg-slate-950/90 border border-amber-400/60 text-xs sm:text-sm md:text-base font-black text-amber-300">
+            --
+          </div>
+        </div>
+
+        <button onclick="location.reload()" class="touch-btn px-8 py-3.5 rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-emerald-400 to-cyan-400 hover:opacity-95 shadow-xl active:scale-95 transition-all">
+          🔄 重新挑戰 30 題
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== 原生 JavaScript 音效引擎與單人30題核心 ==================== -->
+  <script>
+    /* ==========================================================================
+       1. 原生 Web Audio API 合成音效引擎（相容桌面瀏覽器與 iPad Safari）
+       ========================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.compressor = null;
+        this.isMuted = false;
+        this.bpm = 128;
+        this.bgmTimer = null;
+        this.step = 0;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+
+          this.compressor = this.ctx.createDynamicsCompressor();
+          this.compressor.threshold.setValueAtTime(-18, this.ctx.currentTime);
+          this.compressor.knee.setValueAtTime(10, this.ctx.currentTime);
+          this.compressor.ratio.setValueAtTime(5, this.ctx.currentTime);
+          this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+          this.compressor.release.setValueAtTime(0.2, this.ctx.currentTime);
+
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+
+          this.compressor.connect(this.masterGain);
+          this.masterGain.connect(this.ctx.destination);
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        this.startBgm();
+      }
+
+      setBpm(newBpm) {
+        this.bpm = newBpm;
+        if (this.bgmTimer) {
+          this.stopBgm();
+          this.startBgm();
+        }
+      }
+
+      startBgm() {
+        if (this.bgmTimer || !this.ctx) return;
+        const intervalMs = (60 / this.bpm / 4) * 1000;
+        this.bgmTimer = setInterval(() => {
+          if (this.isMuted) return;
+          this.playBgmStep(this.step);
+          this.step = (this.step + 1) % 16;
+        }, intervalMs);
+      }
+
+      stopBgm() {
+        if (this.bgmTimer) {
+          clearInterval(this.bgmTimer);
+          this.bgmTimer = null;
+        }
+      }
+
+      playBgmStep(s) {
+        if (!this.ctx || !this.compressor) return;
+        const t = this.ctx.currentTime;
+
+        if (s % 4 === 0) {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.frequency.setValueAtTime(160, t);
+          osc.frequency.exponentialRampToValueAtTime(35, t + 0.12);
+          gain.gain.setValueAtTime(0.32, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.13);
+        }
+
+        if (s === 4 || s === 12) {
+          const bufferSize = this.ctx.sampleRate * 0.08;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.value = 1400;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.15, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.compressor);
+          noise.start(t);
+        }
+
+        if (s % 2 === 1) {
+          const bufferSize = this.ctx.sampleRate * 0.025;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'highpass';
+          filter.frequency.value = 7500;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(s === 14 ? 0.08 : 0.04, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + (s === 14 ? 0.06 : 0.025));
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.compressor);
+          noise.start(t);
+        }
+      }
+
+      playCorrect() {
+        if (this.isMuted || !this.ctx) return;
+        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        freqs.forEach((freq, i) => {
+          const t = this.ctx.currentTime + i * 0.06;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.28);
+        });
+      }
+
+      playWrong() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, t);
+        osc.frequency.exponentialRampToValueAtTime(70, t + 0.35);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.36);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.38);
+      }
+
+      playTimeout() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        [0, 0.12].forEach(offset => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(440, t + offset);
+          gain.gain.setValueAtTime(0.2, t + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + offset + 0.08);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t + offset);
+          osc.stop(t + offset + 0.09);
+        });
+      }
+
+      playShoot() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(950, t);
+        osc.frequency.exponentialRampToValueAtTime(90, t + 0.11);
+        gain.gain.setValueAtTime(0.28, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      }
+
+      playHammer() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(190, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.14);
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      }
+
+      playDon() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(165, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.18);
+        gain.gain.setValueAtTime(0.42, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.19);
+      }
+
+      playKa() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(880, t);
+        osc.frequency.exponentialRampToValueAtTime(280, t + 0.08);
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.09);
+      }
+
+      playRoll() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        [0, 0.05, 0.1].forEach((off, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(260 + idx * 80, t + off);
+          gain.gain.setValueAtTime(0.28, t + off);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + off + 0.06);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t + off);
+          osc.stop(t + off + 0.07);
+        });
+      }
+
+      playGrabSuccess() {
+        if (this.isMuted || !this.ctx) return;
+        [587.33, 880, 1174.66].forEach((f, i) => {
+          const t = this.ctx.currentTime + i * 0.07;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, t);
+          gain.gain.setValueAtTime(0.28, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.2);
+        });
+      }
+
+      playCoinDrop() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, t);
+        osc.frequency.setValueAtTime(1318.51, t + 0.04);
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.13);
+      }
+
+      playRaffleTick() {
+        if (this.isMuted || !this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(720 + Math.random() * 240, t);
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+        osc.connect(gain);
+        gain.connect(this.compressor);
+        osc.start(t);
+        osc.stop(t + 0.07);
+      }
+
+      playRaffleFanfare(isJackpot) {
+        if (this.isMuted || !this.ctx) return;
+        const notes = isJackpot
+          ? [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50, 1318.51]
+          : [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          const t = this.ctx.currentTime + i * 0.085;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.3, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+          osc.connect(gain);
+          gain.connect(this.compressor);
+          osc.start(t);
+          osc.stop(t + 0.38);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /* ==========================================================================
+       2. 幾何 SVG 圖形產生器（平行四邊形、三角形、梯形高對比視覺圖解）
+       ========================================================================== */
+    const SVG_SHAPES = {
+      // 1. 切割拼補成長方形
+      cutRect: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 320 96" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="45,16 135,16 105,76 15,76" fill="rgba(56,189,248,0.22)" stroke="#38bdf8" stroke-width="2.5"/>
+            <polygon points="45,16 45,76 15,76" fill="rgba(251,191,36,0.35)" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4 3"/>
+            <polyline points="45,67 54,67 54,76" fill="none" stroke="#fbbf24" stroke-width="2"/>
+            <text x="80" y="90" fill="#cbd5e1" font-size="12" font-weight="bold" text-anchor="middle">沿高垂直剪開</text>
+            <text x="160" y="52" fill="#fbbf24" font-size="22" font-weight="bold" text-anchor="middle">➔</text>
+            <rect x="190" y="16" width="90" height="60" fill="rgba(52,211,153,0.22)" stroke="#34d399" stroke-width="2.5"/>
+            <polygon points="280,16 280,76 250,76" fill="rgba(251,191,36,0.35)" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4 3"/>
+            <polyline points="190,25 199,25 199,16" fill="none" stroke="#34d399" stroke-width="2"/>
+            <polyline points="190,67 199,67 199,76" fill="none" stroke="#34d399" stroke-width="2"/>
+            <text x="235" y="90" fill="#6ee7b7" font-size="12" font-weight="bold" text-anchor="middle">拼成長方形(面積不變)</text>
+          </svg>
+        </div>`,
+
+      // 2. 斜剪錯誤示範
+      badDiagonalCut: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 260 94" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="65,16 195,16 165,76 35,76" fill="rgba(244,63,94,0.2)" stroke="#f43f5e" stroke-width="2.5"/>
+            <line x1="65" y1="16" x2="165" y2="76" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="5 4"/>
+            <text x="115" y="90" fill="#fda4af" font-size="12" font-weight="bold" text-anchor="middle">✂️ 沿對角線斜剪（無直角）</text>
+          </svg>
+        </div>`,
+
+      // 3. 底與延長線上的高
+      extHeight: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 300 98" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="95,18 225,18 165,74 35,74" fill="rgba(56,189,248,0.22)" stroke="#38bdf8" stroke-width="2.5"/>
+            <line x1="165" y1="74" x2="232" y2="74" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4 3"/>
+            <line x1="35" y1="74" x2="165" y2="74" stroke="#f43f5e" stroke-width="3"/>
+            <line x1="130" y1="18" x2="130" y2="74" stroke="#fbbf24" stroke-width="2.2" stroke-dasharray="4 3"/>
+            <polyline points="130,65 139,65 139,74" fill="none" stroke="#fbbf24" stroke-width="2"/>
+            <line x1="225" y1="18" x2="225" y2="74" stroke="#34d399" stroke-width="2.2" stroke-dasharray="4 3"/>
+            <polyline points="216,74 216,65 225,65" fill="none" stroke="#34d399" stroke-width="2"/>
+            <text x="100" y="91" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">底 (a)</text>
+            <text x="144" y="50" fill="#fde047" font-size="13" font-weight="bold">高</text>
+            <text x="242" y="50" fill="#6ee7b7" font-size="13" font-weight="bold">高</text>
+          </svg>
+        </div>`,
+
+      // 4. 習作 p.78 題4 ①（底16, 高18, 斜邊24）
+      wb4_1: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 280 96" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="85,16 195,16 145,74 35,74" fill="rgba(168,85,247,0.25)" stroke="#c084fc" stroke-width="2.5"/>
+            <line x1="145" y1="74" x2="202" y2="74" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="3 3"/>
+            <line x1="195" y1="16" x2="195" y2="74" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polyline points="186,74 186,65 195,65" fill="none" stroke="#fbbf24" stroke-width="2"/>
+            <text x="90" y="90" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">底 16cm</text>
+            <text x="228" y="49" fill="#fde047" font-size="13" font-weight="bold" text-anchor="middle">高 18cm</text>
+            <text x="45" y="42" fill="#fda4af" font-size="12" font-weight="bold" text-anchor="middle">24cm</text>
+          </svg>
+        </div>`,
+
+      // 5. 習作 p.78 題4 ②（底57, 高30, 斜邊33）
+      wb4_2: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 290 96" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="65,16 235,16 195,74 25,74" fill="rgba(56,189,248,0.22)" stroke="#38bdf8" stroke-width="2.5"/>
+            <line x1="195" y1="16" x2="195" y2="74" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polyline points="186,74 186,65 195,65" fill="none" stroke="#fbbf24" stroke-width="2"/>
+            <text x="110" y="90" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">底 57cm</text>
+            <text x="166" y="49" fill="#fde047" font-size="13" font-weight="bold" text-anchor="middle">30cm</text>
+            <text x="242" y="49" fill="#fda4af" font-size="12" font-weight="bold" text-anchor="middle">33cm</text>
+          </svg>
+        </div>`,
+
+      // 6. 習作 p.78 題4 ③（垂直底25, 水平高20, 斜邊23）
+      wb4_3: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 260 100" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="65,14 175,34 175,90 65,70" fill="rgba(52,211,153,0.22)" stroke="#34d399" stroke-width="2.5"/>
+            <line x1="65" y1="34" x2="175" y2="34" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polyline points="166,34 166,43 175,43" fill="none" stroke="#fbbf24" stroke-width="2"/>
+            <text x="210" y="65" fill="#6ee7b7" font-size="13" font-weight="bold" text-anchor="middle">底 25cm</text>
+            <text x="118" y="28" fill="#fde047" font-size="13" font-weight="bold" text-anchor="middle">高 20cm</text>
+            <text x="118" y="94" fill="#fda4af" font-size="12" font-weight="bold" text-anchor="middle">23cm</text>
+          </svg>
+        </div>`,
+
+      // 7. 習作 p.78 題4 ④（斜底7, 另一邊15, 延長高13）
+      wb4_4: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 260 100" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="85,16 125,34 95,86 55,68" fill="rgba(251,191,36,0.22)" stroke="#fbbf24" stroke-width="2.5"/>
+            <line x1="125" y1="34" x2="165" y2="52" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="3 3"/>
+            <line x1="95" y1="86" x2="165" y2="52" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polyline points="157,48 153,56 161,60" fill="none" stroke="#38bdf8" stroke-width="2"/>
+            <text x="115" y="22" fill="#fde047" font-size="13" font-weight="bold">底 7cm</text>
+            <text x="45" y="44" fill="#fda4af" font-size="12" font-weight="bold">15cm</text>
+            <text x="155" y="80" fill="#38bdf8" font-size="13" font-weight="bold">高 13cm</text>
+          </svg>
+        </div>`,
+
+      // 8. 課本 p.111 題6（ㄅㄆㄇ 等底3 等高2）
+      equalThree: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 320 94" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="20,22 70,22 85,72 35,72" fill="rgba(56,189,248,0.25)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="52" y="52" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">ㄅ</text>
+            <text x="60" y="87" fill="#93c5fd" font-size="11" font-weight="bold" text-anchor="middle">底3cm</text>
+            <polygon points="115,22 165,22 155,72 105,72" fill="rgba(56,189,248,0.25)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="135" y="52" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">ㄆ</text>
+            <text x="130" y="87" fill="#93c5fd" font-size="11" font-weight="bold" text-anchor="middle">底3cm</text>
+            <polygon points="235,22 285,22 225,72 175,72" fill="rgba(56,189,248,0.25)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="230" y="52" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">ㄇ</text>
+            <text x="200" y="87" fill="#93c5fd" font-size="11" font-weight="bold" text-anchor="middle">底3cm</text>
+            <line x1="285" y1="22" x2="285" y2="72" stroke="#fbbf24" stroke-width="2" stroke-dasharray="3 3"/>
+            <text x="303" y="52" fill="#fde047" font-size="11" font-weight="bold" text-anchor="middle">高2cm</text>
+          </svg>
+        </div>`,
+
+      // 9. 課本 p.111 題7（ㄅㄆㄇㄈ 倍數關係）
+      fourShapes: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 320 98" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="15,56 45,56 55,80 25,80" fill="rgba(167,139,250,0.28)" stroke="#a78bfa" stroke-width="2"/>
+            <text x="35" y="72" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">ㄅ</text>
+            <text x="40" y="93" fill="#cbd5e1" font-size="10" text-anchor="middle">底2 高2</text>
+            <polygon points="75,32 105,32 120,80 90,80" fill="rgba(167,139,250,0.28)" stroke="#a78bfa" stroke-width="2"/>
+            <text x="97" y="60" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">ㄆ</text>
+            <text x="105" y="93" fill="#cbd5e1" font-size="10" text-anchor="middle">底2 高4</text>
+            <polygon points="155,10 185,10 175,80 145,80" fill="rgba(56,189,248,0.28)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="165" y="50" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">ㄇ</text>
+            <text x="160" y="93" fill="#7dd3fc" font-size="10" text-anchor="middle">底2 高6</text>
+            <polygon points="225,10 285,10 275,80 215,80" fill="rgba(52,211,153,0.28)" stroke="#34d399" stroke-width="2"/>
+            <text x="250" y="50" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">ㄈ</text>
+            <text x="245" y="93" fill="#6ee7b7" font-size="10" text-anchor="middle">底4 高6</text>
+          </svg>
+        </div>`,
+
+      // 10. 習作 p.79 題6（甲乙丙丁戊五圖形）
+      fiveCompare: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 330 98" xmlns="http://www.w3.org/2000/svg">
+            <line x1="10" y1="16" x2="295" y2="16" stroke="#64748b" stroke-width="1" stroke-dasharray="3 3"/>
+            <line x1="10" y1="80" x2="320" y2="80" stroke="#64748b" stroke-width="1.5"/>
+            <polygon points="15,16 45,16 55,80 25,80" fill="rgba(244,114,182,0.3)" stroke="#f472b6" stroke-width="2"/>
+            <text x="35" y="52" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">甲</text>
+            <text x="40" y="93" fill="#f9a8d4" font-size="10" text-anchor="middle">底2</text>
+            <polygon points="82,16 98,16 86,80 70,80" fill="rgba(244,114,182,0.3)" stroke="#f472b6" stroke-width="2"/>
+            <text x="84" y="52" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">乙</text>
+            <text x="78" y="93" fill="#f9a8d4" font-size="10" text-anchor="middle">底1</text>
+            <polygon points="122,16 206,16 196,80 112,80" fill="rgba(251,191,36,0.3)" stroke="#fbbf24" stroke-width="2"/>
+            <text x="159" y="52" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">丙</text>
+            <text x="154" y="93" fill="#fde047" font-size="10" text-anchor="middle">底6</text>
+            <polygon points="216,16 232,16 262,80 246,80" fill="rgba(244,114,182,0.3)" stroke="#f472b6" stroke-width="2"/>
+            <text x="239" y="52" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">丁</text>
+            <text x="254" y="93" fill="#f9a8d4" font-size="10" text-anchor="middle">底1</text>
+            <polygon points="274,64 290,64 294,80 278,80" fill="rgba(56,189,248,0.35)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="284" y="58" fill="#7dd3fc" font-size="11" font-weight="bold" text-anchor="middle">戊</text>
+            <text x="286" y="93" fill="#7dd3fc" font-size="10" text-anchor="middle">底1高1</text>
+            <text x="312" y="45" fill="#fde047" font-size="10" font-weight="bold" text-anchor="middle">高4cm</text>
+          </svg>
+        </div>`,
+
+      // 11. 兩個全等三角形拼成平行四邊形
+      triangleDouble: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 280 96" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="75,18 35,74 165,74" fill="rgba(56,189,248,0.32)" stroke="#38bdf8" stroke-width="2.5"/>
+            <polygon points="75,18 205,18 165,74" fill="rgba(251,191,36,0.22)" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4 3"/>
+            <line x1="75" y1="18" x2="75" y2="74" stroke="#34d399" stroke-width="2.2" stroke-dasharray="4 3"/>
+            <polyline points="75,65 84,65 84,74" fill="none" stroke="#34d399" stroke-width="2"/>
+            <text x="105" y="90" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">底 12cm</text>
+            <text x="98" y="50" fill="#6ee7b7" font-size="12" font-weight="bold">高 8cm</text>
+            <text x="236" y="50" fill="#fde047" font-size="11" font-weight="bold" text-anchor="middle">兩全等三角形</text>
+          </svg>
+        </div>`,
+
+      // 12. 三角形干擾斜邊
+      triangleDecoy: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 280 96" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="105,16 35,74 215,74" fill="rgba(52,211,153,0.24)" stroke="#34d399" stroke-width="2.5"/>
+            <line x1="105" y1="16" x2="105" y2="74" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polyline points="105,65 114,65 114,74" fill="none" stroke="#fbbf24" stroke-width="2"/>
+            <text x="125" y="90" fill="#6ee7b7" font-size="13" font-weight="bold" text-anchor="middle">底 14cm</text>
+            <text x="132" y="52" fill="#fde047" font-size="13" font-weight="bold">高 10cm</text>
+            <text x="55" y="42" fill="#fda4af" font-size="12" font-weight="bold">12cm</text>
+            <text x="175" y="42" fill="#fda4af" font-size="12" font-weight="bold">15cm</text>
+          </svg>
+        </div>`,
+
+      // 13. 梯形面積與干擾腰長
+      trapezoidDiagram: () => `
+        <div class="geo-diagram-wrap">
+          <svg viewBox="0 0 280 98" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="85,20 175,20 215,74 45,74" fill="rgba(168,85,247,0.26)" stroke="#c084fc" stroke-width="2.5"/>
+            <line x1="85" y1="20" x2="85" y2="74" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <polyline points="85,65 94,65 94,74" fill="none" stroke="#fbbf24" stroke-width="2"/>
+            <text x="130" y="14" fill="#e9d5ff" font-size="12" font-weight="bold" text-anchor="middle">上底 6cm</text>
+            <text x="130" y="90" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">下底 10cm</text>
+            <text x="114" y="52" fill="#fde047" font-size="13" font-weight="bold">高 5cm</text>
+            <text x="210" y="46" fill="#fda4af" font-size="12" font-weight="bold">6cm</text>
+          </svg>
+        </div>`
+    };
+
+    /* ==========================================================================
+       3. 單人模式 30 題完整題庫（每 10 題為一階段，涵蓋平行四邊形、三角形、梯形）
+       ========================================================================== */
+    const QUESTION_BANK = [
+      // ==================== 第 1 ~ 10 題：【三態幾何診斷是非題 (tf3)】 ====================
+      {
+        round: 1, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `把平行四邊形沿著「垂直於底邊的高」剪開，平移拼成長方形後，拼成的長方形與原平行四邊形「面積一樣大」。${SVG_SHAPES.cutRect()}`,
+        answer: "correct",
+        tip: "【完全正確】切割後重新拼合，圖形只是位置移動，總面積完全不變，一樣大！"
+      },
+      {
+        round: 2, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `為了把平行四邊形剪開拼成長方形，只要沿著「對角線斜斜剪開」，就能拼出四個角都是直角的長方形。${SVG_SHAPES.badDiagonalCut()}`,
+        answer: "geo",
+        tip: "【錯在底與高／切割觀念】長方形的四個角都是直角，必須沿著「垂直於底邊的線（高）」剪開，沿對角線斜剪無法拼成長方形！"
+      },
+      {
+        round: 3, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `把平行四邊形的一邊當作底，從對邊畫垂直線到「底邊的延長線」上的線段，也可以當作這個底的高。${SVG_SHAPES.extHeight()}`,
+        answer: "correct",
+        tip: "【完全正確】只要垂直於底邊（或底邊延長線）到對邊的線段，都叫做平行四邊形的高，而且長度都一樣！"
+      },
+      {
+        round: 4, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `同一個平行四邊形中，畫在圖形正中間的高，會比畫在旁邊或延長線上的高還要長一些。${SVG_SHAPES.extHeight()}`,
+        answer: "geo",
+        tip: "【錯在底與高／切割觀念】平行線之間的垂直距離處處相等！所以同一個底上的每一條高都「一樣長」！"
+      },
+      {
+        round: 5, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `計算下圖平行四邊形的面積，算式列為：<br>👉 16 × 24 ＝ 384（平方公分）${SVG_SHAPES.wb4_1()}`,
+        answer: "geo",
+        tip: "【錯在底與高／切割觀念】24cm 是「斜邊」不是高！18cm 才垂直於底邊 16cm，正確算式是 16 × 18 ＝ 288 平方公分！"
+      },
+      {
+        round: 6, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `計算下圖平行四邊形的面積，算式列為：<br>👉 57 × 30 ＝ 1710（平方公分）${SVG_SHAPES.wb4_2()}`,
+        answer: "correct",
+        tip: "【完全正確】30cm 垂直於底邊 57cm（33cm 是干擾斜邊），底 × 高 ＝ 57 × 30 ＝ 1710 平方公分，完全正確！"
+      },
+      {
+        round: 7, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `計算下圖平行四邊形的面積，算式列為：<br>👉 15 × 13 ＝ 195（平方公分）${SVG_SHAPES.wb4_4()}`,
+        answer: "geo",
+        tip: "【錯在底與高／切割觀念】看清楚直角記號！高 13cm 垂直於「7cm 的延長線」，所以底是 7cm，算式應為 7 × 13 ＝ 91 平方公分！"
+      },
+      {
+        round: 8, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `下圖 ㄅ、ㄆ、ㄇ 三個平行四邊形的傾斜度不同，但底都是 3cm、高都是 2cm，所以它們的面積「都相等」。${SVG_SHAPES.equalThree()}`,
+        answer: "correct",
+        tip: "【完全正確】不同的平行四邊形，只要「底和高相等」，面積就一定相等（都是 3 × 2 ＝ 6 平方公分）！"
+      },
+      {
+        round: 9, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `下圖 ㄇ(底2, 高6) 與 ㄈ(底4, 高6) 的高都是 6cm，ㄈ的底是ㄇ的 2 倍，所以ㄈ的面積是ㄇ的「4 倍」。${SVG_SHAPES.fourShapes()}`,
+        answer: "calc",
+        tip: "【錯在面積算式／倍數關係】高不變（都是 6cm），底變為 2 倍時，面積只會變為「2 倍」（24 ÷ 12 ＝ 2 倍），不是 4 倍！"
+      },
+      {
+        round: 10, stage: "第 1 階段・幾何觀念診斷", type: "tf3", badge: "幾何診斷題",
+        text: `只要兩個平行四邊形的「四條邊長總和（周長）」一樣長，它們的面積就一定一樣大。`,
+        answer: "calc",
+        tip: "【錯在面積算式／倍數關係】平行四邊形推斜時，四邊長（周長）不變，但「高」會變矮，面積就會變小！必須「底和高相等」面積才相等！"
+      },
+
+      // ==================== 第 11 ~ 20 題：【四選一面積計算題 (mc)】 ====================
+      {
+        round: 11, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `習作 p.76：方格紙上每格邊長 1cm，平行四邊形 A 切割拼成「邊長 4cm 的正方形」，A 的面積是幾平方公分？`,
+        options: [`A. 16 平方公分`, `B. 12 平方公分`, `C. 15 平方公分`, `D. 8 平方公分`],
+        answer: 0,
+        tip: "切割拼成的正方形與原平行四邊形面積一樣大，正方形面積 ＝ 4 × 4 ＝ 16 平方公分！"
+      },
+      {
+        round: 12, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `習作 p.78：看圖算出下面平行四邊形的面積是多少平方公分？（小心干擾邊！）${SVG_SHAPES.wb4_3()}`,
+        options: [`A. 460 平方公分`, `B. 575 平方公分`, `C. 500 平方公分`, `D. 480 平方公分`],
+        answer: 2,
+        tip: "右邊底是 25cm、水平高是 20cm（23cm 是斜邊），面積 ＝ 25 × 20 ＝ 500 平方公分！"
+      },
+      {
+        round: 13, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `習作 p.79：下圖五個平行四邊形中，哪兩個平行四邊形的「面積相等」？${SVG_SHAPES.fiveCompare()}`,
+        options: [`A. 甲和丙`, `B. 乙和丁`, `C. 丁和戊`, `D. 甲和乙`],
+        answer: 1,
+        tip: "乙和丁的底都是 1cm、高都是 4cm，等底等高，面積都是 1 × 4 ＝ 4 平方公分！"
+      },
+      {
+        round: 14, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `已知一個平行四邊形的面積是 48 平方公分，底是 8 公分，請問這條底對應的「高」是幾公分？`,
+        options: [`A. 6 公分`, `B. 8 公分`, `C. 40 公分`, `D. 4 公分`],
+        answer: 0,
+        tip: "因為 面積 ＝ 底 × 高，所以 高 ＝ 面積 ÷ 底 ＝ 48 ÷ 8 ＝ 6 公分！"
+      },
+      {
+        round: 15, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `同一個平行四邊形，底 10cm 時高是 6cm；如果改把長 12cm 的另一邊當作底，這條底對應的高是幾公分？`,
+        options: [`A. 5 公分`, `B. 6 公分`, `C. 8 公分`, `D. 4 公分`],
+        answer: 0,
+        tip: "先算面積 ＝ 10 × 6 ＝ 60 平方公分；改用 12cm 當底，高 ＝ 60 ÷ 12 ＝ 5 公分！"
+      },
+      {
+        round: 16, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `兩個全等的三角形可以拼成一個底 12cm、高 8cm 的平行四邊形，請問「其中一個三角形」的面積是多少？${SVG_SHAPES.triangleDouble()}`,
+        options: [`A. 96 平方公分`, `B. 48 平方公分`, `C. 24 平方公分`, `D. 40 平方公分`],
+        answer: 1,
+        tip: "三角形面積 ＝ 底 × 高 ÷ 2 ＝ 12 × 8 ÷ 2 ＝ 96 ÷ 2 ＝ 48 平方公分（別忘了除以 2）！"
+      },
+      {
+        round: 17, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `看圖算出下面三角形的面積是多少平方公分？（請找出垂直於底邊的高！）${SVG_SHAPES.triangleDecoy()}`,
+        options: [`A. 140 平方公分`, `B. 84 平方公分`, `C. 70 平方公分`, `D. 105 平方公分`],
+        answer: 2,
+        tip: "底是 14cm、垂直高是 10cm（12cm 與 15cm 都是斜邊），面積 ＝ 14 × 10 ÷ 2 ＝ 70 平方公分！"
+      },
+      {
+        round: 18, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `已知一個三角形的面積是 36 平方公分，底是 9 公分，請問這條底對應的「高」是幾公分？`,
+        options: [`A. 4 公分`, `B. 6 公分`, `C. 9 公分`, `D. 8 公分`],
+        answer: 3,
+        tip: "逆推三角形的高要「先乘 2 變回平行四邊形」！高 ＝ 36 × 2 ÷ 9 ＝ 72 ÷ 9 ＝ 8 公分！"
+      },
+      {
+        round: 19, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `看圖算出下面梯形的面積是多少平方公分？（注意直角記號 ∟！）${SVG_SHAPES.trapezoidDiagram()}`,
+        options: [`A. 80 平方公分`, `B. 40 平方公分`, `C. 48 平方公分`, `D. 30 平方公分`],
+        answer: 1,
+        tip: "梯形面積 ＝ (上底 ＋ 下底) × 高 ÷ 2 ＝ (6 ＋ 10) × 5 ÷ 2 ＝ 16 × 5 ÷ 2 ＝ 40 平方公分！"
+      },
+      {
+        round: 20, stage: "第 2 階段・圖形面積計算", type: "mc", badge: "四選一選擇題",
+        text: `已知一個梯形的面積是 54 平方公分，上底是 7 公分、下底是 11 公分，請問這個梯形的「高」是幾公分？`,
+        options: [`A. 3 公分`, `B. 9 公分`, `C. 6 公分`, `D. 12 公分`],
+        answer: 2,
+        tip: "逆推梯形的高：面積 × 2 ÷ (上底 ＋ 下底) ＝ 54 × 2 ÷ (7 ＋ 11) ＝ 108 ÷ 18 ＝ 6 公分！"
+      },
+
+      // ==================== 第 21 ~ 30 題：【3對3觀念與運算配對題 (match)】 ====================
+      {
+        round: 21, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "將平行四邊形沿高剪開拼成長方形，請配對完全相等的部位：",
+        left: [
+          { key: "L1", label: `① 原平行四邊形的「底」` },
+          { key: "L2", label: `② 原平行四邊形的「高」` },
+          { key: "L3", label: `③ 原平行四邊形的「面積」` }
+        ],
+        right: [
+          { key: "R1", label: `A. 等於長方形的「長」` },
+          { key: "R2", label: `B. 等於長方形的「寬」` },
+          { key: "R3", label: `C. 等於長方形「長 × 寬」` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "平行四邊形剪拼成長方形後：底＝長、高＝寬、面積＝長×寬＝底×高！"
+      },
+      {
+        round: 22, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "三大基本幾何圖形面積公式大集合！請配對正確公式：",
+        left: [
+          { key: "L1", label: `① 平行四邊形面積` },
+          { key: "L2", label: `② 三角形面積` },
+          { key: "L3", label: `③ 梯形面積` }
+        ],
+        right: [
+          { key: "R1", label: `A. 底 × 高` },
+          { key: "R2", label: `B. 底 × 高 ÷ 2` },
+          { key: "R3", label: `C. (上底 ＋ 下底) × 高 ÷ 2` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "平行四邊形＝底×高；三角形＝底×高÷2；梯形＝(上底＋下底)×高÷2！"
+      },
+      {
+        round: 23, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "請排除干擾斜邊，將平行四邊形的【條件】與【正確面積】配對：",
+        left: [
+          { key: "L1", label: `① 底 16cm、高 18cm、斜邊 24cm` },
+          { key: "L2", label: `② 底 57cm、高 30cm、斜邊 33cm` },
+          { key: "L3", label: `③ 底 7cm、高 13cm、斜邊 15cm` }
+        ],
+        right: [
+          { key: "R1", label: `A. 288 平方公分` },
+          { key: "R2", label: `B. 1710 平方公分` },
+          { key: "R3", label: `C. 91 平方公分` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "① 16×18＝288；② 57×30＝1710；③ 7×13＝91，斜邊皆不可相乘！"
+      },
+      {
+        round: 24, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "三角形面積速算！記得要「除以 2」，請配對正確面積：",
+        left: [
+          { key: "L1", label: `① 三角形：底 10cm、高 6cm` },
+          { key: "L2", label: `② 三角形：底 8cm、高 9cm` },
+          { key: "L3", label: `③ 三角形：底 14cm、高 5cm` }
+        ],
+        right: [
+          { key: "R1", label: `A. 30 平方公分` },
+          { key: "R2", label: `B. 36 平方公分` },
+          { key: "R3", label: `C. 35 平方公分` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "① 10×6÷2＝30；② 8×9÷2＝36；③ 14×5÷2＝35 平方公分！"
+      },
+      {
+        round: 25, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "梯形面積速算！請用 (上底＋下底)×高÷2 配對正確答案：",
+        left: [
+          { key: "L1", label: `① 上底 4cm、下底 6cm、高 5cm` },
+          { key: "L2", label: `② 上底 5cm、下底 9cm、高 4cm` },
+          { key: "L3", label: `③ 上底 3cm、下底 7cm、高 6cm` }
+        ],
+        right: [
+          { key: "R1", label: `A. 25 平方公分` },
+          { key: "R2", label: `B. 28 平方公分` },
+          { key: "R3", label: `C. 30 平方公分` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "① (4+6)×5÷2＝25；② (5+9)×4÷2＝28；③ (3+7)×6÷2＝30 平方公分！"
+      },
+      {
+        round: 26, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "習作 p.79 題6：請將平行四邊形【甲、丙、戊】與【面積】配對：",
+        left: [
+          { key: "L1", label: `① 圖形甲（底 2cm、高 4cm）` },
+          { key: "L2", label: `② 圖形丙（底 6cm、高 4cm）` },
+          { key: "L3", label: `③ 圖形戊（底 1cm、高 1cm）` }
+        ],
+        right: [
+          { key: "R1", label: `A. 面積 8 平方公分` },
+          { key: "R2", label: `B. 面積 24 平方公分` },
+          { key: "R3", label: `C. 面積 1 平方公分` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "甲＝2×4＝8；丙＝6×4＝24；戊＝1×1＝1 平方公分！"
+      },
+      {
+        round: 27, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "底與高的倍數變化規律！請將【條件變化】與【面積結果】配對：",
+        left: [
+          { key: "L1", label: `① 不同的平行四邊形，底和高都相等` },
+          { key: "L2", label: `② 底不變時，高變為原來的 3 倍` },
+          { key: "L3", label: `③ 底變為 2 倍，高也變為 2 倍` }
+        ],
+        right: [
+          { key: "R1", label: `A. 面積會「完全相等」` },
+          { key: "R2", label: `B. 面積變為原來的「3 倍」` },
+          { key: "R3", label: `C. 面積變為原來的「4 倍」` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "等底等高面積相等；底不變高3倍則面積3倍；底2倍×高2倍＝面積4倍！"
+      },
+      {
+        round: 28, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "已知平行四邊形面積，請逆推配對正確的【底或高】：",
+        left: [
+          { key: "L1", label: `① 面積 36 cm²、底 9 cm` },
+          { key: "L2", label: `② 面積 42 cm²、高 6 cm` },
+          { key: "L3", label: `③ 面積 45 cm²、底 9 cm` }
+        ],
+        right: [
+          { key: "R1", label: `A. 高是 4 cm` },
+          { key: "R2", label: `B. 底是 7 cm` },
+          { key: "R3", label: `C. 高是 5 cm` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "① 高＝36÷9＝4cm；② 底＝42÷6＝7cm；③ 高＝45÷9＝5cm！"
+      },
+      {
+        round: 29, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "三角形與梯形逆推求高！記得「面積要先 × 2」喔：",
+        left: [
+          { key: "L1", label: `① 三角形：面積 24 cm²、底 8 cm` },
+          { key: "L2", label: `② 三角形：面積 35 cm²、底 10 cm` },
+          { key: "L3", label: `③ 梯形：面積 40 cm²、上底3、下底5` }
+        ],
+        right: [
+          { key: "R1", label: `A. 高是 6 cm` },
+          { key: "R2", label: `B. 高是 7 cm` },
+          { key: "R3", label: `C. 高是 10 cm` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "① 24×2÷8＝6cm；② 35×2÷10＝7cm；③ 40×2÷(3+5)＝10cm！"
+      },
+      {
+        round: 30, stage: "第 3 階段・幾何配對大考驗", type: "match", badge: "3對3配對題",
+        text: "第 30 題終極總決賽！請配對三大圖形的推導核心觀念：",
+        left: [
+          { key: "L1", label: `① 沿高剪開平行四邊形拼成長方形` },
+          { key: "L2", label: `② 兩個全等三角形拼成平行四邊形` },
+          { key: "L3", label: `③ 兩個全等梯形拼成平行四邊形` }
+        ],
+        right: [
+          { key: "R1", label: `A. 面積與原圖形完全一樣大` },
+          { key: "R2", label: `B. 一個三角形是平行四邊形的一半` },
+          { key: "R3", label: `C. 大平行四邊形的底＝上底 ＋ 下底` }
+        ],
+        matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
+        answer: true,
+        tip: "太棒了！這三條正是平行四邊形、三角形與梯形面積公式的推導核心！"
+      }
+    ];
+
+    /* ==========================================================================
+       4. 單人競賽核心狀態機 (Game State Manager)
+       ========================================================================== */
+    const STATE = {
+      roundIndex: 0,
+      timer: 25,
+      maxTimer: 25,
+      timerInterval: null,
+      isPausedForError: false,
+      autoAdvanceTimer: null,
+
+      totalScore: 0,
+      academicScore: 0,
+      speedScore: 0,
+      correctCount: 0,
+      streak: 0,
+      maxStreak: 0,
+
+      answered: false,
+      answerVal: null,
+      selectedMatches: {},
+      selectedL: null,
+      selectedR: null,
+
+      currentMiniGame: 0,
+      mgTimer: 20.0,
+      mgInterval: null,
+      mgScore: 0,
+      raffleUsed: false
+    };
+
+    const elPlayerTotal = document.getElementById('player-total');
+    const elPlayerAcc = document.getElementById('player-acc');
+    const elPlayerScoreBox = document.getElementById('player-score-box');
+    const elStreakBadge = document.getElementById('streak-badge');
+
+    const elStageBadge = document.getElementById('stage-badge');
+    const elRoundIndicator = document.getElementById('round-indicator');
+    const elTimerText = document.getElementById('timer-text');
+    const elTimerBar = document.getElementById('timer-bar');
+    const elControlBar = document.getElementById('control-bar');
+    const elCtrlIcon = document.getElementById('ctrl-icon');
+    const elCtrlMsg = document.getElementById('ctrl-msg');
+    const elBtnAdvanceLabel = document.getElementById('btn-advance-label');
+
+    const elQText = document.getElementById('q-text');
+    const elQTypeBadge = document.getElementById('q-type-badge');
+    const elQMilestoneHint = document.getElementById('q-milestone-hint');
+    const elQHotkeyHint = document.getElementById('q-hotkey-hint');
+    const elInteractive = document.getElementById('player-interactive');
+    const elAnalysisCard = document.getElementById('player-analysis-card');
+    const elAnalysisText = document.getElementById('player-analysis-text');
+    const elStatusStamp = document.getElementById('player-status-stamp');
+
+    function startGame() {
+      try { sound.init(); } catch (e) {}
+      const sm = document.getElementById('start-modal');
+      if (sm && !sm.classList.contains('hidden')) {
+        sm.classList.add('hidden');
+        loadQuestion(0);
+      }
+    }
+    window.startGame = startGame;
+
+    function toggleMute() {
+      sound.isMuted = !sound.isMuted;
+      document.getElementById('sound-toggle').textContent = sound.isMuted ? '🔇' : '🔊';
+    }
+    window.toggleMute = toggleMute;
+
+    function getNextMiniGameCountdown(roundNum) {
+      if (roundNum <= 10) {
+        const left = 10 - roundNum;
+        return left === 0 ? "本題結束後進入 🎯 射擊靶場！" : `再 ${left} 題進入 🎯 射擊靶場`;
+      } else if (roundNum <= 20) {
+        const left = 20 - roundNum;
+        return left === 0 ? "本題結束後進入 🔨 瘋狂打地鼠！" : `再 ${left} 題進入 🔨 瘋狂打地鼠`;
+      } else {
+        const left = 30 - roundNum;
+        return left === 0 ? "本題結束後進入 🥁 極速太鼓達人！" : `再 ${left} 題進入 🥁 極速太鼓達人`;
+      }
+    }
+
+    function loadQuestion(index) {
+      if (index >= QUESTION_BANK.length) {
+        showFinalVictory();
+        return;
+      }
+
+      if (mgActive) {
+        mgActive = false;
+        if (mgAnimId) cancelAnimationFrame(mgAnimId);
+        if (STATE.mgInterval) clearInterval(STATE.mgInterval);
+      }
+      elMgOverlay.classList.add('hidden');
+      document.getElementById('mg-result-modal').classList.add('hidden');
+
+      const q = QUESTION_BANK[index];
+      // 3對3配對題給 40 秒；是非與選擇題給 25 秒
+      STATE.maxTimer = (q.type === 'match') ? 40 : 25;
+      STATE.timer = STATE.maxTimer;
+      STATE.isPausedForError = false;
+      if (STATE.autoAdvanceTimer) clearTimeout(STATE.autoAdvanceTimer);
+      
+      STATE.answered = false;
+      STATE.answerVal = null;
+      STATE.selectedMatches = {};
+      STATE.selectedL = null;
+      STATE.selectedR = null;
+
+      sound.setBpm(128);
+      updateHUD();
+
+      elControlBar.classList.add('hidden');
+      elControlBar.classList.remove('flex');
+      elAnalysisCard.classList.add('hidden');
+      elAnalysisCard.classList.remove('flex');
+      elStatusStamp.classList.add('hidden');
+      elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
+
+      elInteractive.className = 'flex-1 min-h-0 flex flex-col justify-center';
+
+      const roundNum = index + 1;
+      elStageBadge.textContent = q.stage;
+      elRoundIndicator.textContent = `第 ${roundNum} / 30 題`;
+      elQTypeBadge.textContent = q.badge;
+      elQMilestoneHint.textContent = getNextMiniGameCountdown(roundNum);
+
+      if (q.type === 'tf3') {
+        elQHotkeyHint.textContent = '點擊按鈕 或 鍵盤 1 / 2 / 3';
+      } else if (q.type === 'mc') {
+        elQHotkeyHint.textContent = '點擊選項 或 鍵盤 1 / 2 / 3 / 4';
+      } else {
+        elQHotkeyHint.textContent = '點擊左右配對消除（支援 iPad 觸控與滑鼠）';
+      }
+
+      elQText.innerHTML = q.text;
+      renderInteractiveZone(q);
+      startQuestionTimer();
+    }
+
+    function renderInteractiveZone(q) {
+      elInteractive.innerHTML = '';
+
+      if (q.type === 'tf3') {
+        elInteractive.innerHTML = `
+          <div class="flex flex-col gap-2.5 sm:gap-3 h-full justify-center">
+            <button id="btn-ans-correct" class="touch-btn w-full flex-1 min-h-[52px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/60 hover:border-emerald-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all shadow-md">
+              <span class="flex items-center gap-2.5 text-base sm:text-lg md:text-xl font-black text-emerald-300 pointer-events-none">
+                <span class="text-2xl">⭕</span> <span>1. 完全正確</span>
+              </span>
+              <span class="text-xs sm:text-sm text-slate-300 pointer-events-none">底與高垂直對應、算式皆無誤</span>
+            </button>
+            <button id="btn-ans-geo" class="touch-btn w-full flex-1 min-h-[52px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/60 hover:border-rose-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all shadow-md">
+              <span class="flex items-center gap-2.5 text-base sm:text-lg md:text-xl font-black text-rose-300 pointer-events-none">
+                <span class="text-2xl">📐</span> <span>2. 錯在底與高／切割觀念</span>
+              </span>
+              <span class="text-xs sm:text-sm text-slate-300 pointer-events-none">誤乘斜邊、未垂直底邊、斜剪錯誤</span>
+            </button>
+            <button id="btn-ans-calc" class="touch-btn w-full flex-1 min-h-[52px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/60 hover:border-amber-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all shadow-md">
+              <span class="flex items-center gap-2.5 text-base sm:text-lg md:text-xl font-black text-amber-300 pointer-events-none">
+                <span class="text-2xl">🧮</span> <span>3. 錯在面積算式／倍數關係</span>
+              </span>
+              <span class="text-xs sm:text-sm text-slate-300 pointer-events-none">倍數算錯、誤以為周長相等面積相等</span>
+            </button>
+          </div>
+        `;
+        document.getElementById('btn-ans-correct').onclick = () => handleAnswer('correct');
+        document.getElementById('btn-ans-geo').onclick = () => handleAnswer('geo');
+        document.getElementById('btn-ans-calc').onclick = () => handleAnswer('calc');
+      } else if (q.type === 'mc') {
+        let btns = '';
+        q.options.forEach((opt, idx) => {
+          btns += `
+            <button id="btn-mc-${idx}" class="touch-btn w-full h-full min-h-[54px] text-left px-4 py-3 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-amber-400 active:scale-[0.98] transition-all flex items-center justify-between text-sm sm:text-base md:text-lg font-bold shadow-md hover:bg-slate-800/90">
+              <span class="text-slate-100 break-words leading-snug pointer-events-none">${opt}</span>
+              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 text-amber-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">選項 ${['A','B','C','D'][idx]}</span>
+            </button>
+          `;
+        });
+        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 h-full">${btns}</div>`;
+        q.options.forEach((_, idx) => {
+          document.getElementById(`btn-mc-${idx}`).onclick = () => handleAnswer(idx);
+        });
+      } else if (q.type === 'match') {
+        let leftCols = '';
+        q.left.forEach(item => {
+          leftCols += `
+            <button id="btn-match-${item.key}" class="touch-btn w-full flex-1 min-h-[50px] sm:min-h-[58px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-md hover:bg-slate-800/90 text-left">
+              <span class="w-full leading-snug break-words pointer-events-none">${item.label}</span>
+            </button>
+          `;
+        });
+        
+        const shuffledRight = [...q.right].sort(() => Math.random() - 0.5);
+        let rightCols = '';
+        shuffledRight.forEach(item => {
+          rightCols += `
+            <button id="btn-match-${item.key}" class="touch-btn w-full flex-1 min-h-[50px] sm:min-h-[58px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-md hover:bg-slate-800/90 text-left">
+              <span class="w-full leading-snug break-words pointer-events-none">${item.label}</span>
+            </button>
+          `;
+        });
+
+        elInteractive.innerHTML = `
+          <div class="grid grid-cols-2 gap-3 sm:gap-5 h-full items-stretch">
+            <div class="flex flex-col gap-2 sm:gap-2.5 h-full justify-between">${leftCols}</div>
+            <div class="flex flex-col gap-2 sm:gap-2.5 h-full justify-between">${rightCols}</div>
+          </div>
+        `;
+
+        q.left.forEach(item => {
+          document.getElementById(`btn-match-${item.key}`).onclick = () => handleMatchClick('L', item.key);
+        });
+        shuffledRight.forEach(item => {
+          document.getElementById(`btn-match-${item.key}`).onclick = () => handleMatchClick('R', item.key);
+        });
+      }
+    }
+
+    function handleAnswer(val) {
+      if (STATE.isPausedForError || STATE.answered) return;
+
+      STATE.answered = true;
+      STATE.answerVal = val;
+      clearInterval(STATE.timerInterval);
+
+      elInteractive.classList.add('pointer-events-none', 'opacity-75');
+
+      const q = QUESTION_BANK[STATE.roundIndex];
+      const isCorrect = (q.type === 'match') ? (val === true) : (val === q.answer);
+
+      elStatusStamp.classList.remove('hidden');
+
+      if (isCorrect) {
+        sound.playCorrect();
+        STATE.streak++;
+        if (STATE.streak > STATE.maxStreak) STATE.maxStreak = STATE.streak;
+
+        const timeBonus = Math.floor(STATE.timer * 2);
+        const streakBonus = STATE.streak >= 2 ? Math.min(30, STATE.streak * 5) : 0;
+        const earned = 100 + timeBonus + streakBonus;
+
+        STATE.academicScore += earned;
+        STATE.totalScore += earned;
+        STATE.correctCount++;
+
+        const streakTag = streakBonus > 0 ? ` 🔥連勝+${streakBonus}` : '';
+        elStatusStamp.className = 'text-xs sm:text-sm md:text-base font-black px-3 py-0.5 rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300 font-num shrink-0';
+        elStatusStamp.textContent = `✅ 答對 +${earned} (速+${timeBonus}${streakTag})`;
+
+        updateHUD();
+
+        // 答對後顯示自動前進橫幅（1.8 秒自動下一題，也可立即點擊前往）
+        elControlBar.classList.remove('hidden');
+        elControlBar.classList.add('flex');
+        elControlBar.style.borderColor = '#10b981';
+        elCtrlIcon.textContent = '🎉';
+        elCtrlMsg.className = 'text-xs sm:text-sm md:text-base font-bold text-emerald-300 truncate';
+        elCtrlMsg.textContent = '答對了！1.8 秒後自動進入下一題...';
+        elBtnAdvanceLabel.textContent = '立即下一題 ➔';
+
+        STATE.autoAdvanceTimer = setTimeout(() => {
+          advanceToNextStep();
+        }, 1800);
+
+      } else {
+        sound.playWrong();
+        STATE.streak = 0;
+        STATE.academicScore -= 50;
+        STATE.totalScore -= 50;
+
+        elStatusStamp.className = 'text-xs sm:text-sm md:text-base font-black px-3 py-0.5 rounded-lg bg-rose-950 border border-rose-500 text-rose-300 font-num shrink-0';
+        elStatusStamp.textContent = '❌ 作答錯誤 -50';
+
+        updateHUD();
+
+        STATE.isPausedForError = true;
+        elTimerText.textContent = '⏸️ 停止';
+        elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
+
+        showAnalysisBox(q.tip);
+
+        elControlBar.classList.remove('hidden');
+        elControlBar.classList.add('flex');
+        elControlBar.style.borderColor = '#ef4444';
+        elCtrlIcon.textContent = '🚨';
+        elCtrlMsg.className = 'text-xs sm:text-sm md:text-base font-bold text-rose-300 truncate';
+        elCtrlMsg.textContent = '作答有誤・請先閱讀上方幾何觀念解析';
+        elBtnAdvanceLabel.textContent = '💡 我已理解，下一題 ➔';
+      }
+    }
+
+    function handleMatchClick(side, key) {
+      if (STATE.isPausedForError || STATE.answered) return;
+
+      if (!STATE.selectedL && side === 'L') {
+        STATE.selectedL = key;
+        highlightMatchBtn(key, true);
+        sound.playCoinDrop();
+      } else if (STATE.selectedL && side === 'L') {
+        highlightMatchBtn(STATE.selectedL, false);
+        STATE.selectedL = key;
+        highlightMatchBtn(key, true);
+        sound.playCoinDrop();
+      } else if (!STATE.selectedR && side === 'R') {
+        STATE.selectedR = key;
+        highlightMatchBtn(key, true);
+        sound.playCoinDrop();
+      } else if (STATE.selectedR && side === 'R') {
+        highlightMatchBtn(STATE.selectedR, false);
+        STATE.selectedR = key;
+        highlightMatchBtn(key, true);
+        sound.playCoinDrop();
+      }
+
+      if (STATE.selectedL && STATE.selectedR) {
+        const q = QUESTION_BANK[STATE.roundIndex];
+        const correctRight = q.matches[STATE.selectedL];
+        const isPairCorrect = (correctRight === STATE.selectedR);
+
+        if (isPairCorrect) {
+          sound.playGrabSuccess();
+          STATE.selectedMatches[STATE.selectedL] = STATE.selectedR;
+          eliminateMatchPair(STATE.selectedL, STATE.selectedR);
+          STATE.selectedL = null;
+          STATE.selectedR = null;
+
+          // 3 組皆正確消除，整題過關
+          if (Object.keys(STATE.selectedMatches).length === 3) {
+            setTimeout(() => {
+              handleAnswer(true);
+            }, 320);
+          }
+        } else {
+          const prevL = STATE.selectedL;
+          const prevR = STATE.selectedR;
+          STATE.selectedL = null;
+          STATE.selectedR = null;
+          shakeMatchBtn(prevL);
+          shakeMatchBtn(prevR);
+          handleAnswer(false);
+        }
+      }
+    }
+
+    function highlightMatchBtn(key, active) {
+      const btn = document.getElementById(`btn-match-${key}`);
+      if (!btn) return;
+      if (active) {
+        btn.classList.add('border-amber-400', 'bg-amber-950/50', 'scale-[1.02]');
+      } else {
+        btn.classList.remove('border-amber-400', 'bg-amber-950/50', 'scale-[1.02]');
+      }
+    }
+
+    function shakeMatchBtn(key) {
+      const btn = document.getElementById(`btn-match-${key}`);
+      if (!btn) return;
+      btn.classList.add('border-rose-500', 'bg-rose-950/70');
+      setTimeout(() => {
+        btn.classList.remove('border-rose-500', 'bg-rose-950/70');
+      }, 500);
+    }
+
+    function eliminateMatchPair(lKey, rKey) {
+      const lBtn = document.getElementById(`btn-match-${lKey}`);
+      const rBtn = document.getElementById(`btn-match-${rKey}`);
+      [lBtn, rBtn].forEach(b => {
+        if (b) {
+          b.disabled = true;
+          b.classList.remove('border-amber-400', 'bg-amber-950/50', 'scale-[1.02]');
+          b.classList.add('border-emerald-400', 'bg-emerald-600/40');
+          setTimeout(() => {
+            b.style.transition = 'all 0.3s ease-out';
+            b.style.opacity = '0';
+            b.style.transform = 'scale(0.88)';
+            b.style.pointerEvents = 'none';
+            b.style.visibility = 'hidden';
+          }, 180);
+        }
+      });
+    }
+
+    function showAnalysisBox(tip) {
+      elAnalysisCard.classList.remove('hidden');
+      elAnalysisCard.classList.add('flex');
+      elAnalysisText.innerHTML = tip;
+    }
+
+    function startQuestionTimer() {
+      if (STATE.timerInterval) clearInterval(STATE.timerInterval);
+      const maxTimer = STATE.maxTimer || 25;
+      elTimerText.textContent = `${STATE.timer}s`;
+      elTimerBar.style.width = '100%';
+
+      STATE.timerInterval = setInterval(() => {
+        if (STATE.isPausedForError) return;
+        STATE.timer--;
+        const pct = (STATE.timer / maxTimer) * 100;
+        elTimerBar.style.width = `${pct}%`;
+        elTimerText.textContent = `${STATE.timer}s`;
+
+        if (STATE.timer === 5) {
+          sound.setBpm(152);
+        }
+
+        if (STATE.timer <= 0) {
+          clearInterval(STATE.timerInterval);
+          handleRoundTimeout();
+        }
+      }, 1000);
+    }
+
+    function handleRoundTimeout() {
+      sound.playTimeout();
+      const q = QUESTION_BANK[STATE.roundIndex];
+
+      if (!STATE.answered) {
+        STATE.answered = true;
+        STATE.streak = 0;
+        STATE.academicScore -= 50;
+        STATE.totalScore -= 50;
+        elStatusStamp.classList.remove('hidden');
+        elStatusStamp.className = 'text-xs sm:text-sm md:text-base font-black px-3 py-0.5 rounded-lg bg-rose-950 border border-rose-500 text-rose-300 font-num shrink-0';
+        elStatusStamp.textContent = '⌛ 答題超時 -50';
+        showAnalysisBox(q.tip);
+        elInteractive.classList.add('pointer-events-none', 'opacity-75');
+      }
+
+      updateHUD();
+      STATE.isPausedForError = true;
+      elTimerText.textContent = '⏸️ 停止';
+      elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
+
+      elControlBar.classList.remove('hidden');
+      elControlBar.classList.add('flex');
+      elControlBar.style.borderColor = '#ef4444';
+      elCtrlIcon.textContent = '⌛';
+      elCtrlMsg.className = 'text-xs sm:text-sm md:text-base font-bold text-rose-300 truncate';
+      elCtrlMsg.textContent = '作答時間到・請閱讀觀念解析';
+      elBtnAdvanceLabel.textContent = '💡 我已理解，下一題 ➔';
+    }
+
+    function prevQuestion() {
+      if (STATE.roundIndex > 0) {
+        if (STATE.autoAdvanceTimer) clearTimeout(STATE.autoAdvanceTimer);
+        if (mgActive) {
+          mgActive = false;
+          if (mgAnimId) cancelAnimationFrame(mgAnimId);
+          if (STATE.mgInterval) clearInterval(STATE.mgInterval);
+        }
+        elMgOverlay.classList.add('hidden');
+        document.getElementById('mg-result-modal').classList.add('hidden');
+
+        STATE.roundIndex--;
+        loadQuestion(STATE.roundIndex);
+      }
+    }
+    window.prevQuestion = prevQuestion;
+
+    function nextQuestion() {
+      if (mgActive) {
+        skipMiniGame();
+        return;
+      }
+      advanceToNextStep();
+    }
+    window.nextQuestion = nextQuestion;
+
+    document.getElementById('btn-advance-step').onclick = () => {
+      advanceToNextStep();
+    };
+
+    function advanceToNextStep() {
+      if (STATE.autoAdvanceTimer) clearTimeout(STATE.autoAdvanceTimer);
+      elControlBar.classList.add('hidden');
+      elControlBar.classList.remove('flex');
+
+      if (mgActive) {
+        mgActive = false;
+        if (mgAnimId) cancelAnimationFrame(mgAnimId);
+        if (STATE.mgInterval) clearInterval(STATE.mgInterval);
+      }
+      elMgOverlay.classList.add('hidden');
+      document.getElementById('mg-result-modal').classList.add('hidden');
+
+      const currentRoundNum = STATE.roundIndex + 1;
+      
+      // 每 10 題觸發 1 個小遊戲（第 10、20、30 題後）
+      if (currentRoundNum === 10 && STATE.currentMiniGame < 1) {
+        STATE.currentMiniGame = 1;
+        startMiniGameShooting();
+        return;
+      } 
+      else if (currentRoundNum === 20 && STATE.currentMiniGame < 2) {
+        STATE.currentMiniGame = 2;
+        startMiniGameWhack();
+        return;
+      } 
+      else if (currentRoundNum === 30 && STATE.currentMiniGame < 3) {
+        STATE.currentMiniGame = 3;
+        startMiniGameTaiko();
+        return;
+      }
+
+      STATE.roundIndex++;
+      loadQuestion(STATE.roundIndex);
+    }
+
+    function skipMiniGame() {
+      mgActive = false;
+      if (mgAnimId) cancelAnimationFrame(mgAnimId);
+      if (STATE.mgInterval) clearInterval(STATE.mgInterval);
+      elMgOverlay.classList.add('hidden');
+      document.getElementById('mg-result-modal').classList.add('hidden');
+
+      if (STATE.currentMiniGame === 3) {
+        showFinalVictory();
+      } else {
+        STATE.roundIndex++;
+        loadQuestion(STATE.roundIndex);
+      }
+    }
+    window.skipMiniGame = skipMiniGame;
+
+    function updateHUD() {
+      elPlayerTotal.textContent = STATE.totalScore;
+      elPlayerAcc.textContent = `${STATE.correctCount}/30`;
+
+      if (STATE.streak >= 2) {
+        elStreakBadge.classList.remove('hidden');
+        elStreakBadge.textContent = `🔥 ${STATE.streak}連勝`;
+      } else {
+        elStreakBadge.classList.add('hidden');
+      }
+
+      if (STATE.totalScore < 0) {
+        elPlayerScoreBox.classList.add('negative-score');
+      } else {
+        elPlayerScoreBox.classList.remove('negative-score');
+      }
+    }
+
+    /* ==========================================================================
+       5. 單人遊樂場小遊戲（第10題後：射擊靶場、第20題後：打地鼠、第30題後：太鼓達人）
+       ========================================================================== */
+    const elMgOverlay = document.getElementById('minigame-overlay');
+    const elMgTitle = document.getElementById('mg-title');
+    const elMgTimer = document.getElementById('mg-timer');
+    const elMgPts = document.getElementById('mg-pts');
+    const elMgHint = document.getElementById('mg-hint');
+    const elMgCtrl = document.getElementById('mg-ctrl');
+    const cvs = document.getElementById('mg-canvas');
+    const ctx = cvs.getContext('2d');
+
+    let mgActive = false;
+    let mgAnimId = null;
+    let currentGameInstance = null;
+
+    function resizeMiniGameCanvas() {
+      if (!mgActive) return;
+      const wrap = document.getElementById('mg-canvas-wrap');
+      const rect = wrap.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(280, rect.width);
+      const h = Math.max(220, rect.height);
+      cvs.width = w * dpr;
+      cvs.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cvs.style.width = `${w}px`;
+      cvs.style.height = `${h}px`;
+      if (currentGameInstance && typeof currentGameInstance.onResize === 'function') {
+        currentGameInstance.onResize(w, h);
+      }
+    }
+    window.addEventListener('resize', resizeMiniGameCanvas);
+
+    function openMiniGameUI(title, hint) {
+      sound.setBpm(152);
+      elMgOverlay.classList.remove('hidden');
+      elMgTitle.textContent = title;
+      elMgHint.textContent = hint;
+
+      STATE.mgTimer = 20.0;
+      STATE.mgScore = 0;
+      elMgPts.textContent = '0';
+      elMgTimer.textContent = '20.0s';
+      mgActive = true;
+
+      resizeMiniGameCanvas();
+      elMgCtrl.innerHTML = '';
+
+      if (STATE.mgInterval) clearInterval(STATE.mgInterval);
+      const startTime = performance.now();
+      STATE.mgInterval = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        const remain = Math.max(0, 20.0 - elapsed);
+        STATE.mgTimer = remain;
+        elMgTimer.textContent = `${remain.toFixed(1)}s`;
+
+        if (remain <= 0) {
+          clearInterval(STATE.mgInterval);
+          finishMiniGame();
+        }
+      }, 100);
+    }
+
+    function finishMiniGame() {
+      mgActive = false;
+      currentGameInstance = null;
+      if (mgAnimId) cancelAnimationFrame(mgAnimId);
+      elMgOverlay.classList.add('hidden');
+
+      STATE.speedScore += STATE.mgScore;
+      STATE.totalScore += STATE.mgScore;
+      updateHUD();
+
+      const modal = document.getElementById('mg-result-modal');
+      document.getElementById('mg-res-pts').textContent = `+${STATE.mgScore}`;
+
+      const winEl = document.getElementById('mg-winner-announcement');
+      if (STATE.mgScore >= 400) {
+        winEl.innerHTML = '🔥 神級手速！獎勵分數已全數加入您的總積分！';
+      } else if (STATE.mgScore >= 200) {
+        winEl.innerHTML = '⚡ 表現亮眼！獎勵分數已全數加入您的總積分！';
+      } else {
+        winEl.innerHTML = '🎯 順利完成中場挑戰，獎勵分數已累加至總積分！';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    document.getElementById('btn-close-mg-result').onclick = () => {
+      document.getElementById('mg-result-modal').classList.add('hidden');
+      if (STATE.currentMiniGame === 3) {
+        showFinalVictory();
+      } else {
+        STATE.roundIndex++;
+        loadQuestion(STATE.roundIndex);
+      }
+    };
+
+    /* ==========================================================
+       【小遊戲 ①】（第10題後）：🎯 極速射擊靶場
+       ========================================================== */
+    class TargetShooter {
+      constructor(canvas, context) {
+        this.canvas = canvas;
+        this.ctx = context;
+        this.targets = [];
+        this.lasers = [];
+        this.effects = [];
+        this.initTargets();
+      }
+
+      getSize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        return { w: rect.width || 600, h: rect.height || 360 };
+      }
+
+      initTargets() {
+        const { w, h } = this.getSize();
+        this.targets = [];
+        const types = [
+          { emoji: '🎯', pts: 25, r: 28, speed: 2.5 },
+          { emoji: '🛸', pts: 40, r: 26, speed: 3.5 },
+          { emoji: '🦅', pts: 50, r: 28, speed: 3.1 },
+          { emoji: '⭐', pts: 30, r: 24, speed: 2.2 },
+          { emoji: '💣', pts: -20, r: 26, speed: 2.8 }
+        ];
+
+        for (let i = 0; i < 7; i++) {
+          const t = types[Math.floor(Math.random() * types.length)];
+          this.targets.push({
+            x: Math.random() * (w - 80) + 40,
+            y: 45 + i * ((h - 95) / 7),
+            emoji: t.emoji,
+            pts: t.pts,
+            r: t.r,
+            vx: (Math.random() > 0.5 ? 1 : -1) * t.speed
+          });
+        }
+      }
+
+      onResize(w, h) {
+        this.targets.forEach((t, idx) => {
+          t.x = Math.min(w - 30, Math.max(30, t.x));
+          t.y = 45 + idx * ((h - 95) / Math.max(1, this.targets.length));
+        });
+      }
+
+      shoot(x, y) {
+        sound.playShoot();
+        const { w, h } = this.getSize();
+
+        this.lasers.push({
+          startX: w / 2,
+          startY: h - 10,
+          endX: x,
+          endY: y,
+          alpha: 1.0
+        });
+
+        let hit = false;
+        for (let i = this.targets.length - 1; i >= 0; i--) {
+          const tg = this.targets[i];
+          const dist = Math.hypot(x - tg.x, y - tg.y);
+          if (dist <= tg.r + 16) {
+            hit = true;
+            if (tg.emoji === '💣') {
+              sound.playWrong();
+              STATE.mgScore = Math.max(0, STATE.mgScore - 20);
+              this.effects.push({ x: tg.x, y: tg.y, text: '💥 -20', color: '#f87171', life: 25 });
+            } else {
+              sound.playGrabSuccess();
+              STATE.mgScore += tg.pts;
+              this.effects.push({ x: tg.x, y: tg.y, text: `+${tg.pts}`, color: '#34d399', life: 25 });
+            }
+            elMgPts.textContent = STATE.mgScore;
+
+            this.targets.splice(i, 1);
+            setTimeout(() => {
+              if (mgActive && this.targets.length < 7) {
+                const { w: nw, h: nh } = this.getSize();
+                const types = [
+                  { emoji: '🎯', pts: 25, r: 28, speed: 2.5 },
+                  { emoji: '🛸', pts: 40, r: 26, speed: 3.5 },
+                  { emoji: '🦅', pts: 50, r: 28, speed: 3.1 },
+                  { emoji: '⭐', pts: 30, r: 24, speed: 2.2 },
+                  { emoji: '💣', pts: -20, r: 26, speed: 2.8 }
+                ];
+                const nt = types[Math.floor(Math.random() * types.length)];
+                this.targets.push({
+                  x: Math.random() * (nw - 80) + 40,
+                  y: 45 + Math.random() * (nh - 95),
+                  emoji: nt.emoji,
+                  pts: nt.pts,
+                  r: nt.r,
+                  vx: (Math.random() > 0.5 ? 1 : -1) * nt.speed
+                });
+              }
+            }, 350);
+            break;
+          }
+        }
+
+        if (!hit) {
+          this.effects.push({ x, y, text: 'MISS', color: '#64748b', life: 15 });
+        }
+      }
+
+      update() {
+        const { w } = this.getSize();
+
+        this.targets.forEach(t => {
+          t.x += t.vx;
+          if (t.x < 30) { t.x = 30; t.vx *= -1; }
+          if (t.x > w - 30) { t.x = w - 30; t.vx *= -1; }
+        });
+
+        for (let i = this.lasers.length - 1; i >= 0; i--) {
+          this.lasers[i].alpha -= 0.14;
+          if (this.lasers[i].alpha <= 0) this.lasers.splice(i, 1);
+        }
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.2;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const { w, h } = this.getSize();
+
+        this.ctx.fillStyle = '#060d1b';
+        this.ctx.fillRect(0, 0, w, h);
+
+        this.ctx.strokeStyle = 'rgba(0, 245, 212, 0.25)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.beginPath();
+        this.ctx.arc(w / 2, h / 2, 85, 0, Math.PI * 2);
+        this.ctx.moveTo(w / 2 - 105, h / 2); this.ctx.lineTo(w / 2 + 105, h / 2);
+        this.ctx.moveTo(w / 2, h / 2 - 105); this.ctx.lineTo(w / 2, h / 2 + 105);
+        this.ctx.stroke();
+
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.font = '34px sans-serif';
+        this.targets.forEach(t => {
+          this.ctx.fillText(t.emoji, t.x, t.y);
+        });
+
+        this.lasers.forEach(l => {
+          this.ctx.strokeStyle = `rgba(0, 245, 212, ${l.alpha})`;
+          this.ctx.lineWidth = 4.5;
+          this.ctx.beginPath();
+          this.ctx.moveTo(l.startX, l.startY);
+          this.ctx.lineTo(l.endX, l.endY);
+          this.ctx.stroke();
+        });
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 24px sans-serif';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    function startMiniGameShooting() {
+      openMiniGameUI(
+        "【小遊戲 ①】🎯 極速射擊靶場",
+        "直接點擊螢幕或滑鼠瞄準標靶開火！(🦅+50 / 🛸+40 / ⭐+30 / 避開炸彈💣)"
+      );
+
+      const shooter = new TargetShooter(cvs, ctx);
+      currentGameInstance = shooter;
+
+      cvs.onpointerdown = (e) => {
+        e.preventDefault();
+        const r = cvs.getBoundingClientRect();
+        shooter.shoot(e.clientX - r.left, e.clientY - r.top);
+      };
+
+      elMgCtrl.innerHTML = `
+        <div class="text-xs sm:text-sm text-cyan-200 font-bold bg-slate-950/90 px-4 py-2 rounded-xl border border-cyan-700/70">
+          🧭 支援 iPad 觸控點擊與電腦滑鼠連點！快準狠射擊目標吧！
+        </div>
+      `;
+
+      function shootLoop() {
+        if (!mgActive) return;
+        shooter.update();
+        shooter.draw();
+        mgAnimId = requestAnimationFrame(shootLoop);
+      }
+      mgAnimId = requestAnimationFrame(shootLoop);
+    }
+
+    /* ==========================================================
+       【小遊戲 ②】（第20題後）：🔨 瘋狂打地鼠擂台
+       ========================================================== */
+    class WhackAMole {
+      constructor(canvas, context) {
+        this.canvas = canvas;
+        this.ctx = context;
+        this.holes = [];
+        this.effects = [];
+        this.popTimer = 0;
+        this.initHoles();
+      }
+
+      getSize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        return { w: rect.width || 600, h: rect.height || 360 };
+      }
+
+      initHoles() {
+        const { w, h } = this.getSize();
+        this.holes = [];
+
+        const cols = 4;
+        const rows = 2;
+        const colW = w / cols;
+        const rowH = (h - 20) / rows;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            this.holes.push({
+              x: c * colW + colW / 2,
+              y: r * rowH + rowH / 2 + 12,
+              rx: Math.min(64, colW * 0.36),
+              ry: 22,
+              mole: null
+            });
+          }
+        }
+      }
+
+      onResize(w, h) {
+        const cols = 4;
+        const rows = 2;
+        const colW = w / cols;
+        const rowH = (h - 20) / rows;
+        this.holes.forEach((hole, idx) => {
+          const r = Math.floor(idx / cols);
+          const c = idx % cols;
+          hole.x = c * colW + colW / 2;
+          hole.y = r * rowH + rowH / 2 + 12;
+          hole.rx = Math.min(64, colW * 0.36);
+        });
+      }
+
+      spawnMole() {
+        const available = this.holes.filter(h => !h.mole);
+        if (available.length === 0) return;
+        const targetHole = available[Math.floor(Math.random() * available.length)];
+
+        const moleTypes = [
+          { emoji: '🐹', pts: 25 },
+          { emoji: '👑', pts: 50 },
+          { emoji: '👾', pts: 35 },
+          { emoji: '💎', pts: 40 },
+          { emoji: '💣', pts: -25 }
+        ];
+
+        const m = moleTypes[Math.floor(Math.random() * moleTypes.length)];
+        targetHole.mole = {
+          emoji: m.emoji,
+          pts: m.pts,
+          life: 40,
+          maxLife: 40
+        };
+      }
+
+      hit(x, y) {
+        sound.playHammer();
+        for (let i = 0; i < this.holes.length; i++) {
+          const h = this.holes[i];
+          const dist = Math.hypot(x - h.x, y - (h.y - 14));
+          if (dist <= 46 && h.mole) {
+            const m = h.mole;
+            if (m.emoji === '💣') {
+              sound.playWrong();
+              STATE.mgScore = Math.max(0, STATE.mgScore - 25);
+              this.effects.push({ x: h.x, y: h.y - 28, text: '💥 炸彈 -25', color: '#f87171', life: 25 });
+            } else {
+              sound.playGrabSuccess();
+              STATE.mgScore += m.pts;
+              this.effects.push({ x: h.x, y: h.y - 28, text: `🔨 +${m.pts}`, color: '#fbbf24', life: 25 });
+            }
+            elMgPts.textContent = STATE.mgScore;
+            h.mole = null;
+            break;
+          }
+        }
+      }
+
+      update() {
+        this.popTimer++;
+        if (this.popTimer % 15 === 0) {
+          this.spawnMole();
+        }
+
+        this.holes.forEach(h => {
+          if (h.mole) {
+            h.mole.life--;
+            if (h.mole.life <= 0) h.mole = null;
+          }
+        });
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.3;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const { w, h } = this.getSize();
+
+        this.ctx.fillStyle = '#08140c';
+        this.ctx.fillRect(0, 0, w, h);
+
+        this.holes.forEach(hole => {
+          this.ctx.fillStyle = '#1c2818';
+          this.ctx.beginPath();
+          this.ctx.ellipse(hole.x, hole.y, hole.rx, hole.ry, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          this.ctx.fillStyle = '#070a05';
+          this.ctx.beginPath();
+          this.ctx.ellipse(hole.x, hole.y, hole.rx * 0.85, hole.ry * 0.75, 0, 0, Math.PI * 2);
+          this.ctx.fill();
+
+          if (hole.mole) {
+            const appearRatio = Math.sin((hole.mole.life / hole.mole.maxLife) * Math.PI);
+            const moleY = hole.y - 14 - appearRatio * 20;
+            this.ctx.font = '38px sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(hole.mole.emoji, hole.x, moleY);
+          }
+        });
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 24px sans-serif';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    function startMiniGameWhack() {
+      openMiniGameUI(
+        "【小遊戲 ②】🔨 瘋狂打地鼠擂台",
+        "看準地鼠冒出瞬間直接重錘敲擊！(👑+50 / 💎+40 / 👾+35 / 避開炸彈💣)"
+      );
+
+      const whacker = new WhackAMole(cvs, ctx);
+      currentGameInstance = whacker;
+
+      cvs.onpointerdown = (e) => {
+        e.preventDefault();
+        const r = cvs.getBoundingClientRect();
+        whacker.hit(e.clientX - r.left, e.clientY - r.top);
+      };
+
+      elMgCtrl.innerHTML = `
+        <div class="text-xs sm:text-sm text-emerald-200 font-bold bg-slate-950/90 px-4 py-2 rounded-xl border border-emerald-700/70">
+          🧭 直接拍擊冒出的地鼠洞！iPad 多點觸控連續重擊超爽快！
+        </div>
+      `;
+
+      function whackLoop() {
+        if (!mgActive) return;
+        whacker.update();
+        whacker.draw();
+        mgAnimId = requestAnimationFrame(whackLoop);
+      }
+      mgAnimId = requestAnimationFrame(whackLoop);
+    }
+
+    /* ==========================================================
+       【小遊戲 ③】（第30題後壓軸）：🥁 極速太鼓達人
+       ========================================================== */
+    class TaikoDrum {
+      constructor(canvas, context) {
+        this.canvas = canvas;
+        this.ctx = context;
+        this.notes = [];
+        this.combo = 0;
+        this.effects = [];
+        this.spawnTick = 0;
+      }
+
+      getSize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        return { w: rect.width || 600, h: rect.height || 360 };
+      }
+
+      spawnNote() {
+        const types = [
+          { type: 'don', color: '#ef4444', label: '🔴咚', pts: 30 },
+          { type: 'don', color: '#ef4444', label: '🔴咚', pts: 30 },
+          { type: 'ka',  color: '#0284c7', label: '🔵咔', pts: 30 },
+          { type: 'big', color: '#eab308', label: '🟡連打', pts: 50 }
+        ];
+        const { w } = this.getSize();
+        const n = types[Math.floor(Math.random() * types.length)];
+
+        this.notes.push({
+          x: w + 25,
+          y: 52,
+          type: n.type,
+          color: n.color,
+          label: n.label,
+          pts: n.pts,
+          speed: Math.max(2.6, w / 240)
+        });
+      }
+
+      hit(type) {
+        if (type === 'don') sound.playDon();
+        else if (type === 'ka') sound.playKa();
+        else sound.playRoll();
+
+        const judgeX = 85;
+        let judged = false;
+
+        for (let i = 0; i < this.notes.length; i++) {
+          const n = this.notes[i];
+          const dist = Math.abs(n.x - judgeX);
+
+          if (dist < 64) {
+            judged = true;
+            const isMatch = (n.type === type) || (n.type === 'big');
+
+            if (isMatch) {
+              this.combo++;
+              const comboBonus = Math.min(35, this.combo * 2);
+              const isBigRoll = (n.type === 'big' && type === 'big');
+              const score = (isBigRoll ? n.pts + 20 : n.pts) + comboBonus;
+
+              STATE.mgScore += score;
+              elMgPts.textContent = STATE.mgScore;
+
+              let text = dist < 26 ? `良! +${score}` : `可! +${score}`;
+              if (isBigRoll) text = `🔥連打特良! +${score}`;
+
+              this.effects.push({
+                x: judgeX,
+                y: 52,
+                text: text,
+                color: isBigRoll ? '#fbbf24' : (dist < 26 ? '#facc15' : '#38bdf8'),
+                life: 24
+              });
+
+              if (n.type !== 'big' || dist < 14) {
+                this.notes.splice(i, 1);
+              }
+            } else {
+              this.combo = 0;
+              this.effects.push({ x: judgeX, y: 52, text: '按錯(色不符)', color: '#f87171', life: 18 });
+              this.notes.splice(i, 1);
+            }
+            break;
+          }
+        }
+
+        if (!judged) {
+          this.effects.push({ x: judgeX, y: 52, text: '空敲', color: '#64748b', life: 12 });
+        }
+      }
+
+      update() {
+        this.spawnTick++;
+        if (this.spawnTick % 34 === 0) {
+          this.spawnNote();
+        }
+
+        for (let i = this.notes.length - 1; i >= 0; i--) {
+          const n = this.notes[i];
+          n.x -= n.speed;
+          if (n.x < 15) {
+            this.combo = 0;
+            this.effects.push({ x: 65, y: 52, text: 'MISS', color: '#ef4444', life: 16 });
+            this.notes.splice(i, 1);
+          }
+        }
+
+        for (let i = this.effects.length - 1; i >= 0; i--) {
+          this.effects[i].y -= 1.3;
+          this.effects[i].life--;
+          if (this.effects[i].life <= 0) this.effects.splice(i, 1);
+        }
+      }
+
+      draw() {
+        const { w, h } = this.getSize();
+
+        this.ctx.fillStyle = '#0f172a';
+        this.ctx.fillRect(0, 0, w, h);
+
+        this.ctx.fillStyle = '#1e293b';
+        this.ctx.fillRect(0, 18, w, 68);
+
+        this.ctx.strokeStyle = '#f8fafc';
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.arc(85, 52, 28, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        this.notes.forEach(n => {
+          this.ctx.fillStyle = n.color;
+          this.ctx.beginPath();
+          this.ctx.arc(n.x, n.y, n.type === 'big' ? 26 : 22, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.strokeStyle = '#ffffff';
+          this.ctx.lineWidth = 2.5;
+          this.ctx.stroke();
+
+          this.ctx.fillStyle = n.type === 'big' ? '#000000' : '#ffffff';
+          this.ctx.font = 'bold 12px sans-serif';
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText(n.label, n.x, n.y);
+        });
+
+        const drumCenterX = w / 2;
+        const drumCenterY = Math.max(155, h - 85);
+        const outerR = Math.min(76, (h - 105) * 0.46);
+        const innerR = outerR * 0.72;
+        const centerR = outerR * 0.42;
+
+        // 1. 🔵 藍色邊緣 (咔)
+        this.ctx.fillStyle = '#0284c7';
+        this.ctx.beginPath();
+        this.ctx.arc(drumCenterX, drumCenterY, outerR, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#38bdf8';
+        this.ctx.lineWidth = 3.5;
+        this.ctx.stroke();
+
+        // 2. 🔴 紅色鼓面 (咚)
+        this.ctx.fillStyle = '#ef4444';
+        this.ctx.beginPath();
+        this.ctx.arc(drumCenterX, drumCenterY, innerR, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#fca5a5';
+        this.ctx.lineWidth = 2.5;
+        this.ctx.stroke();
+
+        // 3. 🟡 黃色連打核心
+        this.ctx.fillStyle = '#eab308';
+        this.ctx.beginPath();
+        this.ctx.arc(drumCenterX, drumCenterY, centerR, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#fef08a';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+
+        this.ctx.fillStyle = '#000000';
+        this.ctx.font = 'bold 12px sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('🟡連打', drumCenterX, drumCenterY);
+
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = 'bold 12px sans-serif';
+        this.ctx.fillText('🔴咚', drumCenterX, drumCenterY - innerR * 0.74);
+        this.ctx.fillText('🔵咔', drumCenterX, drumCenterY - outerR * 0.86);
+
+        if (this.combo > 2) {
+          this.ctx.fillStyle = '#fbbf24';
+          this.ctx.font = 'bold 20px sans-serif';
+          this.ctx.textAlign = 'left';
+          this.ctx.fillText(`🔥 ${this.combo} COMBO!`, 16, h - 18);
+        }
+
+        this.effects.forEach(ef => {
+          this.ctx.fillStyle = ef.color;
+          this.ctx.font = 'bold 22px sans-serif';
+          this.ctx.textAlign = 'center';
+          this.ctx.fillText(ef.text, ef.x, ef.y);
+        });
+      }
+    }
+
+    let taikoInstance = null;
+
+    function startMiniGameTaiko() {
+      openMiniGameUI(
+        "【小遊戲 ③】🥁 極速太鼓達人",
+        "音符到達左側白圈時，點擊下方對應顏色大按鈕（或敲擊鼓面／鍵盤 A・S・D）！"
+      );
+
+      taikoInstance = new TaikoDrum(cvs, ctx);
+      currentGameInstance = taikoInstance;
+
+      cvs.onpointerdown = (e) => {
+        e.preventDefault();
+        const r = cvs.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        const drumCenterY = Math.max(155, r.height - 85);
+        const outerR = Math.min(76, (r.height - 105) * 0.46);
+        const innerR = outerR * 0.72;
+        const centerR = outerR * 0.42;
+        const dist = Math.hypot(x - r.width / 2, y - drumCenterY);
+        if (dist <= centerR) {
+          taikoInstance.hit('big');
+        } else if (dist <= innerR) {
+          taikoInstance.hit('don');
+        } else if (dist <= outerR + 8) {
+          taikoInstance.hit('ka');
+        }
+      };
+
+      elMgCtrl.innerHTML = `
+        <button id="btn-don" class="touch-btn flex-1 max-w-[220px] py-3.5 sm:py-4 rounded-2xl bg-gradient-to-b from-red-500 to-rose-600 font-black text-base sm:text-xl text-white shadow-xl active:scale-95 border-2 border-red-300 flex items-center justify-center gap-1.5">
+          <span>🔴</span>
+          <span>咚 (紅 / A)</span>
+        </button>
+        <button id="btn-roll" class="touch-btn flex-1 max-w-[220px] py-3.5 sm:py-4 rounded-2xl bg-gradient-to-b from-yellow-300 via-amber-400 to-amber-500 font-black text-base sm:text-xl text-slate-950 shadow-xl active:scale-95 border-2 border-yellow-100 flex items-center justify-center gap-1.5">
+          <span>🟡</span>
+          <span>連打 (黃 / S)</span>
+        </button>
+        <button id="btn-ka" class="touch-btn flex-1 max-w-[220px] py-3.5 sm:py-4 rounded-2xl bg-gradient-to-b from-sky-400 to-blue-600 font-black text-base sm:text-xl text-white shadow-xl active:scale-95 border-2 border-sky-200 flex items-center justify-center gap-1.5">
+          <span>🔵</span>
+          <span>咔 (藍 / D)</span>
+        </button>
+      `;
+
+      document.getElementById('btn-don').onpointerdown = (e) => { e.preventDefault(); taikoInstance.hit('don'); };
+      document.getElementById('btn-roll').onpointerdown = (e) => { e.preventDefault(); taikoInstance.hit('big'); };
+      document.getElementById('btn-ka').onpointerdown = (e) => { e.preventDefault(); taikoInstance.hit('ka'); };
+
+      function taikoLoop() {
+        if (!mgActive) return;
+        taikoInstance.update();
+        taikoInstance.draw();
+        mgAnimId = requestAnimationFrame(taikoLoop);
+      }
+      mgAnimId = requestAnimationFrame(taikoLoop);
+    }
+
+    /* ==========================================================
+       6. 終局 30 題總結算與「通關幸運抽抽樂」
+       ========================================================== */
+    const RAFFLE_PRIZES = {
+      homework: {
+        id: 'homework',
+        icon: '🎫',
+        title: '減功課',
+        sub: '超級幸運大獎！',
+        cardClass: 'bg-gradient-to-br from-amber-500 via-yellow-400 to-amber-600 border-yellow-200 text-slate-950 glow-gold',
+        subClass: 'text-slate-900 font-bold'
+      },
+      keepgoing: {
+        id: 'keepgoing',
+        icon: '💪',
+        title: '繼續加油',
+        sub: '再接再厲更上層樓！',
+        cardClass: 'bg-gradient-to-br from-sky-900 via-blue-800 to-indigo-900 border-sky-400 text-white',
+        subClass: 'text-sky-200'
+      },
+      youarebest: {
+        id: 'youarebest',
+        icon: '🌟',
+        title: '你是最棒的',
+        sub: '全班掌聲鼓勵！',
+        cardClass: 'bg-gradient-to-br from-emerald-900 via-teal-800 to-emerald-950 border-emerald-400 text-white',
+        subClass: 'text-emerald-200'
+      }
+    };
+
+    function showFinalVictory() {
+      sound.stopBgm();
+      const finalModal = document.getElementById('final-modal');
+      const banner = document.getElementById('perfect-banner');
+      finalModal.classList.remove('hidden');
+
+      const rate = Math.round((STATE.correctCount / 30) * 100);
+      document.getElementById('final-total').textContent = STATE.totalScore;
+      document.getElementById('final-acc').textContent = `${STATE.correctCount} / 30`;
+      document.getElementById('final-rate').textContent = `正確率 ${rate}%`;
+      document.getElementById('final-max-streak').textContent = `最高 ${STATE.maxStreak} 連勝`;
+
+      let rank = 'B';
+      if (STATE.correctCount === 30) rank = 'SSS';
+      else if (STATE.correctCount >= 26) rank = 'S';
+      else if (STATE.correctCount >= 21) rank = 'A';
+      else if (STATE.correctCount >= 15) rank = 'B';
+      else rank = 'C';
+      document.getElementById('final-rank').textContent = rank;
+
+      if (STATE.correctCount === 30) {
+        banner.classList.remove('hidden');
+        sound.playCorrect();
+      }
+
+      const quote = document.getElementById('final-summary-quote');
+      if (STATE.correctCount >= 26) {
+        quote.innerHTML = `🏆 太驚人了！您成功破解平行四邊形、三角形與梯形的底高奧秘，榮獲 <b class="text-amber-300">「${rank} 級幾何大宗師」</b> 榮耀！`;
+      } else if (STATE.correctCount >= 18) {
+        quote.innerHTML = `🌟 表現非常優秀！您已掌握大部分面積計算與垂直高的關鍵，榮獲 <b class="text-cyan-300">「${rank} 級幾何小達人」</b> 稱號！`;
+      } else {
+        quote.innerHTML = `💪 順利完成 30 題挑戰！記得永遠認明「垂直直角記號 ∟」再算面積，下次一定能衝上更高分！`;
+      }
+    }
+
+    function renderBoxContent(boxEl, prize, isSelected) {
+      boxEl.className = `relative py-3.5 px-2 sm:py-4 sm:px-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center shadow-lg prize-pop ${prize.cardClass} ${isSelected ? 'scale-105 ring-4 ring-amber-300/80 z-10' : 'opacity-65 scale-95'}`;
+      boxEl.innerHTML = `
+        <span class="text-[10px] font-black px-2 py-0.5 rounded-full mb-1 ${isSelected ? 'bg-black/30 text-white' : 'bg-black/20 text-slate-300'}">
+          ${isSelected ? '👑 抽中大獎' : '未選中'}
+        </span>
+        <span class="text-2xl sm:text-3xl mb-1">${prize.icon}</span>
+        <span class="text-base sm:text-xl font-black tracking-wider">${prize.title}</span>
+        <span class="text-[11px] mt-0.5 ${prize.subClass}">${prize.sub}</span>
+      `;
+    }
+
+    function triggerRaffle(chosenIdx) {
+      if (STATE.raffleUsed) return;
+      STATE.raffleUsed = true;
+
+      for (let i = 0; i < 3; i++) {
+        const b = document.getElementById(`raffle-box-${i}`);
+        if (b) {
+          b.disabled = true;
+          b.style.pointerEvents = 'none';
+          if (i !== chosenIdx) {
+            b.classList.add('opacity-50');
+          }
+        }
+      }
+
+      const chosenBox = document.getElementById(`raffle-box-${chosenIdx}`);
+      chosenBox.classList.add('chest-shaking');
+
+      let ticks = 0;
+      const tickInterval = setInterval(() => {
+        sound.playRaffleTick();
+        ticks++;
+        if (ticks >= 8) {
+          clearInterval(tickInterval);
+        }
+      }, 140);
+
+      // 加權機率抽選：減功課 10%、繼續加油 45%、你是最棒的 45%
+      const roll = Math.random();
+      let wonKey = 'youarebest';
+      if (roll < 0.10) {
+        wonKey = 'homework';
+      } else if (roll < 0.55) {
+        wonKey = 'keepgoing';
+      } else {
+        wonKey = 'youarebest';
+      }
+
+      const wonPrize = RAFFLE_PRIZES[wonKey];
+      const remainingKeys = ['homework', 'keepgoing', 'youarebest']
+        .filter(k => k !== wonKey)
+        .sort(() => Math.random() - 0.5);
+
+      setTimeout(() => {
+        chosenBox.classList.remove('chest-shaking');
+        sound.playRaffleFanfare(wonKey === 'homework');
+
+        renderBoxContent(chosenBox, wonPrize, true);
+
+        const banner = document.getElementById('raffle-result-banner');
+        banner.classList.remove('hidden');
+
+        if (wonKey === 'homework') {
+          banner.className = 'mt-3 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 text-slate-950 font-black text-sm sm:text-base md:text-lg shadow-lg prize-pop';
+          banner.innerHTML = `🎊 奇蹟降臨！恭喜抽中傳說大獎：【🎫 減功課】！`;
+        } else {
+          banner.className = 'mt-3 py-2 px-3 rounded-xl bg-slate-950/95 border border-amber-400/70 text-amber-300 font-black text-xs sm:text-sm md:text-base prize-pop';
+          banner.innerHTML = `✨ 恭喜抽中：【${wonPrize.icon} ${wonPrize.title}】！${wonPrize.sub}`;
+        }
+
+        setTimeout(() => {
+          let remIdx = 0;
+          for (let i = 0; i < 3; i++) {
+            if (i !== chosenIdx) {
+              const otherBox = document.getElementById(`raffle-box-${i}`);
+              renderBoxContent(otherBox, RAFFLE_PRIZES[remainingKeys[remIdx++]], false);
+            }
+          }
+        }, 650);
+      }, 1200);
+    }
+    window.triggerRaffle = triggerRaffle;
+
+    /* ==========================================================================
+       7. 電腦鍵盤事件監聽與啟動綁定
+       ========================================================================== */
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '[' || e.key === 'PageUp') {
+        prevQuestion();
+      }
+      if (e.key === ']' || e.key === 'PageDown') {
+        nextQuestion();
+      }
+
+      // 太鼓達人專屬鍵盤快捷鍵
+      if (mgActive && STATE.currentMiniGame === 3 && taikoInstance) {
+        if (e.key === 'a' || e.key === 'A' || e.key === '1' || e.key === 'ArrowLeft') {
+          taikoInstance.hit('don');
+        }
+        if (e.key === 's' || e.key === 'S' || e.key === '2' || e.key === 'ArrowDown' || e.key === ' ') {
+          e.preventDefault();
+          taikoInstance.hit('big');
+        }
+        if (e.key === 'd' || e.key === 'D' || e.key === '3' || e.key === 'ArrowRight') {
+          taikoInstance.hit('ka');
+        }
+        return;
+      }
+
+      const q = QUESTION_BANK[STATE.roundIndex];
+      if (!q || STATE.isPausedForError || STATE.answered) return;
+
+      if (q.type === 'tf3') {
+        if (e.key === '1') handleAnswer('correct');
+        if (e.key === '2') handleAnswer('geo');
+        if (e.key === '3') handleAnswer('calc');
+      } else if (q.type === 'mc') {
+        if (e.key === '1' || e.key === 'a' || e.key === 'A') handleAnswer(0);
+        if (e.key === '2' || e.key === 'b' || e.key === 'B') handleAnswer(1);
+        if (e.key === '3' || e.key === 'c' || e.key === 'C') handleAnswer(2);
+        if (e.key === '4' || e.key === 'd' || e.key === 'D') handleAnswer(3);
+      }
+    });
+
+    const startBtn = document.getElementById('btn-start-game');
+    if (startBtn) {
+      startBtn.onclick = startGame;
+    }
+
+    window.addEventListener('contextmenu', e => e.preventDefault());
+  </script>
+</body>
+</html>
