@@ -67,7 +67,26 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      /* 確保在平板/手機上有滑順的滾動體驗 */
+      -webkit-overflow-scrolling: touch; 
     }
+
+    /* ▼▼▼ 新增：強制顯示並美化拉桿 (Scrollbar) ▼▼▼ */
+    #menu-container::-webkit-scrollbar {
+      width: 8px; /* 拉桿寬度 */
+    }
+    #menu-container::-webkit-scrollbar-track {
+      background: #f1f5f9; /* 軌道背景色 */
+      border-radius: 4px;
+    }
+    #menu-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1; /* 拉桿本體的顏色 */
+      border-radius: 4px;
+    }
+    #menu-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8; /* 滑鼠游標碰到拉桿時變深 */
+    }
+    /* ▲▲▲ 新增結束 ▲▲▲ */
 
     /* 單元摺疊區塊 */
     .category-group {
@@ -75,6 +94,8 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
+      /* 防止內容被擠壓 */
+      flex-shrink: 0; 
     }
     .category-header {
       padding: 12px 14px;
@@ -260,7 +281,6 @@
             <span>ch7f</span>
             <span class="tag-badge">國語</span>
           </button>
-          <!-- 新增 ch8a, ch8b, ch8c -->
           <button class="game-btn" onclick="loadGame(this, './ch8a.html', 'ch8a')">
             <span>ch8a</span>
             <span class="tag-badge">國語</span>
@@ -273,7 +293,6 @@
             <span>ch8c</span>
             <span class="tag-badge">國語</span>
           </button>
-          <!-- 新增 ch9a, ch9b -->
           <button class="game-btn" onclick="loadGame(this, './ch9a.html', 'ch9a')">
             <span>ch9a</span>
             <span class="tag-badge">國語</span>
@@ -323,12 +342,10 @@
             <span>m7c</span>
             <span class="tag-badge">數學</span>
           </button>
-          <!-- 新增 m7d -->
           <button class="game-btn" onclick="loadGame(this, './m7d.html', 'm7d')">
             <span>m7d</span>
             <span class="tag-badge">數學</span>
           </button>
-          <!-- 新增 m8a -->
           <button class="game-btn" onclick="loadGame(this, './m8a.html', 'm8a')">
             <span>m8a</span>
             <span class="tag-badge">數學</span>
