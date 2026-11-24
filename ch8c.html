@@ -80,7 +80,7 @@
 <body class="text-white flex flex-col h-screen w-screen relative select-none bg-slate-950">
 
   <!-- ==================== 頂部單人 HUD 資訊列 (適配電腦與平板) ==================== -->
-  <header class="min-h-[70px] sm:h-[76px] bg-slate-900/95 border-b border-slate-700/80 px-2.5 sm:px-5 md:px-8 flex items-center justify-between z-20 shrink-0 shadow-xl gap-2">
+  <header class="min-h-[68px] sm:h-[74px] bg-slate-900/95 border-b border-slate-700/80 px-2.5 sm:px-5 md:px-8 flex items-center justify-between z-20 shrink-0 shadow-xl gap-2">
     
     <!-- 左側：挑戰者狀態 (積分、正答數、連勝) -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -137,10 +137,10 @@
 
   </header>
 
-  <!-- ==================== 主要單人闖關舞台 (電腦大螢幕與平板自適應居中) ==================== -->
-  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-6 pb-12 sm:pb-14 overflow-hidden">
+  <!-- ==================== 主要單人闖關舞台 (彈性流式排版，防止題目與解答遮蓋) ==================== -->
+  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2 sm:p-3.5 md:p-5 overflow-hidden">
     
-    <section class="w-full max-w-4xl h-full flex flex-col justify-between gap-3 sm:gap-4 bg-slate-900/75 p-3.5 sm:p-5 md:p-6 rounded-3xl border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden backdrop-blur-sm">
+    <section id="question-stage-card" class="w-full max-w-4xl h-full flex flex-col justify-between gap-2 sm:gap-3 bg-slate-900/80 p-3 sm:p-4 md:p-5 rounded-3xl border-2 border-cyan-500/40 shadow-2xl relative overflow-y-auto backdrop-blur-sm">
       
       <!-- 頂部關卡類型與答題結果印章 -->
       <div class="flex items-center justify-between gap-2 shrink-0">
@@ -150,33 +150,38 @@
         <span id="player-status-stamp" class="text-xs sm:text-sm font-black px-3 py-1 rounded-xl hidden font-num"></span>
       </div>
 
-      <!-- 題目顯示卡片 -->
-      <div class="min-h-[135px] sm:min-h-[165px] max-h-[230px] flex-shrink-0 bg-slate-900/95 rounded-2xl border-2 border-cyan-400/50 p-4 sm:p-5 md:p-6 flex flex-col justify-between shadow-xl relative overflow-hidden">
-        <div id="player-q-text" class="overflow-y-auto text-base sm:text-xl md:text-2xl font-bold text-white leading-relaxed lesson-font pr-1">
+      <!-- 題目顯示卡片 (獨立高度與捲動，確保不被下方選項或解析覆蓋) -->
+      <div id="question-box-card" class="min-h-[104px] sm:min-h-[126px] max-h-[195px] shrink-0 bg-slate-900/95 rounded-2xl border-2 border-cyan-400/50 p-3 sm:p-4 md:p-5 flex flex-col justify-between shadow-xl relative">
+        <div id="player-q-text" class="overflow-y-auto text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed lesson-font pr-1">
           題目載入中...
         </div>
-        <div class="text-[11px] sm:text-xs text-cyan-300/90 font-mono border-t border-slate-800/90 pt-2 mt-2 flex items-center justify-between shrink-0">
+        <div class="text-[11px] sm:text-xs text-cyan-300/90 font-mono border-t border-slate-800/90 pt-1.5 mt-2 flex items-center justify-between shrink-0">
           <span>📖 康軒五下第八課〈最勇敢的女孩〉3~4段</span>
           <span id="shortcut-hint" class="text-slate-400 hidden sm:inline">支援觸控點擊或鍵盤 1 / 2 / 3 作答</span>
         </div>
       </div>
 
-      <!-- 互動答題區與解析回饋卡片 -->
-      <div class="flex-1 flex flex-col gap-2.5 min-h-0 relative justify-center">
-        <div id="player-interactive" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone"></div>
-
-        <!-- 答錯／重點解析卡片 -->
-        <div id="player-analysis-card" class="max-h-[105px] sm:max-h-[120px] rounded-2xl bg-slate-800/95 border-2 border-amber-400/80 px-3.5 py-2.5 hidden flex-col justify-start text-amber-100 shrink-0 shadow-lg overflow-hidden">
-          <div class="text-xs sm:text-sm font-black text-amber-300 leading-tight mb-1 flex items-center gap-1.5 shrink-0">
-            <span id="analysis-title">💡 課文與語詞深入解析：</span>
-          </div>
-          <div id="player-analysis-text" class="text-xs sm:text-sm md:text-base font-medium leading-snug overflow-y-auto flex-1 text-slate-100 pr-1">--</div>
-        </div>
+      <!-- 互動答題區 -->
+      <div id="interactive-wrapper" class="flex-1 flex flex-col justify-center min-h-0">
+        <div id="player-interactive" class="w-full h-full flex flex-col justify-center min-h-0 interactive-zone"></div>
       </div>
-    </section>
 
-    <!-- ==================== 底部推進中控浮動條 ==================== -->
-    <div id="teacher-control-bar" class="fixed bottom-2 left-1/2 -translate-x-1/2 z-40 hidden items-center gap-3 bg-slate-900/95 border-2 border-amber-400 px-4 py-1.5 rounded-2xl shadow-2xl backdrop-blur-md max-w-[94vw] transition-all"></div>
+      <!-- 答錯／重點解析卡片 (置於選項正下方正常文件流中，清晰不遮擋任何題目與選項) -->
+      <div id="player-analysis-card" class="rounded-2xl bg-slate-900 border-2 border-amber-400 p-3 sm:p-4 text-amber-50 shrink-0 shadow-2xl hidden flex-col gap-2">
+        <div class="flex items-center justify-between gap-2 border-b border-amber-400/30 pb-1.5 shrink-0">
+          <div class="text-xs sm:text-sm md:text-base font-black text-amber-300 flex items-center gap-1.5">
+            <span id="analysis-title">💡 課文與語詞深入解析</span>
+          </div>
+          <button id="btn-next-question" type="button" class="shrink-0 px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow-md active:scale-95 transition-all cursor-pointer">
+            <span>了解・下一題 ➔</span>
+          </button>
+        </div>
+        <div id="player-analysis-text" class="text-xs sm:text-sm md:text-base font-bold leading-relaxed text-slate-100 max-h-[140px] overflow-y-auto pr-1 lesson-font">--</div>
+      </div>
+
+      <!-- 答對時的底部推進提示條 (改為內嵌流式排版，避免懸浮遮擋畫面) -->
+      <div id="teacher-control-bar" class="shrink-0 hidden items-center justify-between gap-3 bg-emerald-950/90 border-2 border-emerald-400 px-3.5 py-2 rounded-2xl shadow-lg"></div>
+    </section>
 
     <!-- ==================== 單人手速小遊戲覆蓋層 (第10、20、30題後觸發) ==================== -->
     <div id="minigame-overlay" class="absolute inset-0 bg-slate-950 z-30 hidden flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-6">
@@ -293,7 +298,7 @@
           <div class="p-3.5 sm:p-4 rounded-2xl bg-emerald-950/60 border-2 border-emerald-400">
             <div class="text-xs sm:text-sm font-black text-emerald-300">🎯 課文精熟度</div>
             <div id="final-player-acc" class="text-3xl sm:text-4xl font-black text-emerald-300 font-num my-1">0/30</div>
-            <div id="final-player-rate" class="text-xs text-slate-300 font-mono">答對率：0%</div>
+            <div class="text-xs text-slate-300 font-mono">答對率：0%</div>
           </div>
         </div>
 
@@ -922,6 +927,7 @@
       streak: 0,
       maxStreak: 0,
       answered: false,
+      answeredAt: 0,
       answerVal: null,
       selectedMatches: {},
       selectedL: null,
@@ -939,8 +945,10 @@
     const elPlayerScoreBox = document.getElementById('player-score-box');
     const elStreakBadge = document.getElementById('streak-badge');
     const elQTypeBadge = document.getElementById('q-type-badge');
+    const elQuestionStageCard = document.getElementById('question-stage-card');
     const elPlayerQText = document.getElementById('player-q-text');
     const elShortcutHint = document.getElementById('shortcut-hint');
+    const elInteractiveWrapper = document.getElementById('interactive-wrapper');
     const elPlayerInteractive = document.getElementById('player-interactive');
     const elPlayerAnalysis = document.getElementById('player-analysis-card');
     const elAnalysisTitle = document.getElementById('analysis-title');
@@ -951,6 +959,9 @@
     const elTimerText = document.getElementById('timer-text');
     const elTimerBar = document.getElementById('timer-bar');
     const elTeacherBar = document.getElementById('teacher-control-bar');
+
+    // 綁定解析卡片內的「了解・下一題」按鈕
+    document.getElementById('btn-next-question').addEventListener('click', advanceToNextStep);
 
     function startGame() {
       try { sound.init(); } catch (e) {}
@@ -985,6 +996,7 @@
       GAME_STATE.timer = GAME_STATE.maxTimer;
       GAME_STATE.hasError = false;
       GAME_STATE.answered = false;
+      GAME_STATE.answeredAt = 0;
       GAME_STATE.answerVal = null;
       GAME_STATE.selectedMatches = {};
       GAME_STATE.selectedL = null;
@@ -993,6 +1005,10 @@
 
       sound.setBpm(128);
       updateHUD();
+
+      // 重置卡片捲動位置與外觀狀態
+      if (elQuestionStageCard) elQuestionStageCard.scrollTop = 0;
+      elInteractiveWrapper.className = 'flex-1 flex flex-col justify-center min-h-0';
 
       elTeacherBar.classList.add('hidden');
       elTeacherBar.classList.remove('flex');
@@ -1027,28 +1043,28 @@
 
       if (type === 'tf3') {
         container.innerHTML = `
-          <div class="flex flex-col gap-2.5 sm:gap-3 h-full justify-center">
-            <button id="btn-tf-correct" class="w-full flex-1 min-h-[54px] sm:min-h-[62px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 hover:border-emerald-400 border-2 border-emerald-500/60 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all touch-btn shadow-lg">
-              <span class="flex items-center gap-2.5 text-sm sm:text-base md:text-lg font-black text-emerald-300 pointer-events-none">
-                <span class="text-lg sm:text-xl">⭕</span> <span>完全正確</span>
+          <div class="flex flex-col gap-2 sm:gap-2.5 h-full justify-center">
+            <button id="btn-tf-correct" class="w-full flex-1 min-h-[46px] sm:min-h-[54px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 hover:border-emerald-400 border-2 border-emerald-500/60 px-3.5 sm:px-4 py-2 flex items-center justify-between gap-2 active:scale-[0.98] transition-all touch-btn shadow-lg">
+              <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-emerald-300 pointer-events-none">
+                <span class="text-base sm:text-xl">⭕</span> <span>完全正確</span>
               </span>
               <span class="text-xs sm:text-sm text-slate-300 pointer-events-none flex items-center gap-2">
                 <span class="hidden sm:inline">字音形義、語詞與課文內容皆無誤</span>
                 <kbd class="px-2 py-0.5 rounded bg-slate-800 border border-slate-600 text-emerald-300 font-mono text-xs">1</kbd>
               </span>
             </button>
-            <button id="btn-tf-rule" class="w-full flex-1 min-h-[54px] sm:min-h-[62px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 hover:border-rose-400 border-2 border-rose-500/60 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all touch-btn shadow-lg">
-              <span class="flex items-center gap-2.5 text-sm sm:text-base md:text-lg font-black text-rose-300 pointer-events-none">
-                <span class="text-lg sm:text-xl">❌</span> <span>錯在字音形義</span>
+            <button id="btn-tf-rule" class="w-full flex-1 min-h-[46px] sm:min-h-[54px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 hover:border-rose-400 border-2 border-rose-500/60 px-3.5 sm:px-4 py-2 flex items-center justify-between gap-2 active:scale-[0.98] transition-all touch-btn shadow-lg">
+              <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-rose-300 pointer-events-none">
+                <span class="text-base sm:text-xl">❌</span> <span>錯在字音形義</span>
               </span>
               <span class="text-xs sm:text-sm text-slate-300 pointer-events-none flex items-center gap-2">
                 <span class="hidden sm:inline">注音標錯、形近字混淆或語詞解釋錯誤</span>
                 <kbd class="px-2 py-0.5 rounded bg-slate-800 border border-slate-600 text-rose-300 font-mono text-xs">2</kbd>
               </span>
             </button>
-            <button id="btn-tf-calc" class="w-full flex-1 min-h-[54px] sm:min-h-[62px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 hover:border-amber-400 border-2 border-amber-500/60 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all touch-btn shadow-lg">
-              <span class="flex items-center gap-2.5 text-sm sm:text-base md:text-lg font-black text-amber-300 pointer-events-none">
-                <span class="text-lg sm:text-xl">💡</span> <span>錯在課文理解</span>
+            <button id="btn-tf-calc" class="w-full flex-1 min-h-[46px] sm:min-h-[54px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 hover:border-amber-400 border-2 border-amber-500/60 px-3.5 sm:px-4 py-2 flex items-center justify-between gap-2 active:scale-[0.98] transition-all touch-btn shadow-lg">
+              <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-amber-300 pointer-events-none">
+                <span class="text-base sm:text-xl">💡</span> <span>錯在課文理解</span>
               </span>
               <span class="text-xs sm:text-sm text-slate-300 pointer-events-none flex items-center gap-2">
                 <span class="hidden sm:inline">人物事件、年份細節或段落大意不符</span>
@@ -1065,13 +1081,13 @@
         let btns = '';
         itemData.options.forEach((opt, idx) => {
           btns += `
-            <button id="btn-mc-${idx}" class="w-full h-full min-h-[56px] sm:min-h-[68px] text-left px-3.5 sm:px-4 py-2.5 rounded-2xl bg-slate-900/95 border-2 border-slate-700 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-between text-sm sm:text-base md:text-lg font-bold shadow-lg hover:bg-slate-800 touch-btn">
+            <button id="btn-mc-${idx}" class="w-full h-full min-h-[48px] sm:min-h-[58px] text-left px-3.5 sm:px-4 py-2 rounded-2xl bg-slate-900/95 border-2 border-slate-700 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-between gap-2 text-sm sm:text-base md:text-lg font-bold shadow-lg hover:bg-slate-800 touch-btn">
               <span class="text-slate-100 break-words leading-snug pointer-events-none lesson-font">${opt}</span>
-              <span class="text-xs font-mono px-2 py-0.5 rounded-lg bg-slate-800 text-cyan-300 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded-lg bg-slate-800 text-cyan-300 border border-slate-600 shrink-0 pointer-events-none">${['A','B','C','D'][idx]}</span>
             </button>
           `;
         });
-        container.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 h-full">${btns}</div>`;
+        container.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 h-full">${btns}</div>`;
         itemData.options.forEach((_, idx) => {
           document.getElementById(`btn-mc-${idx}`).addEventListener('pointerdown', (e) => { e.preventDefault(); handleAnswer(idx); });
         });
@@ -1079,7 +1095,7 @@
         let leftCols = '';
         itemData.left.forEach(item => {
           leftCols += `
-            <button id="btn-match-${item.key}" class="w-full flex-1 min-h-[60px] sm:min-h-[72px] px-3.5 sm:px-4 py-2.5 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/50 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base md:text-lg font-bold shadow-lg touch-btn">
+            <button id="btn-match-${item.key}" class="w-full flex-1 min-h-[52px] sm:min-h-[62px] px-3 sm:px-4 py-2 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/50 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base md:text-lg font-bold shadow-lg touch-btn">
               <span class="w-full leading-snug break-words pointer-events-none lesson-font">${item.label}</span>
             </button>
           `;
@@ -1089,16 +1105,16 @@
         let rightCols = '';
         shuffledRight.forEach(item => {
           rightCols += `
-            <button id="btn-match-${item.key}" class="w-full flex-1 min-h-[60px] sm:min-h-[72px] px-3.5 sm:px-4 py-2.5 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base md:text-lg font-bold shadow-lg touch-btn">
+            <button id="btn-match-${item.key}" class="w-full flex-1 min-h-[52px] sm:min-h-[62px] px-3 sm:px-4 py-2 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base md:text-lg font-bold shadow-lg touch-btn">
               <span class="w-full leading-snug break-words pointer-events-none lesson-font">${item.label}</span>
             </button>
           `;
         });
 
         container.innerHTML = `
-          <div class="grid grid-cols-2 gap-3 sm:gap-5 h-full items-stretch">
-            <div class="flex flex-col gap-2.5 sm:gap-3.5 h-full justify-between">${leftCols}</div>
-            <div class="flex flex-col gap-2.5 sm:gap-3.5 h-full justify-between">${rightCols}</div>
+          <div class="grid grid-cols-2 gap-2.5 sm:gap-4 h-full items-stretch">
+            <div class="flex flex-col gap-2 sm:gap-3 h-full justify-between">${leftCols}</div>
+            <div class="flex flex-col gap-2 sm:gap-3 h-full justify-between">${rightCols}</div>
           </div>
         `;
 
@@ -1117,10 +1133,63 @@
       }
     }
 
+    /**
+     * 標記選項的正確解答與玩家誤選狀態，讓答錯時畫面一目了然
+     */
+    function highlightOptionFeedback(qData, userVal, isCorrect) {
+      if (qData.type === 'tf3') {
+        const keys = ['correct', 'rule', 'calc'];
+        keys.forEach(k => {
+          const btn = document.getElementById(`btn-tf-${k}`);
+          if (!btn) return;
+          if (k === qData.answer) {
+            btn.classList.remove('opacity-40', 'border-emerald-500/60', 'border-rose-500/60', 'border-amber-500/60');
+            btn.classList.add('border-emerald-400', 'bg-emerald-950/90', 'ring-2', 'ring-emerald-400/60');
+            const badge = document.createElement('span');
+            badge.className = 'px-2 py-0.5 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs shrink-0 pointer-events-none';
+            badge.textContent = '✅ 正確解答';
+            btn.appendChild(badge);
+          } else if (!isCorrect && k === userVal) {
+            btn.classList.remove('opacity-40', 'border-emerald-500/60', 'border-rose-500/60', 'border-amber-500/60');
+            btn.classList.add('border-rose-500', 'bg-rose-950/90', 'ring-2', 'ring-rose-500/50');
+            const badge = document.createElement('span');
+            badge.className = 'px-2 py-0.5 rounded-lg bg-rose-500 text-white font-black text-xs shrink-0 pointer-events-none';
+            badge.textContent = '❌ 你的選擇';
+            btn.appendChild(badge);
+          } else {
+            btn.classList.add('opacity-40');
+          }
+        });
+      } else if (qData.type === 'mc') {
+        qData.options.forEach((_, idx) => {
+          const btn = document.getElementById(`btn-mc-${idx}`);
+          if (!btn) return;
+          if (idx === qData.answer) {
+            btn.classList.remove('opacity-40', 'border-slate-700');
+            btn.classList.add('border-emerald-400', 'bg-emerald-950/90', 'ring-2', 'ring-emerald-400/60');
+            const badge = document.createElement('span');
+            badge.className = 'px-2 py-0.5 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs shrink-0 pointer-events-none';
+            badge.textContent = '✅ 正解';
+            btn.appendChild(badge);
+          } else if (!isCorrect && idx === userVal) {
+            btn.classList.remove('opacity-40', 'border-slate-700');
+            btn.classList.add('border-rose-500', 'bg-rose-950/90', 'ring-2', 'ring-rose-500/50');
+            const badge = document.createElement('span');
+            badge.className = 'px-2 py-0.5 rounded-lg bg-rose-500 text-white font-black text-xs shrink-0 pointer-events-none';
+            badge.textContent = '❌ 誤選';
+            btn.appendChild(badge);
+          } else {
+            btn.classList.add('opacity-40');
+          }
+        });
+      }
+    }
+
     function handleAnswer(val) {
       if (GAME_STATE.answered) return;
 
       GAME_STATE.answered = true;
+      GAME_STATE.answeredAt = performance.now();
       GAME_STATE.answerVal = val;
       if (GAME_STATE.timerInterval) clearInterval(GAME_STATE.timerInterval);
 
@@ -1128,7 +1197,9 @@
       const isMatchType = (qData.type === 'match');
       const isCorrect = isMatchType ? (val === true) : (val === qData.answer);
 
-      elPlayerInteractive.classList.add('pointer-events-none', 'opacity-65');
+      // 鎖定選項點擊，但不讓整體變模糊，改用精準色彩標示正確與錯誤選項
+      elPlayerInteractive.classList.add('pointer-events-none');
+      highlightOptionFeedback(qData, val, isCorrect);
       elPlayerStatus.classList.remove('hidden');
 
       if (isCorrect) {
@@ -1151,16 +1222,15 @@
           ? `🔥 連勝加分 +${earned}`
           : `✅ 答對 +${earned}`;
 
-        // 顯示簡短推進提示並自動進入下一題
+        // 顯示內嵌式推進提示條並自動進入下一題
         elTeacherBar.classList.remove('hidden');
         elTeacherBar.classList.add('flex');
-        elTeacherBar.style.borderColor = '#10b981';
         elTeacherBar.innerHTML = `
           <div class="flex items-center gap-2 min-w-0">
             <span class="text-base shrink-0">🎉</span>
-            <span class="text-xs sm:text-sm font-bold text-emerald-300 truncate">回答正確！1.4 秒後自動前往下一關...</span>
+            <span class="text-xs sm:text-sm font-bold text-emerald-200 truncate">回答正確！1.4 秒後自動前往下一關...</span>
           </div>
-          <button id="btn-fast-next" class="shrink-0 px-3 py-1 rounded-xl font-black text-xs text-slate-950 bg-emerald-400 hover:bg-emerald-300 active:scale-95 transition-all">
+          <button id="btn-fast-next" class="shrink-0 px-3 py-1 rounded-xl font-black text-xs text-slate-950 bg-emerald-400 hover:bg-emerald-300 active:scale-95 transition-all cursor-pointer">
             立即下一題 ➔
           </button>
         `;
@@ -1175,35 +1245,42 @@
         GAME_STATE.score -= 50;
         GAME_STATE.hasError = true;
 
+        // 讓選項區自然收合為緊湊高度，騰出充足版面給解析卡片，避免相互擠壓
+        elInteractiveWrapper.className = 'shrink-0 flex flex-col justify-center';
+
         elPlayerStatus.className = 'text-xs sm:text-sm font-black px-3 py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num';
         elPlayerStatus.textContent = val === 'timeout'
           ? '⏰ 時間到 -50'
           : (isMatchType ? '❌ 配對錯誤 -50' : '❌ 答錯 -50');
 
-        // 展開重點解析卡片並暫停倒數，讓學習者看清楚解析後手動點擊下一題
+        // 展開重點解析卡片（內含「了解・下一題」按鈕），不懸浮遮擋任何區域
         elPlayerAnalysis.classList.remove('hidden');
         elPlayerAnalysis.classList.add('flex');
         elAnalysisTitle.textContent = isMatchType
-          ? '💡 配對題重點解析：'
-          : '💡 課文與語詞深入解析：';
-        elPlayerAnalysisText.innerHTML = qData.tip;
+          ? '💡 正確配對與重點解析'
+          : '💡 正確解答與課文深入解析';
+
+        if (isMatchType) {
+          const rightMap = {};
+          qData.right.forEach(r => { rightMap[r.key] = r.label; });
+          const pairsHtml = qData.left.map(l => {
+            const matchedRight = rightMap[qData.matches[l.key]] || '';
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/90 border border-emerald-500/70 text-emerald-200 text-xs sm:text-sm font-bold">✅ ${l.label} ➔ ${matchedRight}</span>`;
+          }).join('');
+          elPlayerAnalysisText.innerHTML = `<div class="flex flex-wrap gap-1.5 mb-2">${pairsHtml}</div><div>${qData.tip}</div>`;
+        } else {
+          elPlayerAnalysisText.innerHTML = qData.tip;
+        }
 
         elTimerText.textContent = '⏸️ 暫停';
         elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
 
-        elTeacherBar.classList.remove('hidden');
-        elTeacherBar.classList.add('flex');
-        elTeacherBar.style.borderColor = '#ef4444';
-        elTeacherBar.innerHTML = `
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="text-base shrink-0">📖</span>
-            <span class="text-xs sm:text-sm font-bold text-rose-300 truncate">請先閱讀上方解析，準備好再前進！</span>
-          </div>
-          <button id="btn-next-question" class="shrink-0 px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow active:scale-95 transition-all">
-            <span>了解・下一題 ➔</span>
-          </button>
-        `;
-        document.getElementById('btn-next-question').addEventListener('click', advanceToNextStep);
+        // 若為小螢幕，自動平滑捲動至解析卡片底部確保完整可見
+        requestAnimationFrame(() => {
+          if (elQuestionStageCard) {
+            elQuestionStageCard.scrollTo({ top: elQuestionStageCard.scrollHeight, behavior: 'smooth' });
+          }
+        });
       }
 
       updateHUD();
@@ -2361,7 +2438,16 @@
       }
 
       const q = QUESTION_BANK[GAME_STATE.roundIndex];
-      if (!q || GAME_STATE.answered) return;
+      if (!q) return;
+
+      // 已作答狀態下按 Enter 或空白鍵可直接前進下一題 (保留 350ms 緩衝防止誤觸)
+      if (GAME_STATE.answered) {
+        if ((e.key === 'Enter' || e.key === ' ') && performance.now() - GAME_STATE.answeredAt > 350) {
+          e.preventDefault();
+          advanceToNextStep();
+        }
+        return;
+      }
 
       if (q.type === 'tf3') {
         if (e.key === '1') handleAnswer('correct');
