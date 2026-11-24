@@ -154,37 +154,38 @@
   </header>
 
   <!-- ==================== 主要遊戲工作區 (單人中央自適應響應式佈局) ==================== -->
-  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-3 md:p-6 overflow-hidden">
+  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 overflow-hidden">
     
-    <!-- 中央主舞台卡片容器 (適配 iPad 寬螢幕與 PC) -->
-    <div class="w-full max-w-4xl h-full flex flex-col justify-between gap-3">
+    <!-- 中央主舞台卡片容器 (適配 iPad 寬螢幕與 PC，確保零重疊遮蓋) -->
+    <div class="w-full max-w-4xl h-full flex flex-col justify-between gap-2.5 min-h-0">
       
       <!-- 上半部：題目卡片區 -->
-      <div class="flex-1 min-h-0 bg-slate-900/90 rounded-3xl border-2 border-cyan-500/40 p-4 md:p-6 shadow-2xl flex flex-col justify-between relative overflow-hidden backdrop-blur-md">
+      <div id="question-card" class="flex-[4.5] min-h-0 bg-slate-900/90 rounded-2xl sm:rounded-3xl border-2 border-cyan-500/40 p-3.5 sm:p-4 md:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden backdrop-blur-md transition-all">
         <div class="flex items-center justify-between text-xs md:text-sm font-bold text-cyan-400 shrink-0 mb-1">
-          <span id="player-q-type" class="px-3 py-1 rounded-xl bg-cyan-950/80 border border-cyan-700 font-mono">三態算則是非題</span>
+          <span id="player-q-type" class="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl bg-cyan-950/80 border border-cyan-700 font-mono">三態算則是非題</span>
           <span class="text-slate-400 font-num hidden sm:inline">鍵盤快捷鍵：數字鍵 1/2/3 或 A/B/C/D</span>
         </div>
 
         <!-- 題目內文 -->
-        <div id="player-q-text" class="flex-1 overflow-y-auto text-base sm:text-xl md:text-2xl font-bold text-slate-100 leading-relaxed md:leading-[1.8] py-2 break-words pr-1">
+        <div id="player-q-text" class="flex-1 min-h-0 overflow-y-auto text-sm sm:text-lg md:text-2xl font-bold text-slate-100 leading-relaxed md:leading-[1.7] py-1 break-words pr-1">
           題目載入中...
         </div>
 
-        <div class="flex items-center justify-between text-xs md:text-sm text-slate-400 font-mono shrink-0 pt-2 border-t border-slate-800">
+        <div class="flex items-center justify-between gap-2 text-xs md:text-sm text-slate-400 font-mono shrink-0 pt-1.5 border-t border-slate-800">
           <span class="truncate">📐 熟練運算定律：a ÷ b ÷ c = a ÷ (b × c) ＝ a ÷ c ÷ b</span>
-          <div id="player-status-stamp" class="shrink-0 text-xs md:text-sm font-black px-3 py-1 rounded-lg hidden font-num"></div>
+          <div id="player-status-stamp" class="shrink-0 text-xs md:text-sm font-black px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-lg hidden font-num"></div>
         </div>
       </div>
 
-      <!-- 下半部：互動答題與盲點解析區 -->
-      <div class="flex-1 min-h-0 flex flex-col gap-2 relative">
+      <!-- 下半部：互動答題與盲點解析區 (使用彈性串流佈局，完全不互相遮蓋) -->
+      <div id="bottom-stage" class="flex-[5.5] min-h-0 flex flex-col gap-2.5">
         <div id="player-interactive" class="flex-1 min-h-0 flex flex-col justify-center"></div>
 
         <!-- 答錯/觀念解析面板 (Analysis Box) -->
-        <div id="player-analysis-card" class="h-1/2 min-h-0 rounded-2xl bg-rose-950/95 border-2 border-rose-500/70 p-3.5 hidden flex-col justify-start text-rose-200 shrink-0 shadow-2xl">
-          <div class="flex items-center gap-1.5 text-xs md:text-sm font-black text-rose-300 mb-1 shrink-0">
-            <span>💡 數學算則盲點深度剖析：</span>
+        <div id="player-analysis-card" class="flex-1 min-h-[115px] rounded-2xl bg-gradient-to-br from-rose-950 via-slate-900 to-rose-950/95 border-2 border-rose-400/80 p-3 sm:p-4 hidden flex-col justify-start text-rose-100 shadow-[0_0_25px_rgba(244,63,94,0.25)] overflow-hidden">
+          <div class="flex items-center justify-between gap-2 text-xs sm:text-sm md:text-base font-black text-amber-300 mb-1.5 pb-1 border-b border-rose-500/40 shrink-0">
+            <span>💡 數學算則盲點深度剖析</span>
+            <span class="text-[11px] font-mono text-rose-300 bg-rose-900/60 px-2 py-0.5 rounded-md border border-rose-500/40">請對照上方紅/綠選項檢討</span>
           </div>
           <div id="player-analysis-text" class="text-xs sm:text-sm md:text-base font-medium leading-relaxed text-slate-100 overflow-y-auto flex-1 pr-1">
             --
@@ -192,17 +193,17 @@
         </div>
       </div>
 
-    </div>
-
-    <!-- ==================== 答錯暫停・理解確認中控浮動條 ==================== -->
-    <div id="teacher-control-bar" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 hidden items-center gap-3 bg-slate-900/95 border-2 border-amber-400 px-4 py-2 rounded-2xl shadow-2xl backdrop-blur-md max-w-[90vw] transition-all">
-      <div class="flex items-center gap-2">
-        <span class="text-lg" id="ctrl-icon">🚨</span>
-        <span id="ctrl-msg" class="text-xs sm:text-sm font-bold text-rose-300 whitespace-nowrap">算則或計算有誤・計時已暫停</span>
+      <!-- ==================== 理解確認中控條 (納入正常版面流底端，絕不浮動遮擋文字) ==================== -->
+      <div id="teacher-control-bar" class="shrink-0 hidden items-center justify-between gap-3 bg-slate-900/95 border-2 border-amber-400 px-3.5 py-2 rounded-2xl shadow-xl backdrop-blur-md transition-all">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-base sm:text-lg shrink-0" id="ctrl-icon">🚨</span>
+          <span id="ctrl-msg" class="text-xs sm:text-sm font-bold text-rose-300 truncate">算則或計算有誤・計時已暫停</span>
+        </div>
+        <button id="btn-next-question" class="shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow-md active:scale-95 transition-all flex items-center gap-1 animate-pulse">
+          <span>💡 我已理解，繼續挑戰 ➔</span>
+        </button>
       </div>
-      <button id="btn-next-question" class="shrink-0 px-4 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow-md active:scale-95 transition-all flex items-center gap-1 animate-pulse">
-        <span>💡 我已理解，繼續挑戰 ➔</span>
-      </button>
+
     </div>
 
     <!-- ==================== 手速小遊戲覆蓋層 (單人全屏沉浸遊樂場) ==================== -->
@@ -973,6 +974,7 @@
       selectedMatches: {},
       selectedL: null,
       selectedR: null,
+      wrongMatchPair: null,
 
       currentMiniGame: 0,
       mgTimer: 20.0,
@@ -990,6 +992,8 @@
     const elTeacherBar = document.getElementById('teacher-control-bar');
     const elCtrlMsg = document.getElementById('ctrl-msg');
 
+    const elQuestionCard = document.getElementById('question-card');
+    const elBottomStage = document.getElementById('bottom-stage');
     const elPlayerQText = document.getElementById('player-q-text');
     const elPlayerQType = document.getElementById('player-q-type');
     const elPlayerInteractive = document.getElementById('player-interactive');
@@ -1036,6 +1040,7 @@
       STATE.selectedMatches = {};
       STATE.selectedL = null;
       STATE.selectedR = null;
+      STATE.wrongMatchPair = null;
 
       sound.setBpm(128);
       updateHUD();
@@ -1046,6 +1051,9 @@
       elPlayerStatus.classList.add('hidden');
       elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
 
+      // 恢復正常答題時的上下卡片比例
+      elQuestionCard.className = 'flex-[4.5] min-h-0 bg-slate-900/90 rounded-2xl sm:rounded-3xl border-2 border-cyan-500/40 p-3.5 sm:p-4 md:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden backdrop-blur-md transition-all';
+      elBottomStage.className = 'flex-[5.5] min-h-0 flex flex-col gap-2.5';
       elPlayerInteractive.className = 'flex-1 min-h-0 flex flex-col justify-center';
 
       elRoundIndicator.textContent = `ROUND ${index + 1} / 30`;
@@ -1063,24 +1071,27 @@
       // 三態算則診斷是非題
       if (type === 'tf3') {
         elPlayerInteractive.innerHTML = `
-          <div class="flex flex-col gap-2.5 h-full justify-center">
-            <button id="btn-correct" class="w-full flex-1 min-h-[58px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/60 hover:border-emerald-400 p-3 flex items-center justify-between active:scale-[0.98] transition-all shadow-md touch-btn">
+          <div id="tf3-list" class="flex flex-col gap-2.5 h-full justify-center">
+            <button id="btn-correct" class="w-full flex-1 min-h-[54px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/60 hover:border-emerald-400 p-3 flex items-center justify-between gap-2 active:scale-[0.98] transition-all shadow-md touch-btn">
               <span class="flex items-center gap-2.5 text-base sm:text-lg font-black text-emerald-300 pointer-events-none">
-                <span class="text-2xl">⭕</span> <span>完全正確</span>
+                <span class="text-xl sm:text-2xl">⭕</span> <span>完全正確</span>
               </span>
-              <span class="text-xs sm:text-sm text-slate-400 pointer-events-none">運算法則、速算變形與最終計算結果皆無誤</span>
+              <span class="tf3-desc text-xs sm:text-sm text-slate-400 pointer-events-none truncate">運算法則、速算變形與最終計算結果皆無誤</span>
+              <span class="tf3-badge hidden text-xs font-black px-2.5 py-0.5 rounded-lg shrink-0 pointer-events-none"></span>
             </button>
-            <button id="btn-rule" class="w-full flex-1 min-h-[58px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/60 hover:border-rose-400 p-3 flex items-center justify-between active:scale-[0.98] transition-all shadow-md touch-btn">
+            <button id="btn-rule" class="w-full flex-1 min-h-[54px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/60 hover:border-rose-400 p-3 flex items-center justify-between gap-2 active:scale-[0.98] transition-all shadow-md touch-btn">
               <span class="flex items-center gap-2.5 text-base sm:text-lg font-black text-rose-300 pointer-events-none">
-                <span class="text-2xl">❌</span> <span>錯在算則符號</span>
+                <span class="text-xl sm:text-2xl">❌</span> <span>錯在算則符號</span>
               </span>
-              <span class="text-xs sm:text-sm text-slate-400 pointer-events-none">括號內誤寫為除號/加號、運算法則變形錯誤</span>
+              <span class="tf3-desc text-xs sm:text-sm text-slate-400 pointer-events-none truncate">括號內誤寫為除號/加號、運算法則變形錯誤</span>
+              <span class="tf3-badge hidden text-xs font-black px-2.5 py-0.5 rounded-lg shrink-0 pointer-events-none"></span>
             </button>
-            <button id="btn-calc" class="w-full flex-1 min-h-[58px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/60 hover:border-amber-400 p-3 flex items-center justify-between active:scale-[0.98] transition-all shadow-md touch-btn">
+            <button id="btn-calc" class="w-full flex-1 min-h-[54px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/60 hover:border-amber-400 p-3 flex items-center justify-between gap-2 active:scale-[0.98] transition-all shadow-md touch-btn">
               <span class="flex items-center gap-2.5 text-base sm:text-lg font-black text-amber-300 pointer-events-none">
-                <span class="text-2xl">💡</span> <span>錯在計算數值</span>
+                <span class="text-xl sm:text-2xl">💡</span> <span>錯在計算數值</span>
               </span>
-              <span class="text-xs sm:text-sm text-slate-400 pointer-events-none">算則變形完全正確，但最後心算數字算錯了</span>
+              <span class="tf3-desc text-xs sm:text-sm text-slate-400 pointer-events-none truncate">算則變形完全正確，但最後心算數字算錯了</span>
+              <span class="tf3-badge hidden text-xs font-black px-2.5 py-0.5 rounded-lg shrink-0 pointer-events-none"></span>
             </button>
           </div>
         `;
@@ -1093,13 +1104,13 @@
         let btns = '';
         roundData.options.forEach((opt, idx) => {
           btns += `
-            <button id="mc-${idx}" class="w-full h-full text-left px-4 py-3 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-between text-sm sm:text-base font-bold shadow hover:bg-slate-800/80 touch-btn">
-              <span class="text-slate-100 break-words leading-relaxed pointer-events-none math-font">${opt}</span>
-              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">選項 ${['A','B','C','D'][idx]}</span>
+            <button id="mc-${idx}" class="w-full h-full text-left px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-between gap-2 text-sm sm:text-base font-bold shadow hover:bg-slate-800/80 touch-btn">
+              <span class="text-slate-100 break-words leading-snug pointer-events-none math-font">${opt}</span>
+              <span class="mc-tag text-xs font-mono px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 pointer-events-none">選項 ${['A','B','C','D'][idx]}</span>
             </button>
           `;
         });
-        elPlayerInteractive.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 h-full">${btns}</div>`;
+        elPlayerInteractive.innerHTML = `<div id="mc-grid" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 h-full">${btns}</div>`;
         roundData.options.forEach((_, idx) => {
           document.getElementById(`mc-${idx}`).addEventListener('pointerdown', (e) => { e.preventDefault(); handleAnswer(idx); });
         });
@@ -1109,7 +1120,7 @@
         let leftCols = '';
         roundData.left.forEach(item => {
           leftCols += `
-            <button id="match-${item.key}" class="w-full flex-1 min-h-[64px] sm:min-h-[76px] px-3.5 py-2.5 rounded-2xl bg-slate-900/90 border-2 border-cyan-500/50 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base font-bold shadow-md hover:bg-slate-800/90 touch-btn">
+            <button id="match-${item.key}" class="w-full flex-1 min-h-[60px] sm:min-h-[72px] px-3.5 py-2 rounded-2xl bg-slate-900/90 border-2 border-cyan-500/50 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base font-bold shadow-md hover:bg-slate-800/90 touch-btn">
               <span class="w-full leading-relaxed break-words pointer-events-none math-font">${item.label}</span>
             </button>
           `;
@@ -1119,7 +1130,7 @@
         let rightCols = '';
         shuffledRight.forEach(item => {
           rightCols += `
-            <button id="match-${item.key}" class="w-full flex-1 min-h-[64px] sm:min-h-[76px] px-3.5 py-2.5 rounded-2xl bg-slate-900/90 border-2 border-cyan-500/50 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base font-bold shadow-md hover:bg-slate-800/90 touch-btn">
+            <button id="match-${item.key}" class="w-full flex-1 min-h-[60px] sm:min-h-[72px] px-3.5 py-2 rounded-2xl bg-slate-900/90 border-2 border-cyan-500/50 hover:border-cyan-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-base font-bold shadow-md hover:bg-slate-800/90 touch-btn">
               <span class="w-full leading-relaxed break-words pointer-events-none math-font">${item.label}</span>
             </button>
           `;
@@ -1127,7 +1138,7 @@
 
         elPlayerInteractive.innerHTML = `
           <div class="relative w-full h-full">
-            <div id="match-box" class="grid grid-cols-2 gap-3.5 h-full items-stretch">
+            <div id="match-box" class="grid grid-cols-2 gap-3 h-full items-stretch">
               <div class="flex flex-col gap-2.5 h-full justify-between">${leftCols}</div>
               <div class="flex flex-col gap-2.5 h-full justify-between">${rightCols}</div>
             </div>
@@ -1149,12 +1160,92 @@
       }
     }
 
+    function applyReviewLayout(roundData, userVal) {
+      // 1. 題目區自動調整為緊湊自適應高度（保留完整捲動能力，不擠壓下方解答區）
+      elQuestionCard.className = 'flex-none max-h-[30%] min-h-[96px] bg-slate-900/90 rounded-2xl border-2 border-cyan-500/40 p-3 sm:p-3.5 shadow-xl flex flex-col justify-between relative overflow-hidden backdrop-blur-md transition-all';
+      elPlayerQText.className = 'flex-1 min-h-0 overflow-y-auto text-sm sm:text-base md:text-lg font-bold text-slate-100 leading-snug py-1 break-words pr-1';
+
+      // 2. 互動選項區轉為緊湊高對比檢討模式，清楚標出「你的選擇 ❌」與「正確解答 ✅」
+      elPlayerInteractive.className = 'shrink-0 flex flex-col justify-center pointer-events-none';
+
+      if (roundData.type === 'tf3') {
+        const list = document.getElementById('tf3-list');
+        if (list) list.className = 'flex flex-col gap-1.5 justify-center';
+
+        ['correct', 'rule', 'calc'].forEach(key => {
+          const btn = document.getElementById(`btn-${key}`);
+          if (!btn) return;
+          const desc = btn.querySelector('.tf3-desc');
+          const badge = btn.querySelector('.tf3-badge');
+          if (desc) desc.classList.add('hidden');
+
+          btn.className = 'w-full rounded-xl px-3 py-1.5 border-2 flex items-center justify-between gap-2 transition-all text-sm font-black';
+
+          if (key === roundData.answer) {
+            btn.classList.add('border-emerald-400', 'bg-emerald-950/90', 'text-emerald-200', 'shadow-md');
+            if (badge) {
+              badge.textContent = '✅ 正確解答';
+              badge.className = 'tf3-badge text-xs font-black px-2 py-0.5 rounded-md bg-emerald-500 text-slate-950 shrink-0';
+            }
+          } else if (key === userVal) {
+            btn.classList.add('border-rose-500', 'bg-rose-950/90', 'text-rose-200');
+            if (badge) {
+              badge.textContent = '❌ 你的選擇';
+              badge.className = 'tf3-badge text-xs font-black px-2 py-0.5 rounded-md bg-rose-500 text-white shrink-0';
+            }
+          } else {
+            btn.classList.add('border-slate-700/70', 'bg-slate-900/50', 'opacity-45');
+          }
+        });
+      } else if (roundData.type === 'mc') {
+        const grid = document.getElementById('mc-grid');
+        if (grid) grid.className = 'grid grid-cols-2 gap-1.5 sm:gap-2';
+
+        roundData.options.forEach((_, idx) => {
+          const btn = document.getElementById(`mc-${idx}`);
+          if (!btn) return;
+          const tag = btn.querySelector('.mc-tag');
+          btn.className = 'w-full text-left px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border-2 flex items-center justify-between gap-1.5 text-xs sm:text-sm font-bold transition-all';
+
+          if (idx === roundData.answer) {
+            btn.classList.add('border-emerald-400', 'bg-emerald-950/90', 'text-emerald-100', 'shadow-md');
+            if (tag) {
+              tag.textContent = '✅ 正解';
+              tag.className = 'mc-tag text-[11px] font-black px-2 py-0.5 rounded bg-emerald-500 text-slate-950 shrink-0';
+            }
+          } else if (idx === userVal) {
+            btn.classList.add('border-rose-500', 'bg-rose-950/90', 'text-rose-200');
+            if (tag) {
+              tag.textContent = '❌ 誤選';
+              tag.className = 'mc-tag text-[11px] font-black px-2 py-0.5 rounded bg-rose-500 text-white shrink-0';
+            }
+          } else {
+            btn.classList.add('border-slate-700/70', 'bg-slate-900/50', 'opacity-45');
+          }
+        });
+      } else if (roundData.type === 'match') {
+        // 顯示清晰的正確配對對照表，不互相遮擋
+        const leftMap = Object.fromEntries(roundData.left.map(i => [i.key, i.label]));
+        const rightMap = Object.fromEntries(roundData.right.map(i => [i.key, i.label]));
+        let rowsHtml = '';
+        Object.entries(roundData.matches).forEach(([lKey, rKey]) => {
+          rowsHtml += `
+            <div class="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-400/70 text-xs sm:text-sm font-bold text-emerald-100 math-font">
+              <span class="truncate">${leftMap[lKey]}</span>
+              <span class="text-emerald-400 font-black shrink-0">➔ 正確配對 ➔</span>
+              <span class="truncate text-right">${rightMap[rKey]}</span>
+            </div>
+          `;
+        });
+        elPlayerInteractive.innerHTML = `<div class="flex flex-col gap-1.5">${rowsHtml}</div>`;
+      }
+    }
+
     function handleAnswer(val) {
       if (STATE.isPausedForError || STATE.answered) return;
 
       STATE.answered = true;
       STATE.answerVal = val;
-      elPlayerInteractive.classList.add('pointer-events-none', 'opacity-70');
 
       const roundData = QUESTION_BANK[STATE.roundIndex];
       const isCorrect = (roundData.type === 'match') ? (val === true) : (val === roundData.answer);
@@ -1162,6 +1253,15 @@
       elPlayerStatus.classList.remove('hidden');
 
       if (isCorrect) {
+        elPlayerInteractive.classList.add('pointer-events-none');
+        if (roundData.type === 'tf3') {
+          const btn = document.getElementById(`btn-${val}`);
+          if (btn) btn.classList.add('border-emerald-400', 'bg-emerald-900/60', 'scale-[1.01]');
+        } else if (roundData.type === 'mc') {
+          const btn = document.getElementById(`mc-${val}`);
+          if (btn) btn.classList.add('border-emerald-400', 'bg-emerald-900/60', 'scale-[1.01]');
+        }
+
         sound.playCorrect();
         clearInterval(STATE.timerInterval);
         
@@ -1172,7 +1272,7 @@
         STATE.totalScore += earned;
         STATE.correctCount++;
 
-        elPlayerStatus.className = 'text-xs md:text-sm font-black px-3 py-1 rounded-xl bg-emerald-950 border border-emerald-500 text-emerald-300 font-num shrink-0';
+        elPlayerStatus.className = 'text-xs md:text-sm font-black px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl bg-emerald-950 border border-emerald-500 text-emerald-300 font-num shrink-0';
         elPlayerStatus.textContent = `✅ 正確 +${earned} (神速+${timeBonus})`;
 
         updateHUD();
@@ -1180,7 +1280,7 @@
         elTeacherBar.classList.remove('hidden');
         elTeacherBar.classList.add('flex');
         elTeacherBar.style.borderColor = '#10b981';
-        elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-emerald-400 whitespace-nowrap';
+        elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-emerald-400 truncate';
         elCtrlMsg.textContent = '🎉 計算正確！1.8 秒後進入下一關...';
 
         STATE.autoAdvanceTimer = setTimeout(() => {
@@ -1194,9 +1294,10 @@
         STATE.totalScore -= 50;
         STATE.isPausedForError = true;
 
-        elPlayerStatus.className = 'text-xs md:text-sm font-black px-3 py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num shrink-0';
+        elPlayerStatus.className = 'text-xs md:text-sm font-black px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num shrink-0';
         elPlayerStatus.textContent = '❌ 算則/計算錯誤 -50';
 
+        applyReviewLayout(roundData, val);
         showAnalysisBox(roundData.tip);
         updateHUD();
 
@@ -1206,7 +1307,7 @@
         elTeacherBar.classList.remove('hidden');
         elTeacherBar.classList.add('flex');
         elTeacherBar.style.borderColor = '#ef4444';
-        elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-rose-300 whitespace-nowrap';
+        elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-rose-300 truncate';
         elCtrlMsg.textContent = '算則有誤・計時已停止';
       }
     }
@@ -1254,6 +1355,7 @@
         } else {
           const prevL = STATE.selectedL;
           const prevR = STATE.selectedR;
+          STATE.wrongMatchPair = [prevL, prevR];
           STATE.selectedL = null;
           STATE.selectedR = null;
           shakeMatchBtn(prevL);
@@ -1340,10 +1442,11 @@
       STATE.academicScore -= 50;
       STATE.totalScore -= 50;
       elPlayerStatus.classList.remove('hidden');
-      elPlayerStatus.className = 'text-xs md:text-sm font-black px-3 py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num shrink-0';
+      elPlayerStatus.className = 'text-xs md:text-sm font-black px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num shrink-0';
       elPlayerStatus.textContent = '⌛ 答題超時 -50';
+
+      applyReviewLayout(roundData, null);
       showAnalysisBox(roundData.tip);
-      elPlayerInteractive.classList.add('pointer-events-none', 'opacity-70');
 
       updateHUD();
       STATE.isPausedForError = true;
@@ -1352,7 +1455,7 @@
       elTeacherBar.classList.remove('hidden');
       elTeacherBar.classList.add('flex');
       elTeacherBar.style.borderColor = '#ef4444';
-      elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-rose-300 whitespace-nowrap';
+      elCtrlMsg.className = 'text-xs sm:text-sm font-bold text-rose-300 truncate';
       elCtrlMsg.textContent = '計算超時・已停止計時';
     }
 
@@ -1885,7 +1988,7 @@
 
     /* ==========================================================
        【小遊戲 ③】（第30關後壓軸）：🥁 極速太鼓達人【極速狂飆版】
-       ========================================================= */
+       ========================================================== */
     class TaikoDrum {
       constructor(canvas, ctx) {
         this.canvas = canvas;
