@@ -104,6 +104,7 @@
       border: 1px solid rgba(148, 163, 184, 0.28);
       border-radius: 14px;
       width: 100%;
+      flex-shrink: 0;
     }
     .geo-diagram-wrap svg {
       max-height: 112px;
@@ -113,12 +114,12 @@
     }
     @media (min-height: 760px) {
       .geo-diagram-wrap svg {
-        max-height: 138px;
+        max-height: 136px;
       }
     }
     @media (min-width: 1024px) and (min-height: 820px) {
       .geo-diagram-wrap svg {
-        max-height: 152px;
+        max-height: 148px;
       }
     }
     
@@ -189,57 +190,64 @@
     </div>
   </header>
 
-  <!-- ==================== 主要單人遊戲工作區 (響應式居中容器，完美支援電腦與 iPad 橫/直向) ==================== -->
-  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950/30">
+  <!-- ==================== 主要單人遊戲工作區 (可自適應捲動，確保題目、選項與解答絕不互相遮蓋) ==================== -->
+  <main id="game-stage" class="flex-1 relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950/30">
     
-    <div class="w-full max-w-5xl h-full flex flex-col px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 gap-2.5 sm:gap-3.5">
-      
-      <!-- 上半部：題目敘述與幾何圖形卡片 -->
-      <section class="flex-1 min-h-0 bg-slate-900/95 rounded-2xl sm:rounded-3xl border-2 border-cyan-500/40 p-3.5 sm:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
-        <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cyan-400 shrink-0 mb-1">
-          <div class="flex items-center gap-2">
-            <span id="q-type-badge" class="px-2.5 py-0.5 rounded-lg bg-cyan-950/90 border border-cyan-700 text-cyan-300">幾何診斷題</span>
-            <span id="q-milestone-hint" class="text-[11px] sm:text-xs text-amber-300/90 font-num">距離小遊戲還有 10 題</span>
+    <div id="quiz-scroll-area" class="w-full h-full overflow-y-auto overscroll-contain flex flex-col items-center">
+      <div class="w-full max-w-5xl min-h-full flex flex-col justify-between px-3 sm:px-6 md:px-8 py-2.5 sm:py-3.5 gap-2.5 sm:gap-3">
+        
+        <!-- 上半部：題目敘述與幾何圖形卡片 -->
+        <section id="question-card" class="shrink-0 bg-slate-900/95 rounded-2xl sm:rounded-3xl border-2 border-cyan-500/40 p-3.5 sm:p-5 shadow-2xl flex flex-col justify-between relative">
+          <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cyan-400 shrink-0 mb-1.5">
+            <div class="flex items-center gap-2">
+              <span id="q-type-badge" class="px-2.5 py-0.5 rounded-lg bg-cyan-950/90 border border-cyan-700 text-cyan-300">幾何診斷題</span>
+              <span id="q-milestone-hint" class="text-[11px] sm:text-xs text-amber-300/90 font-num">距離小遊戲還有 10 題</span>
+            </div>
+            <span class="text-slate-400 font-num hidden sm:inline" id="q-hotkey-hint">支援觸控點擊 或 鍵盤 1 / 2 / 3</span>
           </div>
-          <span class="text-slate-400 font-num hidden sm:inline" id="q-hotkey-hint">支援觸控點擊 或 鍵盤 1 / 2 / 3</span>
-        </div>
 
-        <div id="q-text" class="flex-1 overflow-y-auto text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-100 leading-[1.6] py-1 break-words pr-1 flex flex-col justify-center">
-          題目載入中...
-        </div>
-
-        <div class="flex items-center justify-between text-xs sm:text-sm text-slate-400 font-mono shrink-0 pt-2 border-t border-slate-800/90 gap-2">
-          <span class="truncate">📐 認明垂直直角記號 ∟，小心干擾斜邊！</span>
-          <div id="player-status-stamp" class="shrink-0 text-xs sm:text-sm md:text-base font-black px-3 py-0.5 rounded-lg hidden font-num"></div>
-        </div>
-      </section>
-
-      <!-- 下半部：作答互動區 + 觀念解析卡片 -->
-      <section class="flex-1 min-h-0 flex flex-col gap-2.5">
-        <div id="player-interactive" class="flex-1 min-h-0 flex flex-col justify-center"></div>
-
-        <!-- 答錯／觀念解析面板 (Analysis Box) -->
-        <div id="player-analysis-card" class="shrink-0 max-h-[46%] rounded-2xl bg-rose-950/95 border-2 border-rose-500/70 p-3 sm:p-4 hidden flex-col justify-start text-rose-100 shadow-xl">
-          <div class="flex items-center gap-1.5 text-xs sm:text-sm md:text-base font-black text-amber-300 mb-1 shrink-0">
-            <span>💡 幾何觀念解析：</span>
+          <div id="q-text" class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-slate-100 leading-[1.6] py-1 break-words">
+            題目載入中...
           </div>
-          <div id="player-analysis-text" class="text-xs sm:text-sm md:text-base font-medium leading-relaxed text-slate-100 overflow-y-auto pr-1">
-            --
-          </div>
-        </div>
-      </section>
 
-      <!-- 底部內嵌式控制橫幅（絕不遮擋題目與選項，完美適配 iPad 觸控） -->
-      <div id="control-bar" class="shrink-0 hidden items-center justify-between gap-3 bg-slate-900/95 border-2 border-amber-400 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-2xl shadow-2xl">
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="text-lg sm:text-xl shrink-0" id="ctrl-icon">🚨</span>
-          <span id="ctrl-msg" class="text-xs sm:text-sm md:text-base font-bold text-rose-300 truncate">作答有誤・已停止計時</span>
+          <div class="flex items-center justify-between text-xs sm:text-sm text-slate-400 font-mono shrink-0 pt-2 mt-1.5 border-t border-slate-800/90 gap-2">
+            <span class="truncate">📐 認明垂直直角記號 ∟，小心干擾斜邊！</span>
+            <div id="player-status-stamp" class="shrink-0 text-xs sm:text-sm md:text-base font-black px-3 py-0.5 rounded-lg hidden font-num"></div>
+          </div>
+        </section>
+
+        <!-- 下半部：作答互動區 + 觀念解析卡片 -->
+        <section class="flex-1 flex flex-col justify-center gap-2.5 sm:gap-3">
+          <div id="player-interactive" class="w-full flex flex-col justify-center"></div>
+
+          <!-- 答錯／觀念解析面板 (Analysis Box)：獨立區塊且清晰標示正解與觀念 -->
+          <div id="player-analysis-card" class="w-full rounded-2xl bg-slate-900/95 border-2 border-amber-400/90 p-3.5 sm:p-4 hidden flex-col justify-start text-slate-100 shadow-2xl ring-2 ring-rose-500/35">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-700/90 shrink-0">
+              <div class="flex items-center gap-1.5 text-sm sm:text-base md:text-lg font-black text-amber-300">
+                <span>💡 幾何觀念解析</span>
+              </div>
+              <span id="player-correct-pill" class="text-xs sm:text-sm md:text-base font-black px-3 py-1 rounded-xl bg-emerald-950 border border-emerald-400/80 text-emerald-300 shadow-sm">
+                --
+              </span>
+            </div>
+            <div id="player-analysis-text" class="text-sm sm:text-base md:text-lg font-medium leading-relaxed text-slate-100 break-words">
+              --
+            </div>
+          </div>
+        </section>
+
+        <!-- 底部內嵌式控制橫幅（絕不遮擋題目與選項，完美適配 iPad 觸控） -->
+        <div id="control-bar" class="shrink-0 hidden items-center justify-between gap-3 bg-slate-900/95 border-2 border-amber-400 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-2xl shadow-2xl">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-lg sm:text-xl shrink-0" id="ctrl-icon">🚨</span>
+            <span id="ctrl-msg" class="text-xs sm:text-sm md:text-base font-bold text-rose-300 truncate">作答有誤・已停止計時</span>
+          </div>
+          <button id="btn-advance-step" class="touch-btn shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm md:text-base text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow-lg active:scale-95 transition-all flex items-center gap-1.5">
+            <span id="btn-advance-label">💡 我已理解，下一題 ➔</span>
+          </button>
         </div>
-        <button id="btn-advance-step" class="touch-btn shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm md:text-base text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:opacity-95 shadow-lg active:scale-95 transition-all flex items-center gap-1.5">
-          <span id="btn-advance-label">💡 我已理解，下一題 ➔</span>
-        </button>
+
       </div>
-
     </div>
 
     <!-- ==================== 單人手速小遊戲覆蓋層 (全螢幕自適應遊樂場) ==================== -->
@@ -1306,12 +1314,14 @@
     const elCtrlMsg = document.getElementById('ctrl-msg');
     const elBtnAdvanceLabel = document.getElementById('btn-advance-label');
 
+    const elQuizScrollArea = document.getElementById('quiz-scroll-area');
     const elQText = document.getElementById('q-text');
     const elQTypeBadge = document.getElementById('q-type-badge');
     const elQMilestoneHint = document.getElementById('q-milestone-hint');
     const elQHotkeyHint = document.getElementById('q-hotkey-hint');
     const elInteractive = document.getElementById('player-interactive');
     const elAnalysisCard = document.getElementById('player-analysis-card');
+    const elCorrectPill = document.getElementById('player-correct-pill');
     const elAnalysisText = document.getElementById('player-analysis-text');
     const elStatusStamp = document.getElementById('player-status-stamp');
 
@@ -1342,6 +1352,22 @@
         const left = 30 - roundNum;
         return left === 0 ? "本題結束後進入 🥁 極速太鼓達人！" : `再 ${left} 題進入 🥁 極速太鼓達人`;
       }
+    }
+
+    function getCorrectAnswerLabel(q) {
+      if (q.type === 'tf3') {
+        const map = {
+          correct: '1. 完全正確',
+          geo: '2. 錯在底與高／切割觀念',
+          calc: '3. 錯在面積算式／倍數關係'
+        };
+        return map[q.answer] || '';
+      } else if (q.type === 'mc') {
+        return q.options[q.answer] || '';
+      } else if (q.type === 'match') {
+        return '全部 3 組正確配對';
+      }
+      return '';
     }
 
     function loadQuestion(index) {
@@ -1381,7 +1407,8 @@
       elStatusStamp.classList.add('hidden');
       elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
 
-      elInteractive.className = 'flex-1 min-h-0 flex flex-col justify-center';
+      elInteractive.className = 'w-full flex flex-col justify-center';
+      if (elQuizScrollArea) elQuizScrollArea.scrollTop = 0;
 
       const roundNum = index + 1;
       elStageBadge.textContent = q.stage;
@@ -1407,24 +1434,24 @@
 
       if (q.type === 'tf3') {
         elInteractive.innerHTML = `
-          <div class="flex flex-col gap-2.5 sm:gap-3 h-full justify-center">
-            <button id="btn-ans-correct" class="touch-btn w-full flex-1 min-h-[52px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/60 hover:border-emerald-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all shadow-md">
+          <div id="tf3-grid" class="flex flex-col gap-2.5 sm:gap-3 justify-center">
+            <button id="btn-ans-correct" class="touch-btn w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/60 hover:border-emerald-400 px-4 py-2.5 flex items-center justify-between gap-2 active:scale-[0.98] transition-all shadow-md">
               <span class="flex items-center gap-2.5 text-base sm:text-lg md:text-xl font-black text-emerald-300 pointer-events-none">
                 <span class="text-2xl">⭕</span> <span>1. 完全正確</span>
               </span>
-              <span class="text-xs sm:text-sm text-slate-300 pointer-events-none">底與高垂直對應、算式皆無誤</span>
+              <span id="tag-ans-correct" class="text-xs sm:text-sm text-slate-300 pointer-events-none text-right">底與高垂直對應、算式皆無誤</span>
             </button>
-            <button id="btn-ans-geo" class="touch-btn w-full flex-1 min-h-[52px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/60 hover:border-rose-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all shadow-md">
+            <button id="btn-ans-geo" class="touch-btn w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/60 hover:border-rose-400 px-4 py-2.5 flex items-center justify-between gap-2 active:scale-[0.98] transition-all shadow-md">
               <span class="flex items-center gap-2.5 text-base sm:text-lg md:text-xl font-black text-rose-300 pointer-events-none">
                 <span class="text-2xl">📐</span> <span>2. 錯在底與高／切割觀念</span>
               </span>
-              <span class="text-xs sm:text-sm text-slate-300 pointer-events-none">誤乘斜邊、未垂直底邊、斜剪錯誤</span>
+              <span id="tag-ans-geo" class="text-xs sm:text-sm text-slate-300 pointer-events-none text-right">誤乘斜邊、未垂直底邊、斜剪錯誤</span>
             </button>
-            <button id="btn-ans-calc" class="touch-btn w-full flex-1 min-h-[52px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/60 hover:border-amber-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.98] transition-all shadow-md">
+            <button id="btn-ans-calc" class="touch-btn w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/60 hover:border-amber-400 px-4 py-2.5 flex items-center justify-between gap-2 active:scale-[0.98] transition-all shadow-md">
               <span class="flex items-center gap-2.5 text-base sm:text-lg md:text-xl font-black text-amber-300 pointer-events-none">
                 <span class="text-2xl">🧮</span> <span>3. 錯在面積算式／倍數關係</span>
               </span>
-              <span class="text-xs sm:text-sm text-slate-300 pointer-events-none">倍數算錯、誤以為周長相等面積相等</span>
+              <span id="tag-ans-calc" class="text-xs sm:text-sm text-slate-300 pointer-events-none text-right">倍數算錯、誤以為周長相等面積相等</span>
             </button>
           </div>
         `;
@@ -1435,13 +1462,13 @@
         let btns = '';
         q.options.forEach((opt, idx) => {
           btns += `
-            <button id="btn-mc-${idx}" class="touch-btn w-full h-full min-h-[54px] text-left px-4 py-3 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-amber-400 active:scale-[0.98] transition-all flex items-center justify-between text-sm sm:text-base md:text-lg font-bold shadow-md hover:bg-slate-800/90">
+            <button id="btn-mc-${idx}" class="touch-btn w-full min-h-[54px] text-left px-4 py-3 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-amber-400 active:scale-[0.98] transition-all flex items-center justify-between text-sm sm:text-base md:text-lg font-bold shadow-md hover:bg-slate-800/90">
               <span class="text-slate-100 break-words leading-snug pointer-events-none">${opt}</span>
-              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 text-amber-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">選項 ${['A','B','C','D'][idx]}</span>
+              <span id="tag-mc-${idx}" class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 text-amber-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">選項 ${['A','B','C','D'][idx]}</span>
             </button>
           `;
         });
-        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 h-full">${btns}</div>`;
+        elInteractive.innerHTML = `<div id="mc-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">${btns}</div>`;
         q.options.forEach((_, idx) => {
           document.getElementById(`btn-mc-${idx}`).onclick = () => handleAnswer(idx);
         });
@@ -1449,7 +1476,7 @@
         let leftCols = '';
         q.left.forEach(item => {
           leftCols += `
-            <button id="btn-match-${item.key}" class="touch-btn w-full flex-1 min-h-[50px] sm:min-h-[58px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-md hover:bg-slate-800/90 text-left">
+            <button id="btn-match-${item.key}" class="touch-btn w-full min-h-[50px] sm:min-h-[58px] px-3.5 py-2.5 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-md hover:bg-slate-800/90 text-left">
               <span class="w-full leading-snug break-words pointer-events-none">${item.label}</span>
             </button>
           `;
@@ -1459,16 +1486,16 @@
         let rightCols = '';
         shuffledRight.forEach(item => {
           rightCols += `
-            <button id="btn-match-${item.key}" class="touch-btn w-full flex-1 min-h-[50px] sm:min-h-[58px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-md hover:bg-slate-800/90 text-left">
+            <button id="btn-match-${item.key}" class="touch-btn w-full min-h-[50px] sm:min-h-[58px] px-3.5 py-2.5 rounded-2xl bg-slate-900/95 border-2 border-indigo-500/50 hover:border-indigo-400 active:scale-[0.98] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-md hover:bg-slate-800/90 text-left">
               <span class="w-full leading-snug break-words pointer-events-none">${item.label}</span>
             </button>
           `;
         });
 
         elInteractive.innerHTML = `
-          <div class="grid grid-cols-2 gap-3 sm:gap-5 h-full items-stretch">
-            <div class="flex flex-col gap-2 sm:gap-2.5 h-full justify-between">${leftCols}</div>
-            <div class="flex flex-col gap-2 sm:gap-2.5 h-full justify-between">${rightCols}</div>
+          <div class="grid grid-cols-2 gap-3 sm:gap-5 items-stretch">
+            <div class="flex flex-col gap-2 sm:gap-2.5 justify-between">${leftCols}</div>
+            <div class="flex flex-col gap-2 sm:gap-2.5 justify-between">${rightCols}</div>
           </div>
         `;
 
@@ -1481,6 +1508,91 @@
       }
     }
 
+    /* 標示作答結果（清晰區分「你的選擇」與「正確答案」，避免視覺混淆與遮蓋） */
+    function highlightAnswerOutcomes(q, chosenVal, isCorrect) {
+      if (q.type === 'tf3') {
+        const keys = ['correct', 'geo', 'calc'];
+        const grid = document.getElementById('tf3-grid');
+        if (!isCorrect && grid) {
+          // 答錯時改為緊湊三欄橫排，騰出充足垂直空間顯示觀念解析
+          grid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-2';
+        }
+        keys.forEach(k => {
+          const btn = document.getElementById(`btn-ans-${k}`);
+          const tag = document.getElementById(`tag-ans-${k}`);
+          if (!btn) return;
+          if (!isCorrect && grid) {
+            btn.classList.remove('min-h-[52px]');
+            btn.classList.add('min-h-[44px]', 'py-2', 'px-3');
+          }
+          if (k === q.answer) {
+            btn.className = 'w-full min-h-[44px] rounded-2xl bg-emerald-950/95 border-2 border-emerald-400 px-3 py-2 flex items-center justify-between gap-1.5 shadow-lg ring-2 ring-emerald-400/50';
+            if (tag) {
+              tag.className = 'text-xs font-black px-2 py-0.5 rounded-md bg-emerald-500 text-slate-950 shrink-0';
+              tag.textContent = '✅ 正確答案';
+            }
+          } else if (k === chosenVal && !isCorrect) {
+            btn.className = 'w-full min-h-[44px] rounded-2xl bg-rose-950/95 border-2 border-rose-500 px-3 py-2 flex items-center justify-between gap-1.5 shadow-lg ring-2 ring-rose-500/50';
+            if (tag) {
+              tag.className = 'text-xs font-black px-2 py-0.5 rounded-md bg-rose-500 text-white shrink-0';
+              tag.textContent = '❌ 你的選擇';
+            }
+          } else {
+            btn.classList.add('opacity-40');
+          }
+        });
+      } else if (q.type === 'mc') {
+        const grid = document.getElementById('mc-grid');
+        if (!isCorrect && grid) {
+          grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+        }
+        q.options.forEach((_, idx) => {
+          const btn = document.getElementById(`btn-mc-${idx}`);
+          const tag = document.getElementById(`tag-mc-${idx}`);
+          if (!btn) return;
+          if (!isCorrect) {
+            btn.classList.remove('min-h-[54px]', 'py-3');
+            btn.classList.add('min-h-[44px]', 'py-2');
+          }
+          if (idx === q.answer) {
+            btn.className = 'w-full min-h-[44px] text-left px-3.5 py-2 rounded-2xl bg-emerald-950/95 border-2 border-emerald-400 flex items-center justify-between text-sm sm:text-base font-bold shadow-lg ring-2 ring-emerald-400/50';
+            if (tag) {
+              tag.className = 'text-xs font-black px-2 py-0.5 rounded-lg bg-emerald-500 text-slate-950 shrink-0 ml-2';
+              tag.textContent = '✅ 正解';
+            }
+          } else if (idx === chosenVal && !isCorrect) {
+            btn.className = 'w-full min-h-[44px] text-left px-3.5 py-2 rounded-2xl bg-rose-950/95 border-2 border-rose-500 flex items-center justify-between text-sm sm:text-base font-bold shadow-lg ring-2 ring-rose-500/50';
+            if (tag) {
+              tag.className = 'text-xs font-black px-2 py-0.5 rounded-lg bg-rose-500 text-white shrink-0 ml-2';
+              tag.textContent = '❌ 誤選';
+            }
+          } else {
+            btn.classList.add('opacity-40');
+          }
+        });
+      } else if (q.type === 'match' && !isCorrect) {
+        // 配對題答錯時，整理為清晰不重疊的三組正確配對總覽
+        const rightMap = {};
+        q.right.forEach(r => { rightMap[r.key] = r.label; });
+        let summaryRows = '';
+        q.left.forEach(l => {
+          const rLabel = rightMap[q.matches[l.key]] || '';
+          summaryRows += `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 px-3.5 py-2 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-xs sm:text-sm md:text-base font-bold">
+              <span class="text-slate-100">${l.label}</span>
+              <span class="text-emerald-300 shrink-0">➔ ${rLabel}</span>
+            </div>
+          `;
+        });
+        elInteractive.innerHTML = `
+          <div class="flex flex-col gap-1.5">
+            <div class="text-xs font-black text-emerald-300 tracking-wider">✅ 正確配對組合一覽：</div>
+            ${summaryRows}
+          </div>
+        `;
+      }
+    }
+
     function handleAnswer(val) {
       if (STATE.isPausedForError || STATE.answered) return;
 
@@ -1488,11 +1600,12 @@
       STATE.answerVal = val;
       clearInterval(STATE.timerInterval);
 
-      elInteractive.classList.add('pointer-events-none', 'opacity-75');
+      elInteractive.classList.add('pointer-events-none');
 
       const q = QUESTION_BANK[STATE.roundIndex];
       const isCorrect = (q.type === 'match') ? (val === true) : (val === q.answer);
 
+      highlightAnswerOutcomes(q, val, isCorrect);
       elStatusStamp.classList.remove('hidden');
 
       if (isCorrect) {
@@ -1542,15 +1655,19 @@
         elTimerText.textContent = '⏸️ 停止';
         elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
 
-        showAnalysisBox(q.tip);
+        showAnalysisBox(q);
 
         elControlBar.classList.remove('hidden');
         elControlBar.classList.add('flex');
         elControlBar.style.borderColor = '#ef4444';
         elCtrlIcon.textContent = '🚨';
         elCtrlMsg.className = 'text-xs sm:text-sm md:text-base font-bold text-rose-300 truncate';
-        elCtrlMsg.textContent = '作答有誤・請先閱讀上方幾何觀念解析';
+        elCtrlMsg.textContent = '作答有誤・請先閱讀幾何觀念解析';
         elBtnAdvanceLabel.textContent = '💡 我已理解，下一題 ➔';
+
+        setTimeout(() => {
+          elControlBar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 60);
       }
     }
 
@@ -1645,10 +1762,11 @@
       });
     }
 
-    function showAnalysisBox(tip) {
+    function showAnalysisBox(q) {
       elAnalysisCard.classList.remove('hidden');
       elAnalysisCard.classList.add('flex');
-      elAnalysisText.innerHTML = tip;
+      elCorrectPill.textContent = `✅ 正解：${getCorrectAnswerLabel(q)}`;
+      elAnalysisText.innerHTML = q.tip;
     }
 
     function startQuestionTimer() {
@@ -1687,8 +1805,9 @@
         elStatusStamp.classList.remove('hidden');
         elStatusStamp.className = 'text-xs sm:text-sm md:text-base font-black px-3 py-0.5 rounded-lg bg-rose-950 border border-rose-500 text-rose-300 font-num shrink-0';
         elStatusStamp.textContent = '⌛ 答題超時 -50';
-        showAnalysisBox(q.tip);
-        elInteractive.classList.add('pointer-events-none', 'opacity-75');
+        highlightAnswerOutcomes(q, null, false);
+        showAnalysisBox(q);
+        elInteractive.classList.add('pointer-events-none');
       }
 
       updateHUD();
@@ -1703,6 +1822,10 @@
       elCtrlMsg.className = 'text-xs sm:text-sm md:text-base font-bold text-rose-300 truncate';
       elCtrlMsg.textContent = '作答時間到・請閱讀觀念解析';
       elBtnAdvanceLabel.textContent = '💡 我已理解，下一題 ➔';
+
+      setTimeout(() => {
+        elControlBar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 60);
     }
 
     function prevQuestion() {
