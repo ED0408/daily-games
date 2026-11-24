@@ -46,16 +46,19 @@
     }
 
     ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+      width: 6px;
+      height: 6px;
     }
     ::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.5);
+      background: rgba(100, 116, 139, 0.55);
       border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.8);
     }
 
     *, *::before, *::after {
@@ -64,11 +67,15 @@
     }
     
     canvas, .touch-btn, .interactive-zone {
-      touch-action: none !important;
+      touch-action: pan-y !important;
       -webkit-touch-callout: none !important;
       -webkit-user-select: none !important;
       user-select: none !important;
       cursor: pointer;
+    }
+
+    canvas {
+      touch-action: none !important;
     }
 
     .lesson-font {
@@ -80,7 +87,7 @@
 <body class="text-white flex flex-col h-screen w-screen relative select-none bg-slate-950">
 
   <!-- ==================== 頂部 HUD 資訊列 (單人挑戰者・中控計時・連擊與直達) ==================== -->
-  <header class="h-[74px] bg-slate-900/95 border-b border-slate-700/80 px-2 sm:px-4 md:px-6 flex items-center justify-between z-20 shrink-0 shadow-xl gap-1 sm:gap-3">
+  <header class="h-[68px] sm:h-[74px] bg-slate-900/95 border-b border-slate-700/80 px-2 sm:px-4 md:px-6 flex items-center justify-between z-20 shrink-0 shadow-xl gap-1 sm:gap-3">
     
     <!-- 左側：單人挑戰者積分 HUD -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -150,12 +157,12 @@
   </header>
 
   <!-- ==================== 單人主要闖關舞台 ==================== -->
-  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 pb-12 sm:pb-14 overflow-hidden">
+  <main id="game-stage" class="flex-1 min-h-0 relative flex flex-col items-center justify-center p-2 sm:p-3.5 md:p-4 pb-16 sm:pb-[68px] overflow-hidden">
     
     <!-- 單人中央對戰卡片容器 -->
-    <section class="w-full max-w-4xl flex-1 flex flex-col justify-between gap-3 min-h-0 bg-slate-900/80 p-3.5 sm:p-5 md:p-6 rounded-3xl border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden backdrop-blur-sm">
+    <section class="w-full max-w-4xl flex-1 flex flex-col gap-2.5 min-h-0 bg-slate-900/90 p-3 sm:p-4 md:p-5 rounded-3xl border-2 border-cyan-500/40 shadow-2xl relative overflow-hidden backdrop-blur-sm">
       
-      <!-- 頂部題型與作答狀態條 -->
+      <!-- 頂部題型與作答狀態條 (固定在卡片頂端不捲動) -->
       <div class="flex items-center justify-between text-xs sm:text-sm font-bold shrink-0">
         <div class="flex items-center gap-2">
           <span id="q-type-badge" class="px-3 py-1 rounded-xl bg-cyan-950 border border-cyan-600 text-cyan-300 font-black tracking-wider">🎯 三態是非診斷題</span>
@@ -164,28 +171,38 @@
         <span id="p1-status-stamp" class="text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl hidden font-num"></span>
       </div>
 
-      <!-- 題目展示卡片 -->
-      <div class="min-h-[145px] max-h-[220px] flex-shrink-0 bg-slate-950/90 rounded-2xl border-2 border-cyan-400/50 p-4 sm:p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
-        <div id="p1-q-text" class="overflow-y-auto text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed lesson-font pr-1">
-          題目載入中...
-        </div>
-        <div class="text-[11px] text-cyan-300/90 font-mono border-t border-slate-800/90 pt-2 mt-2 flex justify-between shrink-0">
-          <span>範圍：課前想想・作者・1~2段課文大意・語詞與形近字</span>
-          <span id="shortcut-hint" class="text-slate-400 hidden md:inline">快捷鍵: 1 / 2 / 3</span>
-        </div>
-      </div>
+      <!-- 統一垂直捲動區：確保題目、選項區、正確解答與解析卡片依序排列、絕不互相重疊遮蓋 -->
+      <div id="question-body-scroll" class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2.5 sm:gap-3 pr-1">
 
-      <!-- 單人互動答題區與深入解析卡片 -->
-      <div class="flex-1 flex flex-col gap-2.5 min-h-0 relative justify-center">
-        <div id="p1-interactive" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone"></div>
-
-        <!-- 解析卡片 (答對或答錯皆可清晰呈現重點) -->
-        <div id="p1-analysis-card" class="max-h-[95px] sm:max-h-[105px] rounded-2xl bg-cyan-950/95 border-2 border-cyan-400/80 px-3.5 py-2 hidden flex-col justify-start text-cyan-100 shrink-0 shadow-lg overflow-hidden">
-          <div id="p1-analysis-title" class="text-xs font-black text-cyan-300 leading-tight mb-1 flex items-center gap-1 shrink-0">
-            <span>💡 課文與語詞深入解析：</span>
+        <!-- 1. 題目展示卡片 -->
+        <div class="shrink-0 bg-slate-950/95 rounded-2xl border-2 border-cyan-400/50 p-3.5 sm:p-4 flex flex-col justify-between gap-2 shadow-xl relative">
+          <div id="p1-q-text" class="text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed lesson-font">
+            題目載入中...
           </div>
-          <div id="p1-analysis-text" class="text-xs sm:text-sm font-medium leading-snug overflow-y-auto flex-1 text-slate-100 pr-1">--</div>
+          <div class="text-[11px] text-cyan-300/90 font-mono border-t border-slate-800/90 pt-1.5 flex justify-between items-center shrink-0">
+            <span>範圍：課前想想・作者・1~2段課文大意・語詞與形近字</span>
+            <span id="shortcut-hint" class="text-slate-400 hidden md:inline">快捷鍵: 1 / 2 / 3</span>
+          </div>
         </div>
+
+        <!-- 2. 單人互動答題區 (依內容自然撐開高度，不強制溢出遮擋上下區塊) -->
+        <div id="p1-interactive" class="shrink-0 flex flex-col interactive-zone"></div>
+
+        <!-- 3. 正確解答與深入解析卡片 (答對或答錯皆獨立成塊顯示，絕不與題目或選項重疊) -->
+        <div id="p1-analysis-card" class="shrink-0 rounded-2xl bg-slate-950 border-2 border-cyan-400/80 p-3 sm:p-4 hidden flex-col gap-2 text-cyan-100 shadow-2xl">
+          <!-- 明確標示正確答案區塊 -->
+          <div id="p1-correct-answer-box" class="rounded-xl bg-emerald-950/90 border border-emerald-500/70 px-3 py-2 text-xs sm:text-sm font-black text-emerald-200 leading-snug">
+            ✅ 正確解答：--
+          </div>
+          <!-- 深入解析說明區塊 -->
+          <div class="flex flex-col gap-1">
+            <div id="p1-analysis-title" class="text-xs font-black text-cyan-300 leading-tight flex items-center gap-1">
+              <span>💡 課文與語詞深入解析：</span>
+            </div>
+            <div id="p1-analysis-text" class="text-xs sm:text-sm font-medium leading-relaxed text-slate-100">--</div>
+          </div>
+        </div>
+
       </div>
 
     </section>
@@ -642,61 +659,61 @@
         round: 1, type: "tf3",
         text: `【形近字部首與讀音綜合診斷】<br>👉 「女<span class="text-cyan-300">性</span>（心部）」與「百<span class="text-cyan-300">姓</span>（女部）」都讀作 ㄒㄧㄥˋ，而「犧<span class="text-cyan-300">牲</span>（牛部）」與「<span class="text-cyan-300">生</span>命」讀音相同，皆讀作 ㄕㄥ。`,
         answer: "correct",
-        tip: "【完全正確】「性」從心部、「姓」從女部，皆讀 ㄒㄧㄥˋ；「牲」從牛部，與「生」同音，皆讀作 ㄕㄥ！"
+        tip: "「性」從心部、「姓」從女部，皆讀 ㄒㄧㄥˋ；「牲」從牛部，與「生」同音，皆讀作 ㄕㄥ！"
       },
       {
         round: 2, type: "tf3",
         text: `【多音字與課本標注讀音診斷】<br>👉 課文第二段出現「廣<span class="text-cyan-300">播</span>公司」與「霸<span class="text-cyan-300">占</span>」，課本將「播」標注為「ㄅㄛ」，而「占」在「霸占」中讀作「ㄓㄢ」，在「占卜」中才讀作「ㄓㄢˋ」。`,
         answer: "rule",
-        tip: "【錯在字音形義】雙重陷阱！課本將「廣播」的「播」標注為「ㄅㄛˋ」；且「霸占」讀作「ㄓㄢˋ」（奪取據有），「占卜」才讀作「ㄓㄢ」！"
+        tip: "雙重陷阱！課本將「廣播」的「播」標注為「ㄅㄛˋ」；且「霸占」讀作「ㄓㄢˋ」（奪取據有），「占卜」才讀作「ㄓㄢ」！"
       },
       {
         round: 3, type: "tf3",
         text: `【課文因果關係與入學背景診斷】<br>👉 馬拉拉之所以能到學校接受正式教育，是因為當地政府規定所有女孩都必須入學，加上她的父親擔任校長，親自要求她每天上學。`,
         answer: "calc",
-        tip: "【錯在課文理解】當地大部分女孩都「沒有」機會上學！馬拉拉能上學是因為父親身為詩人、校長和社會運動家，沒有當地輕視女性的觀念。"
+        tip: "當地大部分女孩都「沒有」機會上學！馬拉拉能上學是因為父親身為詩人、校長和社會運動家，沒有當地輕視女性的觀念。"
       },
       {
         round: 4, type: "tf3",
         text: `【形近字部首、筆畫與讀音診斷】<br>👉 「平<span class="text-cyan-300">坦</span>」的「坦」是土部，總筆畫 8 畫；「<span class="text-cyan-300">但</span>願」的「但」是人部，總筆畫 7 畫，兩字右邊都是「旦」，所以讀音也完全相同。`,
         answer: "rule",
-        tip: "【錯在字音形義】部首與筆畫都正確（坦：土部8畫；但：人部7畫），但讀音不同！「坦」讀作「ㄊㄢˇ」，「但」讀作「ㄉㄢˋ」！"
+        tip: "部首與筆畫都正確（坦：土部8畫；但：人部7畫），但讀音不同！「坦」讀作「ㄊㄢˇ」，「但」讀作「ㄉㄢˋ」！"
       },
       {
         round: 5, type: "tf3",
         text: `【時間軸與事件因果綜合診斷】<br>👉 西元二○○八年，十一歲的馬拉拉為了讓世界了解恐怖組織的暴行，開始在英國廣播公司的網站上記錄被控制的生活。`,
         answer: "calc",
-        tip: "【錯在課文理解】年份與事件錯置！2008年（11歲）是恐怖組織霸占家鄉；在英國廣播公司網站記錄生活是「西元二○○九年」才開始的！"
+        tip: "年份與事件錯置！2008年（11歲）是恐怖組織霸占家鄉；在英國廣播公司網站記錄生活是「西元二○○九年」才開始的！"
       },
       {
         round: 6, type: "tf3",
         text: `【課文多音字「為、得、覺」語境診斷】<br>👉 在「因<span class="text-cyan-300">為</span>她的父親……所以她<span class="text-cyan-300">得</span>以上學……<span class="text-cyan-300">覺</span>得不公平」這兩句話中，「為」讀作 ㄨㄟˋ，「得」讀作 ㄉㄜˊ，「覺」讀作 ㄐㄩㄝˊ。`,
         answer: "correct",
-        tip: "【完全正確】「因為（ㄨㄟˋ）」、「得以（ㄉㄜˊ，能夠）」、「覺得（ㄐㄩㄝˊ）」在課文語境中的三個多音字讀音完全正確！"
+        tip: "「因為（ㄨㄟˋ）」、「得以（ㄉㄜˊ，能夠）」、「覺得（ㄐㄩㄝˊ）」在課文語境中的三個多音字讀音完全正確！"
       },
       {
         round: 7, type: "tf3",
         text: `【形近字「怖／布」與部首結構診斷】<br>👉 「恐<span class="text-cyan-300">怖</span>」與「瀑<span class="text-cyan-300">布</span>」雖然讀音都是 ㄅㄨˋ，但「恐怖」的「怖」是心部（心裡害怕），「瀑布」的「布」是水部（從高山直瀉而下的水流）。`,
         answer: "rule",
-        tip: "【錯在字音形義】「瀑」是水部，但「瀑布」的「布」部首是「巾」部（共5畫），不是水部喔！"
+        tip: "「瀑」是水部，但「瀑布」的「布」部首是「巾」部（共5畫），不是水部喔！"
       },
       {
         round: 8, type: "tf3",
         text: `【課文抗議行動因果邏輯診斷】<br>👉 馬拉拉和父親認為恐怖組織不准女孩上學、不讓婦女工作以及禁止娛樂的要求不合理，因此他們選擇暫時隱忍，直到二○○九年才開始有反抗行動。`,
         answer: "calc",
-        tip: "【錯在課文理解】課文第二段指出：因為認為要求不合理，「所以參加許多抗議活動並發表演講」，並非暫時隱忍！"
+        tip: "課文第二段指出：因為認為要求不合理，「所以參加許多抗議活動並發表演講」，並非暫時隱忍！"
       },
       {
         round: 9, type: "tf3",
         text: `【語詞「女性」與「恐怖」深層辨析】<br>👉 課本解釋「女性」是指「兩性之一，具雌性特徵者，與男性相對」；而在「深夜在暗巷裡獨自行走，讓膽小的他倍覺恐怖」中，「恐怖」的意思是「可怕、害怕」。`,
         answer: "correct",
-        tip: "【完全正確】兩則語詞的課本解釋與例句情境皆完全正確無誤！"
+        tip: "兩則語詞的課本解釋與例句情境皆完全正確無誤！"
       },
       {
         round: 10, type: "tf3",
         text: `【第一段段落大意精準歸納】<br>👉 第一段的段落大意主要在說明：馬拉拉幼年時住在巴基斯坦西北部小村落，因為父親沒有輕視女性的觀念，所以她可以上學接受教育。`,
         answer: "correct",
-        tip: "【完全正確】精準掌握第一段核心人事時地物與因果關係！"
+        tip: "精準掌握第一段核心人事時地物與因果關係！"
       },
 
       // ==================== 11~20 關：高難度四選一單選題 (mc) ====================
@@ -710,7 +727,7 @@
           `D. 但、姓、布、坦`
         ],
         answer: 0,
-        tip: "【解析】「巴基斯坦」（土部）、「百姓」（女部）、「恐怖」（心部）、「但」（人部），依序為「坦、姓、怖、但」！"
+        tip: "「巴基斯坦」（土部）、「百姓」（女部）、「恐怖」（心部）、「但」（人部），依序為「坦、姓、怖、但」！"
       },
       {
         round: 12, type: "mc",
@@ -722,7 +739,7 @@
           `D. 馬拉拉因為受到母親的影響，覺得女孩無法上學很不公平`
         ],
         answer: 2,
-        tip: "【解析】A 應為「西北部小村落」；B 應為「大部分都沒有機會」；D 應為「受到父親影響」。唯有 C 完全正確！"
+        tip: "A 應為「西北部小村落」；B 應為「大部分都沒有機會」；D 應為「受到父親影響」。唯有 C 完全正確！"
       },
       {
         round: 13, type: "mc",
@@ -734,7 +751,7 @@
           `D. 因為她得以上學接受教育，所以她的父親成了社會運動家。`
         ],
         answer: 1,
-        tip: "【解析】「之所以……（結果），是因為……（原因）」是標準的因果倒裝句型，完整保留原句邏輯！"
+        tip: "「之所以……（結果），是因為……（原因）」是標準的因果倒裝句型，完整保留原句邏輯！"
       },
       {
         round: 14, type: "mc",
@@ -746,7 +763,7 @@
           `D. 犧「牲」的「牲」`
         ],
         answer: 3,
-        tip: "【解析】「怖、恐、性」都是心部；「牲」的部首是「牛」部！"
+        tip: "「怖、恐、性」都是心部；「牲」的部首是「牛」部！"
       },
       {
         round: 15, type: "mc",
@@ -758,7 +775,7 @@
           `D. 禁止居民使用電腦與網際網路對外通訊`
         ],
         answer: 3,
-        tip: "【解析】課文第二段提到不准女孩上學、不讓婦女工作、不許看電影看電視唱歌跳舞，並未提到禁止使用網路（馬拉拉 2009 年還透過網路發聲）。"
+        tip: "課文第二段提到不准女孩上學、不讓婦女工作、不許看電影看電視唱歌跳舞，並未提到禁止使用網路（馬拉拉 2009 年還透過網路發聲）。"
       },
       {
         round: 16, type: "mc",
@@ -770,7 +787,7 @@
           `D. 為了代替父親管理學校的線上教學事務`
         ],
         answer: 1,
-        tip: "【解析】課文第二段末句點明目的：「透過網路讓世界了解恐怖組織的暴行。」"
+        tip: "課文第二段末句點明目的：「透過網路讓世界了解恐怖組織的暴行。」"
       },
       {
         round: 17, type: "mc",
@@ -782,7 +799,7 @@
           `D. 因「為」父親 ／ 成為「為」首`
         ],
         answer: 0,
-        tip: "【解析】A 兩者皆讀作 ㄓㄢˋ；B 為 ㄕㄥ／ㄒㄧㄥˋ；C 為 ㄊㄢˇ／ㄉㄢˋ；D 為 ㄨㄟˋ／ㄨㄟˊ。"
+        tip: "A 兩者皆讀作 ㄓㄢˋ；B 為 ㄕㄥ／ㄒㄧㄥˋ；C 為 ㄊㄢˇ／ㄉㄢˋ；D 為 ㄨㄟˋ／ㄨㄟˊ。"
       },
       {
         round: 18, type: "mc",
@@ -794,7 +811,7 @@
           `D. 上台演講前因為太緊張而決定放棄比賽`
         ],
         answer: 1,
-        tip: "【解析】面對心中的恐懼仍鼓起勇氣練習克服、或挺身保護家人，正呼應馬拉拉無懼威脅、勇敢捍衛權利的特質！"
+        tip: "面對心中的恐懼仍鼓起勇氣練習克服、或挺身保護家人，正呼應馬拉拉無懼威脅、勇敢捍衛權利的特質！"
       },
       {
         round: 19, type: "mc",
@@ -806,7 +823,7 @@
           `D. 公平合理`
         ],
         answer: 0,
-        tip: "【解析】課本解釋「恐怖」＝「可怕、害怕」，因此「恐慌害怕」最貼近原句語意！"
+        tip: "課本解釋「恐怖」＝「可怕、害怕」，因此「恐慌害怕」最貼近原句語意！"
       },
       {
         round: 20, type: "mc",
@@ -818,7 +835,7 @@
           `D. 丙 → 丁 → 乙 → 甲`
         ],
         answer: 0,
-        tip: "【解析】先是幼年受父親影響上學（乙）→ 2008年恐怖組織霸占家鄉（丙）→ 父女參加抗議與演講（丁）→ 2009年在BBC網站記錄生活（甲）。"
+        tip: "先是幼年受父親影響上學（乙）→ 2008年恐怖組織霸占家鄉（丙）→ 父女參加抗議與演講（丁）→ 2009年在BBC網站記錄生活（甲）。"
       },
 
       // ==================== 21~30 關：高難度連連看配對題 (21~25為3對3，26~30為4對4) ====================
@@ -836,7 +853,7 @@
           { key: "R3", label: "C. 姓（女部，讀 ㄒㄧㄥˋ）" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
-        tip: "【解析】「犧牲」用牛部（ㄕㄥ）；「女性」用心部（ㄒㄧㄥˋ）；「百姓」用女部（ㄒㄧㄥˋ）！"
+        tip: "「犧牲」用牛部（ㄕㄥ）；「女性」用心部（ㄒㄧㄥˋ）；「百姓」用女部（ㄒㄧㄥˋ）！"
       },
       {
         round: 22, type: "match",
@@ -852,7 +869,7 @@
           { key: "R3", label: "C. 坦（土部，讀 ㄊㄢˇ）" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
-        tip: "【解析】「瀑布」用巾部的「布」；「恐怖」用心部的「怖」；「平坦」用土部的「坦」！"
+        tip: "「瀑布」用巾部的「布」；「恐怖」用心部的「怖」；「平坦」用土部的「坦」！"
       },
       {
         round: 23, type: "match",
@@ -868,7 +885,7 @@
           { key: "R3", label: "C. 使馬拉拉對女孩無法受教感到不公平" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
-        tip: "【解析】精準釐清第一段中父親的身分、觀念以及對馬拉拉造成的兩層影響！"
+        tip: "精準釐清第一段中父親的身分、觀念以及對馬拉拉造成的兩層影響！"
       },
       {
         round: 24, type: "match",
@@ -884,7 +901,7 @@
           { key: "R3", label: "C. 在英國廣播公司網站記錄生活、揭露暴行" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
-        tip: "【解析】2008年家鄉遭霸占 → 參加抗議與演講 → 2009年在BBC網站記錄生活！"
+        tip: "2008年家鄉遭霸占 → 參加抗議與演講 → 2009年在BBC網站記錄生活！"
       },
       {
         round: 25, type: "match",
@@ -900,7 +917,7 @@
           { key: "R3", label: "C. 說明馬拉拉能上學及父女參加抗議的原因" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3" },
-        tip: "【解析】掌握課文作者、學習叮嚀閱讀策略以及第一、二段共通的因果句型！"
+        tip: "掌握課文作者、學習叮嚀閱讀策略以及第一、二段共通的因果句型！"
       },
       {
         round: 26, type: "match",
@@ -918,7 +935,7 @@
           { key: "R4", label: "D. 巾部，共 5 畫（ㄅㄨˋ）" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3", "L4": "R4" },
-        tip: "【解析】坦（土部8畫 ㄊㄢˇ）、但（人部7畫 ㄉㄢˋ）、怖（心部8畫 ㄅㄨˋ）、布（巾部5畫 ㄅㄨˋ）！"
+        tip: "坦（土部8畫 ㄊㄢˇ）、但（人部7畫 ㄉㄢˋ）、怖（心部8畫 ㄅㄨˋ）、布（巾部5畫 ㄅㄨˋ）！"
       },
       {
         round: 27, type: "match",
@@ -936,7 +953,7 @@
           { key: "R4", label: "D. ㄎㄨㄥˋ ／ ㄓˋ" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3", "L4": "R4" },
-        tip: "【解析】恐怖組織（ㄅㄨˋ ㄓ）、霸占（ㄅㄚˋ ㄓㄢˋ）、廣播（ㄅㄛˋ）、控制（ㄎㄨㄥˋ ㄓˋ）！"
+        tip: "恐怖組織（ㄅㄨˋ ㄓ）、霸占（ㄅㄚˋ ㄓㄢˋ）、廣播（ㄅㄛˋ）、控制（ㄎㄨㄥˋ ㄓˋ）！"
       },
       {
         round: 28, type: "match",
@@ -954,7 +971,7 @@
           { key: "R4", label: "D. 打破花盆後不逃避，勇於承擔過錯" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3", "L4": "R4" },
-        tip: "【解析】課前想想四幅插畫分別呈現：保護家人、勇敢打針、鼓勵同伴、勇於認錯！"
+        tip: "課前想想四幅插畫分別呈現：保護家人、勇敢打針、鼓勵同伴、勇於認錯！"
       },
       {
         round: 29, type: "match",
@@ -972,7 +989,7 @@
           { key: "R4", label: "D. 為了正義或他人而捨棄利益或生命" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3", "L4": "R4" },
-        tip: "【解析】精準區分「女性、本性、百姓、犧牲」四個詞語的字形與深層涵義！"
+        tip: "精準區分「女性、本性、百姓、犧牲」四個詞語的字形與深層涵義！"
       },
       {
         round: 30, type: "match",
@@ -990,7 +1007,7 @@
           { key: "R4", label: "D. 展現馬拉拉無懼威脅、捍衛受教權的勇氣" }
         ],
         matches: { "L1": "R1", "L2": "R2", "L3": "R3", "L4": "R4" },
-        tip: "【解析】恭喜完成 30 關高難度挑戰！你已徹底掌握〈最勇敢的女孩〉1~2段的字音形義與深層文意！"
+        tip: "恭喜完成 30 關高難度挑戰！你已徹底掌握〈最勇敢的女孩〉1~2段的字音形義與深層文意！"
       }
     ];
 
@@ -1028,9 +1045,11 @@
     const elQTypeBadge = document.getElementById('q-type-badge');
     const elQStageHint = document.getElementById('q-stage-hint');
     const elShortcutHint = document.getElementById('shortcut-hint');
+    const elQuestionScroll = document.getElementById('question-body-scroll');
     const elQText = document.getElementById('p1-q-text');
     const elInteractive = document.getElementById('p1-interactive');
     const elAnalysis = document.getElementById('p1-analysis-card');
+    const elCorrectAnswerBox = document.getElementById('p1-correct-answer-box');
     const elAnalysisTitle = document.getElementById('p1-analysis-title');
     const elAnalysisText = document.getElementById('p1-analysis-text');
     const elStatus = document.getElementById('p1-status-stamp');
@@ -1039,6 +1058,36 @@
     const elTimerText = document.getElementById('timer-text');
     const elTimerBar = document.getElementById('timer-bar');
     const elTeacherBar = document.getElementById('teacher-control-bar');
+
+    // 三態是非題答案文字對照表
+    const TF3_LABELS = {
+      correct: '⭕ 1. 完全正確',
+      rule: '❌ 2. 錯在字音形義',
+      calc: '💡 3. 錯在課文理解'
+    };
+
+    /**
+     * 根據題型產生完整、高對比的「正確解答」HTML 標示，避免與題目或選項互相遮擋
+     */
+    function buildCorrectAnswerHTML(qData) {
+      if (qData.type === 'tf3') {
+        return `<span class="text-emerald-300">✅ 正確解答：</span><span class="text-white">${TF3_LABELS[qData.answer] || qData.answer}</span>`;
+      }
+      if (qData.type === 'mc') {
+        return `<span class="text-emerald-300">✅ 正確解答：</span><span class="text-white">${qData.options[qData.answer]}</span>`;
+      }
+      if (qData.type === 'match') {
+        const leftMap = Object.fromEntries(qData.left.map(item => [item.key, item.label]));
+        const rightMap = Object.fromEntries(qData.right.map(item => [item.key, item.label]));
+        const pairsHtml = Object.entries(qData.matches).map(([lKey, rKey]) => {
+          return `<div class="bg-slate-900/90 border border-emerald-500/40 rounded-lg px-2.5 py-1 text-xs text-slate-100 leading-snug">
+            <span>${leftMap[lKey]}</span> <span class="text-emerald-400 font-black">➔ ${rightMap[rKey]}</span>
+          </div>`;
+        }).join('');
+        return `<div class="text-emerald-300 mb-1.5">✅ 正確配對解答：</div><div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-medium">${pairsHtml}</div>`;
+      }
+      return '';
+    }
 
     function startGame() {
       try { sound.init(); } catch (e) {}
@@ -1089,6 +1138,8 @@
       elAnalysis.classList.remove('flex');
       elStatus.classList.add('hidden');
 
+      if (elQuestionScroll) elQuestionScroll.scrollTop = 0;
+
       elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
       elRoundIndicator.textContent = `ROUND ${index + 1} / 30`;
 
@@ -1114,28 +1165,28 @@
 
     function renderInteractive(qData) {
       elInteractive.innerHTML = '';
-      elInteractive.classList.remove('pointer-events-none', 'opacity-65');
+      elInteractive.classList.remove('pointer-events-none');
 
       if (qData.type === 'tf3') {
         elInteractive.innerHTML = `
-          <div class="flex flex-col gap-2.5 h-full justify-center">
-            <button id="btn-tf-correct" class="w-full flex-1 min-h-[50px] sm:min-h-[56px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/60 hover:border-emerald-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-md">
+          <div class="flex flex-col gap-2">
+            <button id="btn-tf-correct" class="w-full min-h-[46px] sm:min-h-[52px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/60 hover:border-emerald-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-md">
               <span class="flex items-center gap-2 text-sm sm:text-base font-black text-emerald-300 pointer-events-none">
                 <span>⭕</span> <span>1. 完全正確</span>
               </span>
-              <span class="text-xs text-slate-400 pointer-events-none hidden sm:inline">字音形義、語詞與課文內容皆無誤</span>
+              <span class="option-sub-hint text-xs text-slate-400 pointer-events-none hidden sm:inline">字音形義、語詞與課文內容皆無誤</span>
             </button>
-            <button id="btn-tf-rule" class="w-full flex-1 min-h-[50px] sm:min-h-[56px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/60 hover:border-rose-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-md">
+            <button id="btn-tf-rule" class="w-full min-h-[46px] sm:min-h-[52px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/60 hover:border-rose-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-md">
               <span class="flex items-center gap-2 text-sm sm:text-base font-black text-rose-300 pointer-events-none">
                 <span>❌</span> <span>2. 錯在字音形義</span>
               </span>
-              <span class="text-xs text-slate-400 pointer-events-none hidden sm:inline">注音標錯、形近字混淆或語詞解釋錯誤</span>
+              <span class="option-sub-hint text-xs text-slate-400 pointer-events-none hidden sm:inline">注音標錯、形近字混淆或語詞解釋錯誤</span>
             </button>
-            <button id="btn-tf-calc" class="w-full flex-1 min-h-[50px] sm:min-h-[56px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/60 hover:border-amber-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-md">
+            <button id="btn-tf-calc" class="w-full min-h-[46px] sm:min-h-[52px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/60 hover:border-amber-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-md">
               <span class="flex items-center gap-2 text-sm sm:text-base font-black text-amber-300 pointer-events-none">
                 <span>💡</span> <span>3. 錯在課文理解</span>
               </span>
-              <span class="text-xs text-slate-400 pointer-events-none hidden sm:inline">人物事件、年份細節或段落大意不符</span>
+              <span class="option-sub-hint text-xs text-slate-400 pointer-events-none hidden sm:inline">人物事件、年份細節或段落大意不符</span>
             </button>
           </div>
         `;
@@ -1148,25 +1199,25 @@
         let btns = '';
         qData.options.forEach((opt, idx) => {
           btns += `
-            <button id="btn-mc-${idx}" class="w-full h-full min-h-[52px] text-left px-3.5 py-2.5 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-400/70 active:scale-[0.99] transition-all flex items-center justify-between text-sm sm:text-base font-bold shadow hover:bg-slate-800/90 touch-btn">
+            <button id="btn-mc-${idx}" class="w-full min-h-[48px] sm:min-h-[54px] text-left px-3.5 py-2.5 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-400/70 active:scale-[0.99] transition-all flex items-center justify-between text-sm sm:text-base font-bold shadow hover:bg-slate-800/90 touch-btn">
               <span class="text-slate-100 break-words leading-snug pointer-events-none lesson-font">${opt}</span>
-              <span class="text-xs font-mono px-2 py-0.5 rounded-lg bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
+              <span class="option-key-badge text-xs font-mono px-2 py-0.5 rounded-lg bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
             </button>
           `;
         });
-        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 h-full">${btns}</div>`;
+        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">${btns}</div>`;
         qData.options.forEach((_, idx) => {
           document.getElementById(`btn-mc-${idx}`).addEventListener('pointerdown', (e) => { e.preventDefault(); handleAnswer(idx); });
         });
 
       } else if (qData.type === 'match') {
         const isQuad = qData.left.length >= 4;
-        const cardMinH = isQuad ? 'min-h-[42px] sm:min-h-[48px] py-1.5' : 'min-h-[52px] sm:min-h-[60px] py-2';
+        const cardMinH = isQuad ? 'min-h-[40px] sm:min-h-[44px] py-1.5' : 'min-h-[46px] sm:min-h-[52px] py-2';
         const cardText = isQuad ? 'text-xs sm:text-sm' : 'text-xs sm:text-sm md:text-base';
         let leftCols = '';
         qData.left.forEach(item => {
           leftCols += `
-            <button id="match-${item.key}" class="w-full flex-1 ${cardMinH} px-3 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/40 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start ${cardText} font-bold shadow touch-btn">
+            <button id="match-${item.key}" class="w-full ${cardMinH} px-3 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/40 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start ${cardText} font-bold shadow touch-btn">
               <span class="w-full leading-snug break-words pointer-events-none lesson-font">${item.label}</span>
             </button>
           `;
@@ -1176,16 +1227,16 @@
         let rightCols = '';
         shuffledRight.forEach(item => {
           rightCols += `
-            <button id="match-${item.key}" class="w-full flex-1 ${cardMinH} px-3 rounded-2xl bg-slate-900/95 border-2 border-amber-500/40 hover:border-amber-400 active:scale-[0.99] transition-all flex items-center justify-start ${cardText} font-bold shadow touch-btn">
+            <button id="match-${item.key}" class="w-full ${cardMinH} px-3 rounded-2xl bg-slate-900/95 border-2 border-amber-500/40 hover:border-amber-400 active:scale-[0.99] transition-all flex items-center justify-start ${cardText} font-bold shadow touch-btn">
               <span class="w-full leading-snug break-words pointer-events-none lesson-font">${item.label}</span>
             </button>
           `;
         });
 
         elInteractive.innerHTML = `
-          <div class="grid grid-cols-2 gap-2.5 sm:gap-3 h-full items-stretch">
-            <div class="flex flex-col gap-2 h-full justify-between">${leftCols}</div>
-            <div class="flex flex-col gap-2 h-full justify-between">${rightCols}</div>
+          <div class="grid grid-cols-2 gap-2 sm:gap-2.5 items-stretch">
+            <div class="flex flex-col gap-2 justify-between">${leftCols}</div>
+            <div class="flex flex-col gap-2 justify-between">${rightCols}</div>
           </div>
         `;
 
@@ -1204,6 +1255,55 @@
       }
     }
 
+    /**
+     * 在作答結束後，於選項按鈕上清楚標示「✅ 正確答案」與「❌ 你的選擇」，並淡化無關選項
+     */
+    function highlightAnswerButtons(qData, userVal, isCorrect) {
+      if (qData.type === 'tf3') {
+        ['correct', 'rule', 'calc'].forEach(key => {
+          const btn = document.getElementById(`btn-tf-${key}`);
+          if (!btn) return;
+          const subHint = btn.querySelector('.option-sub-hint');
+          if (key === qData.answer) {
+            btn.className = 'w-full min-h-[46px] sm:min-h-[52px] rounded-2xl bg-emerald-950 border-2 border-emerald-400 px-4 py-2.5 flex items-center justify-between shadow-lg ring-2 ring-emerald-400/40';
+            if (subHint) {
+              subHint.className = 'text-xs font-black px-2.5 py-0.5 rounded-lg bg-emerald-500 text-slate-950 shrink-0';
+              subHint.textContent = '✅ 正確答案';
+            }
+          } else if (!isCorrect && key === userVal) {
+            btn.className = 'w-full min-h-[46px] sm:min-h-[52px] rounded-2xl bg-rose-950 border-2 border-rose-500 px-4 py-2.5 flex items-center justify-between shadow-lg';
+            if (subHint) {
+              subHint.className = 'text-xs font-black px-2.5 py-0.5 rounded-lg bg-rose-500 text-white shrink-0';
+              subHint.textContent = '❌ 你的選擇';
+            }
+          } else {
+            btn.classList.add('opacity-45');
+          }
+        });
+      } else if (qData.type === 'mc') {
+        qData.options.forEach((_, idx) => {
+          const btn = document.getElementById(`btn-mc-${idx}`);
+          if (!btn) return;
+          const badge = btn.querySelector('.option-key-badge');
+          if (idx === qData.answer) {
+            btn.className = 'w-full min-h-[48px] sm:min-h-[54px] text-left px-3.5 py-2.5 rounded-2xl bg-emerald-950 border-2 border-emerald-400 flex items-center justify-between text-sm sm:text-base font-bold shadow-lg ring-2 ring-emerald-400/40';
+            if (badge) {
+              badge.className = 'text-xs font-black px-2.5 py-0.5 rounded-lg bg-emerald-500 text-slate-950 shrink-0 ml-2';
+              badge.textContent = '✅ 正解';
+            }
+          } else if (!isCorrect && idx === userVal) {
+            btn.className = 'w-full min-h-[48px] sm:min-h-[54px] text-left px-3.5 py-2.5 rounded-2xl bg-rose-950 border-2 border-rose-500 flex items-center justify-between text-sm sm:text-base font-bold shadow-lg';
+            if (badge) {
+              badge.className = 'text-xs font-black px-2.5 py-0.5 rounded-lg bg-rose-500 text-white shrink-0 ml-2';
+              badge.textContent = '❌ 誤選';
+            }
+          } else {
+            btn.classList.add('opacity-45');
+          }
+        });
+      }
+    }
+
     function handleAnswer(val) {
       if (GAME_STATE.answered) return;
 
@@ -1214,8 +1314,11 @@
       const isMatchType = (qData.type === 'match');
       const isCorrect = isMatchType ? (val === true) : (val === qData.answer);
 
-      elInteractive.classList.add('pointer-events-none', 'opacity-65');
+      elInteractive.classList.add('pointer-events-none');
       elStatus.classList.remove('hidden');
+
+      highlightAnswerButtons(qData, val, isCorrect);
+      elCorrectAnswerBox.innerHTML = buildCorrectAnswerHTML(qData);
 
       if (isCorrect) {
         sound.playCorrect();
@@ -1236,8 +1339,8 @@
           ? `🔥 ${GAME_STATE.streak}連擊！+${earned}`
           : `✅ 答對！+${earned}`;
 
-        // 顯示解析卡片（綠色鼓勵樣式）
-        elAnalysis.className = 'max-h-[95px] sm:max-h-[105px] rounded-2xl bg-emerald-950/90 border-2 border-emerald-400/80 px-3.5 py-2 flex flex-col justify-start text-emerald-100 shrink-0 shadow-lg overflow-hidden';
+        // 顯示解析卡片（綠色鼓勵樣式，完全不與題目/選項重疊）
+        elAnalysis.className = 'shrink-0 rounded-2xl bg-slate-950 border-2 border-emerald-400/90 p-3 sm:p-4 flex flex-col gap-2 text-emerald-100 shadow-2xl';
         elAnalysisTitle.innerHTML = '<span>✨ 知識點鞏固：</span>';
         elAnalysisText.innerHTML = qData.tip;
 
@@ -1256,6 +1359,10 @@
         document.getElementById('btn-fast-next').addEventListener('click', advanceToNextStep);
 
         updateHUD();
+        requestAnimationFrame(() => {
+          elAnalysis.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
         GAME_STATE.autoAdvanceTimer = setTimeout(() => {
           advanceToNextStep();
         }, 1800);
@@ -1269,25 +1376,20 @@
         elStatus.className = 'text-xs sm:text-sm font-black px-3 py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num shadow';
         elStatus.textContent = (val === 'timeout') ? '⏰ 時間到 -50' : '❌ 答錯了 -50';
 
-        // 高亮正確選項（若是單選題）
-        if (qData.type === 'mc') {
-          const rightBtn = document.getElementById(`btn-mc-${qData.answer}`);
-          if (rightBtn) {
-            rightBtn.classList.remove('border-slate-700');
-            rightBtn.classList.add('border-emerald-400', 'bg-emerald-950/60');
-          }
-        }
-
-        // 展開紅框解析卡片
-        elAnalysis.className = 'max-h-[95px] sm:max-h-[105px] rounded-2xl bg-rose-950/95 border-2 border-rose-400/90 px-3.5 py-2 flex flex-col justify-start text-rose-100 shrink-0 shadow-lg overflow-hidden';
+        // 展開高對比紅框解答與解析卡片（獨立置於選項下方，絕不遮擋題目）
+        elAnalysis.className = 'shrink-0 rounded-2xl bg-slate-950 border-2 border-rose-500 p-3 sm:p-4 flex flex-col gap-2 text-rose-100 shadow-2xl';
         elAnalysisTitle.innerHTML = '<span>💡 錯題重點解析：</span>';
         elAnalysisText.innerHTML = qData.tip;
 
         elTimerText.textContent = '⏸️ 暫停';
         elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
 
-        showPauseControls(val === 'timeout' ? '時間到 (-50分)・請閱讀解析' : '作答有誤 (-50分)・請閱讀解析');
+        showPauseControls(val === 'timeout' ? '時間到 (-50分)・請閱讀解答與解析' : '作答有誤 (-50分)・請閱讀解答與解析');
         updateHUD();
+
+        requestAnimationFrame(() => {
+          elAnalysis.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
       }
     }
 
@@ -1389,10 +1491,8 @@
           b.classList.add('border-emerald-400', 'bg-emerald-600/40');
           setTimeout(() => {
             b.style.transition = 'all 0.32s ease-out';
-            b.style.opacity = '0';
-            b.style.transform = 'scale(0.85)';
+            b.style.opacity = '0.25';
             b.style.pointerEvents = 'none';
-            b.style.visibility = 'hidden';
           }, 180);
         }
       });
