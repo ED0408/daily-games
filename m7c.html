@@ -64,7 +64,7 @@
     }
 
     .arcade-card {
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(9, 14, 28, 0.94));
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(9, 14, 28, 0.97));
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.12);
     }
 
@@ -79,6 +79,12 @@
     .arcade-btn:active {
       transform: translateY(2px) scale(0.985);
       box-shadow: 0 1px 0 rgba(2, 6, 23, 0.9);
+    }
+
+    /* 答題後緊湊模式：讓題目、選項與詳解卡片同框清晰呈現不重疊 */
+    .answered-compact .arcade-btn {
+      padding-top: 0.45rem !important;
+      padding-bottom: 0.45rem !important;
     }
 
     @keyframes alertPulse {
@@ -122,14 +128,14 @@
     }
 
     ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(56, 189, 248, 0.45);
+      background: rgba(56, 189, 248, 0.5);
       border-radius: 4px;
     }
 
@@ -226,11 +232,11 @@
   <!-- ==================== 主要對戰舞台 ==================== -->
   <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 overflow-hidden w-full z-10">
     
-    <!-- 中央大題卡 -->
-    <section id="game-panel" class="w-full max-w-4xl h-full max-h-[660px] flex-1 flex flex-col justify-between gap-2.5 sm:gap-3.5 arcade-card p-3.5 sm:p-6 rounded-3xl border-2 border-cyan-500/45 relative overflow-hidden backdrop-blur-xl">
+    <!-- 中央大題卡（採用自適應彈性佈局，確保題目、選項與解答詳解完全不遮蓋重疊） -->
+    <section id="game-panel" class="w-full max-w-4xl max-h-full flex flex-col justify-between gap-2.5 sm:gap-3 arcade-card p-3.5 sm:p-5 rounded-3xl border-2 border-cyan-500/45 relative overflow-y-auto backdrop-blur-xl">
       
       <!-- 頂部題型徽章與狀態印章 -->
-      <div class="flex items-center justify-between text-xs font-bold shrink-0 gap-2">
+      <div class="flex items-center justify-between text-xs font-bold shrink-0 gap-2 flex-wrap">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-cyan-950 to-blue-950 border border-cyan-500/60 text-cyan-300 font-bold text-[11px] sm:text-xs shadow">
             📚 國小五上數學・單元 7
@@ -239,46 +245,42 @@
             三態是非題
           </span>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2 shrink-0 ml-auto">
           <span id="status-stamp" class="text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl hidden font-num shadow-lg"></span>
         </div>
       </div>
 
-      <!-- 題目顯示區 -->
-      <div class="bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-indigo-950/70 rounded-2xl border border-cyan-400/50 p-3.5 sm:p-5 flex flex-col justify-between shadow-[inset_0_2px_12px_rgba(6,182,212,0.12)] relative shrink-0">
+      <!-- 題目顯示區（永不被浮動列遮擋） -->
+      <div id="question-box" class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/85 rounded-2xl border border-cyan-400/50 p-3 sm:p-4 flex flex-col justify-between shadow-[inset_0_2px_12px_rgba(6,182,212,0.12)] relative shrink-0 z-10">
         <div id="q-text" class="text-sm sm:text-lg md:text-xl font-bold text-white leading-snug sm:leading-relaxed math-font">
           題目載入中...
         </div>
-        <div class="text-[10px] sm:text-xs text-cyan-300/90 font-mono border-t border-slate-700/70 pt-2 mt-2 flex flex-wrap justify-between gap-1 shrink-0">
+        <div class="text-[10px] sm:text-xs text-cyan-300/90 font-mono border-t border-slate-700/70 pt-1.5 mt-2 flex flex-wrap justify-between gap-1 shrink-0">
           <span class="flex items-center gap-1">📐 <b>7-3 平均</b> ＝ 總和 ÷ 個數</span>
           <span class="text-amber-300 font-bold flex items-center gap-1">⚡ <b>7-4 分配律</b>：(甲 ± 乙) × 丙 ＝ 甲×丙 ± 乙×丙</span>
         </div>
       </div>
 
-      <!-- 互動答題區與解析卡 -->
-      <div class="flex-1 flex flex-col gap-2 min-h-0 relative justify-center">
-        <div id="interactive-area" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone relative"></div>
+      <!-- 互動答題區（獨立捲動與自動居中，避免答錯展開解析時擠壓重疊） -->
+      <div id="interactive-area" class="flex-1 flex flex-col min-h-[140px] overflow-y-auto py-0.5 interactive-zone relative z-10"></div>
 
-        <!-- 答錯深入解析卡片 -->
-        <div id="analysis-card" class="max-h-[92px] sm:max-h-[108px] rounded-2xl bg-gradient-to-r from-cyan-950/95 to-slate-900/95 border-2 border-cyan-400 px-3.5 py-2.5 hidden flex-col justify-start text-cyan-200 shrink-0 shadow-xl overflow-y-auto">
-          <div class="text-xs font-black text-amber-300 mb-0.5 flex items-center gap-1.5">
-            <span>💡 觀念盲點深入解析：</span>
+      <!-- 答錯深入解析與推進卡片（置於標準文件流底部，高對比不透明背景，清晰展示解析與下一題按鈕） -->
+      <div id="analysis-card" class="rounded-2xl bg-slate-950 border-2 border-amber-400 px-3.5 py-3 hidden flex-col gap-2 text-slate-100 shrink-0 shadow-[0_0_28px_rgba(251,191,36,0.28)] relative z-20">
+        <div class="flex items-center justify-between gap-2 flex-wrap border-b border-amber-500/30 pb-1.5">
+          <div class="text-xs sm:text-sm font-black text-amber-300 flex items-center gap-1.5">
+            <span id="ctrl-icon">🚨</span>
+            <span id="ctrl-msg">作答有誤・倒數已暫停！請查看觀念解析：</span>
           </div>
-          <div id="analysis-text" class="text-xs sm:text-sm font-medium leading-relaxed text-slate-100 pr-1">--</div>
+          <button id="btn-next-question" class="shrink-0 px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-300 hover:brightness-105 shadow-md active:scale-95 transition-all flex items-center gap-1 touch-btn">
+            <span>確認觀念・繼續下一題 ➔</span>
+          </button>
+        </div>
+        <div class="bg-cyan-950/60 border border-cyan-500/40 rounded-xl px-3 py-2">
+          <div id="analysis-text" class="text-xs sm:text-sm md:text-base font-bold leading-relaxed text-cyan-100 math-font">--</div>
         </div>
       </div>
-    </section>
 
-    <!-- ==================== 答錯暫停與推進列 ==================== -->
-    <div id="teacher-control-bar" class="fixed top-[98px] sm:top-[104px] left-1/2 -translate-x-1/2 z-40 hidden items-center gap-3 bg-slate-900/98 border-2 border-amber-400 px-4 py-2 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl max-w-[95vw] transition-all text-xs">
-      <div class="flex items-center gap-2">
-        <span class="text-lg" id="ctrl-icon">🚨</span>
-        <span id="ctrl-msg" class="text-xs sm:text-sm font-bold text-amber-300 whitespace-nowrap">作答有誤・倒數已停止</span>
-      </div>
-      <button id="btn-next-question" class="shrink-0 px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-300 hover:brightness-105 shadow-md active:scale-95 transition-all flex items-center gap-1">
-        <span>確認觀念・繼續下一題 ➔</span>
-      </button>
-    </div>
+    </section>
 
     <!-- ==================== 小遊戲遊樂場覆蓋層 ==================== -->
     <div id="minigame-overlay" class="absolute inset-0 bg-slate-950/98 z-30 hidden flex flex-col p-2 sm:p-4">
@@ -450,7 +452,6 @@
       playBgmStep(s) {
         if (!this.ctx || !this.compressor) return;
         const t = this.ctx.currentTime;
-        // 輕快電玩節拍底鼓與貝斯
         if (s % 4 === 0) {
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
@@ -609,61 +610,61 @@
         round: 1, type: "tf3", badge: "三態是非題",
         text: `【7-3 巧克力平均問題】三堆巧克力分別有 16 顆、20 顆和 24 顆，平均每堆有幾顆？<br><span class="text-cyan-300">(16 ＋ 20 ＋ 24) ÷ 3 ＝ 60 ÷ 3 ＝ 20 (顆)</span>`,
         answer: "correct",
-        tip: "【完全正確】總和 60 顆除以 3 堆，每堆 20 顆！"
+        tip: "【正確答案：⭕ 完全正確】總和 60 顆除以 3 堆，每堆 20 顆，算則與計算皆正確！"
       },
       {
         round: 2, type: "tf3", badge: "三態是非題",
         text: `【7-3 小考平均】凱西 4 次數學小考成績 87、93、89、95 分，平均分數是多少？<br><span class="text-cyan-300">(87 ＋ 93 ＋ 89 ＋ 95) ÷ 4 ＝ 364 ÷ 4 ＝ 92 (分)</span>`,
         answer: "calc",
-        tip: "【錯在計算數值】總和 364 分正確，但 364 ÷ 4 ＝ 91 分，不是 92 分！"
+        tip: "【正確答案：💡 錯在計算數值】總和 364 分列式正確，但 364 ÷ 4 ＝ 91 分，不是 92 分！"
       },
       {
         round: 3, type: "tf3", badge: "三態是非題",
         text: `【7-4 加法分配律】1 袋 5 紅球和 9 綠球，7 袋共有幾個球？<br><span class="text-cyan-300">(5 ＋ 9) × 7 ＝ 5 × 7 ＋ 9 × 7 ＝ 35 ＋ 63 ＝ 98 (個)</span>`,
         answer: "correct",
-        tip: "【完全正確】(甲 ＋ 乙) × 丙 ＝ 甲 × 丙 ＋ 乙 × 丙，計算正確！"
+        tip: "【正確答案：⭕ 完全正確】(甲 ＋ 乙) × 丙 ＝ 甲 × 丙 ＋ 乙 × 丙，計算完全正確！"
       },
       {
         round: 4, type: "tf3", badge: "三態是非題",
         text: `【7-4 減法分配律】計算 <span class="text-cyan-300">(36 － 15) × 14</span> 展開算式：<br><span class="text-cyan-300">(36 － 15) × 14 ＝ 36 × 14 ＋ 15 × 14</span>`,
         answer: "rule",
-        tip: "【錯在算則符號】括號內為減號，展開後中間必須是減號！"
+        tip: "【正確答案：❌ 錯在算則符號】括號內為減號，展開後中間必須是減號：36 × 14 － 15 × 14！"
       },
       {
         round: 5, type: "tf3", badge: "三態是非題",
         text: `【7-4 隱藏的 ×1】名牌套 1 個 15 元，拿 99 個再多拿 1 個共付幾元？<br><span class="text-cyan-300">15 × 99 ＋ 15 ＝ 15 × (99 ＋ 1) ＝ 15 × 100 ＝ 1500 (元)</span>`,
         answer: "correct",
-        tip: "【完全正確】單獨的 15 視為 15 × 1，提出後為 15 × 100 ＝ 1500 元！"
+        tip: "【正確答案：⭕ 完全正確】單獨的 15 視為 15 × 1，提出後為 15 × 100 ＝ 1500 元！"
       },
       {
         round: 6, type: "tf3", badge: "三態是非題",
         text: `【7-3 旅遊平均】小藍 225 元、粉粉 295 元、小綠 149 元，3 人平均分擔：<br><span class="text-cyan-300">(225 ＋ 295 ＋ 149) ÷ 3 ＝ 669 ÷ 3 ＝ 223 (元)</span>`,
         answer: "correct",
-        tip: "【完全正確】總和 669 元除以 3 人，每人 223 元！"
+        tip: "【正確答案：⭕ 完全正確】總和 669 元除以 3 人，每人 223 元！"
       },
       {
         round: 7, type: "tf3", badge: "三態是非題",
         text: `【7-4 湊整速算】計算 <span class="text-cyan-300">184 × 840 ＋ 184 × 160</span>：<br><span class="text-cyan-300">＝ 184 × (840 ＋ 160) ＝ 184 × 1000 ＝ 18400</span>`,
         answer: "calc",
-        tip: "【錯在計算數值】湊整 1000 正確，但 184 × 1000 ＝ 184000（少寫一個 0）！"
+        tip: "【正確答案：💡 錯在計算數值】湊整 1000 正確，但 184 × 1000 ＝ 184000（少寫一個 0）！"
       },
       {
         round: 8, type: "tf3", badge: "三態是非題",
         text: `【7-4 面積相差】長方形寬 40m，高麗菜區長 60m、白菜區長 20m，相差多少？<br><span class="text-cyan-300">(60 － 20) × 40 ＝ 40 × 40 ＝ 1600 (平方公尺)</span>`,
         answer: "correct",
-        tip: "【完全正確】(60 － 20) × 40 ＝ 1600 平方公尺！"
+        tip: "【正確答案：⭕ 完全正確】(60 － 20) × 40 ＝ 1600 平方公尺！"
       },
       {
         round: 9, type: "tf3", badge: "三態是非題",
         text: `【7-3 平均秒數】接力 4 位選手 14 秒、16 秒、15 秒、17 秒，平均每人跑幾秒？<br><span class="text-cyan-300">(14 ＋ 16 ＋ 15 ＋ 17) ÷ 4 ＝ 62 ÷ 4 ＝ 15.5 (秒)</span>`,
         answer: "correct",
-        tip: "【完全正確】總和 62 ÷ 4 ＝ 15.5 秒！"
+        tip: "【正確答案：⭕ 完全正確】總和 62 ÷ 4 ＝ 15.5 秒！"
       },
       {
         round: 10, type: "tf3", badge: "三態是非題",
         text: `【7-4 分配律診斷】計算 <span class="text-cyan-300">45 × (20 ＋ 2)</span> 展開算式：<br><span class="text-cyan-300">45 × (20 ＋ 2) ＝ 45 × 20 ＋ 2</span>`,
         answer: "rule",
-        tip: "【錯在算則漏乘】括號外的 45 必須分別乘給 20 與 2！"
+        tip: "【正確答案：❌ 錯在算則符號】括號外的 45 必須分別乘給 20 與 2，應為 45 × 20 ＋ 45 × 2！"
       },
 
       // 11~20 關：四選一選擇題
@@ -672,70 +673,70 @@
         text: `【7-3 平均概念】關於「平均」的意義與計算方法，下列敘述哪一個正確？`,
         options: [`A. 拿多補少，把總和依個數平分`, `B. 最大數減最小數`, `C. 全部相加不用除以個數`, `D. 每一堆原本數量必須一樣`],
         answer: 0,
-        tip: "【解析】平均就是把所有數量加總後，再除以個數（總和 ÷ 個數）！"
+        tip: "【正確答案：拿多補少，把總和依個數平分】平均就是把所有數量加總後，再除以個數（總和 ÷ 個數）！"
       },
       {
         round: 12, type: "mc", badge: "四選一選擇題",
         text: `【7-3 平均意義】凱西 4 次小考平均 91 分，這代表什麼意思？`,
         options: [`A. 把 4 次看成每次都考同分，每次都是 91 分`, `B. 每一次都考 91 分`, `C. 最高分是 91 分`, `D. 總分是 91 分`],
         answer: 0,
-        tip: "【解析】總分是 91 × 4 ＝ 364 分，平均代表拉平後每次相當於 91 分！"
+        tip: "【正確答案：把 4 次看成每次都考同分，每次都是 91 分】總分是 91 × 4 ＝ 364 分，平均代表拉平後每次相當於 91 分！"
       },
       {
         round: 13, type: "mc", badge: "四選一選擇題",
         text: `【7-4 分配律填空】<span class="text-cyan-300">23 × 91 ＋ 23 × 9 ＝ 23 × ( □ ＋ 9 )</span>，□ 應填入？`,
         options: [`A. 91`, `B. 23`, `C. 100`, `D. 1`],
         answer: 0,
-        tip: "【解析】提出共同乘數 23，括號內放入 91 ＋ 9 ＝ 100！"
+        tip: "【正確答案：91】提出共同乘數 23，括號內放入 91 ＋ 9 ＝ 100！"
       },
       {
         round: 14, type: "mc", badge: "四選一選擇題",
         text: `【7-4 分配律填空】<span class="text-cyan-300">45 × 99 ＋ 45 ＝ 45 × ( 99 ＋ □ )</span>，□ 應填入？`,
         options: [`A. 1`, `B. 45`, `C. 0`, `D. 100`],
         answer: 0,
-        tip: "【解析】後面的 45 視為 45 × 1，提出 45 後括號內為 99 ＋ 1！"
+        tip: "【正確答案：1】後面的 45 視為 45 × 1，提出 45 後括號內為 99 ＋ 1！"
       },
       {
         round: 15, type: "mc", badge: "四選一選擇題",
         text: `【7-4 分配律填空】<span class="text-cyan-300">(52 ＋ 48) × 25 ＝ 52 × □ ＋ 48 × 25</span>，□ 應填入？`,
         options: [`A. 25`, `B. 48`, `C. 52`, `D. 100`],
         answer: 0,
-        tip: "【解析】括號外的 × 25 要分別分配給 52 與 48！"
+        tip: "【正確答案：25】括號外的 × 25 要分別分配給 52 與 48！"
       },
       {
         round: 16, type: "mc", badge: "四選一選擇題",
         text: `【7-4 減法分配律】<span class="text-cyan-300">58 × 25 － 58 × 17 ＝ □ × (25 － 17)</span>，□ 應填入？`,
         options: [`A. 58`, `B. 25`, `C. 17`, `D. 8`],
         answer: 0,
-        tip: "【解析】提出共同乘數 58，括號內相減為 25 － 17！"
+        tip: "【正確答案：58】提出共同乘數 58，括號內相減為 25 － 17！"
       },
       {
         round: 17, type: "mc", badge: "四選一選擇題",
         text: `【7-4 應用】1 盆 65 元，昨天賣 48 盆，今天賣 36 盆，昨天比今天多賣幾元？`,
         options: [`A. 65 × (48 － 36) ＝ 780 (元)`, `B. 65 × (48 ＋ 36)`, `C. 65 × 48 ＋ 36`, `D. (65 － 48) × 36`],
         answer: 0,
-        tip: "【解析】先算多賣幾盆 (48 － 36) ＝ 12 盆，再乘 65 元 ＝ 780 元！"
+        tip: "【正確答案：65 × (48 － 36) ＝ 780 (元)】先算多賣幾盆 (48 － 36) ＝ 12 盆，再乘 65 元 ＝ 780 元！"
       },
       {
         round: 18, type: "mc", badge: "四選一選擇題",
         text: `【7-4 面積】長 65cm、寬 25cm 長方形，比邊長 25cm 正方形多幾平方公分？`,
         options: [`A. (65 － 25) × 25 ＝ 1000`, `B. (65 ＋ 25) × 25`, `C. 65 × 25 － 25`, `D. (65 － 25) × 4`],
         answer: 0,
-        tip: "【解析】65×25 － 25×25 ＝ (65 － 25) × 25 ＝ 40 × 25 ＝ 1000 平方公分！"
+        tip: "【正確答案：(65 － 25) × 25 ＝ 1000】65×25 － 25×25 ＝ (65 － 25) × 25 ＝ 40 × 25 ＝ 1000 平方公分！"
       },
       {
         round: 19, type: "mc", badge: "四選一選擇題",
         text: `【7-4 湊整速算】計算 <span class="text-cyan-300">199 × 123 ＋ 101 × 123</span> 最快方式？`,
         options: [`A. (199 ＋ 101) × 123 ＝ 300 × 123 ＝ 36900`, `B. (199 － 101) × 123`, `C. 199 × 224`, `D. 300 × 246`],
         answer: 0,
-        tip: "【解析】提出 123，將 199 ＋ 101 湊成整百 300，300 × 123 ＝ 36900！"
+        tip: "【正確答案：(199 ＋ 101) × 123 ＝ 300 × 123 ＝ 36900】提出 123，將 199 ＋ 101 湊成整百 300，300 × 123 ＝ 36900！"
       },
       {
         round: 20, type: "mc", badge: "四選一選擇題",
         text: `【7-4 減法速算】計算 <span class="text-cyan-300">77 × 308 － 77 × 298</span> 最快方式？`,
         options: [`A. 77 × (308 － 298) ＝ 77 × 10 ＝ 770`, `B. 77 × 606`, `C. 0`, `D. 23418`],
         answer: 0,
-        tip: "【解析】提出 77，先算 308 － 298 ＝ 10，77 × 10 ＝ 770！"
+        tip: "【正確答案：77 × (308 － 298) ＝ 77 × 10 ＝ 770】提出 77，先算 308 － 298 ＝ 10，77 × 10 ＝ 770！"
       },
 
       // 21~30 關：2對2連連看配對題
@@ -745,7 +746,7 @@
         left: [{ key: "L1", label: "① 巧克力 16、20、24 顆求平均" }, { key: "L2", label: "② 小考 87、93、89、95 分求平均" }],
         right: [{ key: "R1", label: "A. (16 ＋ 20 ＋ 24) ÷ 3 ＝ 20" }, { key: "R2", label: "B. (87 ＋ 93 ＋ 89 ＋ 95) ÷ 4 ＝ 91" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】平均＝總和÷個數！3 堆除以 3，4 次除以 4！"
+        tip: "【正確配對】① 連 A（3 堆除以 3）；② 連 B（4 次除以 4）！平均 ＝ 總和 ÷ 個數！"
       },
       {
         round: 22, type: "match", badge: "光束 2對2 配對",
@@ -753,7 +754,7 @@
         left: [{ key: "L1", label: "① 5 × 7 ＋ 9 × 7" }, { key: "L2", label: "② 15 × 99 ＋ 15" }],
         right: [{ key: "R1", label: "A. (5 ＋ 9) × 7" }, { key: "R2", label: "B. 15 × (99 ＋ 1)" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】提出共同乘數！單獨的 15 視為 15 × 1！"
+        tip: "【正確配對】① 連 A（提出共同乘數 7）；② 連 B（單獨的 15 視為 15 × 1）！"
       },
       {
         round: 23, type: "match", badge: "光束 2對2 配對",
@@ -761,7 +762,7 @@
         left: [{ key: "L1", label: "① 60 × 40 － 20 × 40" }, { key: "L2", label: "② 365 × 9 － 9" }],
         right: [{ key: "R1", label: "A. (60 － 20) × 40" }, { key: "R2", label: "B. (365 － 1) × 9" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】減去的 9 視為 1 × 9！"
+        tip: "【正確配對】① 連 A；② 連 B（減去的 9 視為 1 × 9，提出 9 得 (365 － 1) × 9）！"
       },
       {
         round: 24, type: "match", badge: "光束 2對2 配對",
@@ -769,7 +770,7 @@
         left: [{ key: "L1", label: "① 184 × 840 ＋ 184 × 160" }, { key: "L2", label: "② (48 ＋ 72) × 18" }],
         right: [{ key: "R1", label: "A. 184000" }, { key: "R2", label: "B. 2160 (塊)" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】184 × 1000 ＝ 184000；120 × 18 ＝ 2160！"
+        tip: "【正確配對】① 連 A（184 × 1000 ＝ 184000）；② 連 B（120 × 18 ＝ 2160）！"
       },
       {
         round: 25, type: "match", badge: "光束 2對2 配對",
@@ -777,7 +778,7 @@
         left: [{ key: "L1", label: "① 250 × 754 － 150 × 754" }, { key: "L2", label: "② 65 × 25 － 25 × 25" }],
         right: [{ key: "R1", label: "A. 75400" }, { key: "R2", label: "B. 1000 (平方公分)" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】100 × 754 ＝ 75400；40 × 25 ＝ 1000！"
+        tip: "【正確配對】① 連 A（100 × 754 ＝ 75400）；② 連 B（40 × 25 ＝ 1000）！"
       },
       {
         round: 26, type: "match", badge: "光束 2對2 配對",
@@ -785,7 +786,7 @@
         left: [{ key: "L1", label: "① 總花費 669 元，3 人平均分" }, { key: "L2", label: "② 菜園高麗菜與白菜面積相差" }],
         right: [{ key: "R1", label: "A. 每人 223 元" }, { key: "R2", label: "B. 1600 平方公尺" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】669 ÷ 3 ＝ 223 元；(60 － 20) × 40 ＝ 1600！"
+        tip: "【正確配對】① 連 A（669 ÷ 3 ＝ 223 元）；② 連 B（(60 － 20) × 40 ＝ 1600）！"
       },
       {
         round: 27, type: "match", badge: "光束 2對2 配對",
@@ -793,7 +794,7 @@
         left: [{ key: "L1", label: "① 乘法對加法分配律" }, { key: "L2", label: "② 乘法對減法分配律" }],
         right: [{ key: "R1", label: "A. (甲 ＋ 乙) × 丙 ＝ 甲 × 丙 ＋ 乙 × 丙" }, { key: "R2", label: "B. (甲 － 乙) × 丙 ＝ 甲 × 丙 － 乙 × 丙" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】分配律括號內加減符號一致！"
+        tip: "【正確配對】① 連 A（加法分配律）；② 連 B（減法分配律），括號內外加減號一致！"
       },
       {
         round: 28, type: "match", badge: "光束 2對2 配對",
@@ -801,7 +802,7 @@
         left: [{ key: "L1", label: "① 甲 × (乙 ＋ 丙)" }, { key: "L2", label: "② 甲 × (乙 － 丙)" }],
         right: [{ key: "R1", label: "A. 甲 × 乙 ＋ 甲 × 丙" }, { key: "R2", label: "B. 甲 × 乙 － 甲 × 丙" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】外面的甲分別乘進去！"
+        tip: "【正確配對】① 連 A；② 連 B！外面的甲要分別乘進去括號裡的每一項！"
       },
       {
         round: 29, type: "match", badge: "光束 2對2 配對",
@@ -809,7 +810,7 @@
         left: [{ key: "L1", label: "① 7-3 平均問題心法" }, { key: "L2", label: "② 7-4 分配律速算心法" }],
         right: [{ key: "R1", label: "A. 拿多補少，總和 ÷ 個數" }, { key: "R2", label: "B. 提出共同乘數，湊整百整千" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】平均靠總和÷個數；分配律靠湊整數！"
+        tip: "【正確配對】① 連 A（平均靠總和÷個數）；② 連 B（分配律靠提出共同乘數湊整）！"
       },
       {
         round: 30, type: "match", badge: "光束 2對2 配對",
@@ -817,7 +818,7 @@
         left: [{ key: "L1", label: "① 480 × (10 － 6)" }, { key: "L2", label: "② (465 ＋ 135) × 40" }],
         right: [{ key: "R1", label: "A. 1920 (元)" }, { key: "R2", label: "B. 24000 (公克)" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】480 × 4 ＝ 1920 元；600 × 40 ＝ 24000 公克！"
+        tip: "【正確配對】① 連 A（480 × 4 ＝ 1920 元）；② 連 B（600 × 40 ＝ 24000 公克）！"
       }
     ];
 
@@ -836,6 +837,7 @@
       history: new Array(30).fill(null), // null | 'correct' | 'wrong'
       answered: false,
       selectedMatches: {},
+      lastWrongPair: null,
       selectedL: null,
       selectedR: null,
       currentMiniGame: 0,
@@ -861,7 +863,7 @@
     const elRoundIndicator = document.getElementById('round-indicator');
     const elTimerText = document.getElementById('timer-text');
     const elTimerBar = document.getElementById('timer-bar');
-    const elTeacherBar = document.getElementById('teacher-control-bar');
+    const elCtrlIcon = document.getElementById('ctrl-icon');
     const elCtrlMsg = document.getElementById('ctrl-msg');
 
     /* ==================== 4. 30 關進度地圖渲染 ==================== */
@@ -887,7 +889,7 @@
       const div = document.createElement('div');
       div.className = `score-popup font-num font-black text-xl sm:text-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] ${colorClass}`;
       div.style.left = '50%';
-      div.style.top = '38%';
+      div.style.top = '34%';
       div.textContent = text;
       document.body.appendChild(div);
       setTimeout(() => div.remove(), 1000);
@@ -927,6 +929,7 @@
       STATE.hasError = false;
       STATE.answered = false;
       STATE.selectedMatches = {};
+      STATE.lastWrongPair = null;
       STATE.selectedL = null;
       STATE.selectedR = null;
       if (STATE.autoAdvanceTimer) clearTimeout(STATE.autoAdvanceTimer);
@@ -935,7 +938,6 @@
       updateHUD();
       renderStageMap();
 
-      // 依據階段更新主題色提示
       if (index < 10) {
         elPhaseBadge.textContent = '🎯 第一階段';
         elNextMgHint.textContent = '第 10 關解鎖雷射靶場';
@@ -948,12 +950,11 @@
       }
 
       elQTypeBadge.textContent = qData.badge;
-      elTeacherBar.classList.add('hidden');
-      elTeacherBar.classList.remove('flex');
       elAnalysisCard.classList.add('hidden');
       elAnalysisCard.classList.remove('flex');
       elStatusStamp.classList.add('hidden');
       elGamePanel.classList.remove('shake-panel');
+      elGamePanel.scrollTop = 0;
 
       elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-amber-400 rounded-full w-full transition-all duration-200';
       elRoundIndicator.textContent = `STAGE ${index + 1} / 30`;
@@ -964,39 +965,38 @@
 
     function renderInteractive(type, itemData) {
       elInteractive.innerHTML = '';
-      elInteractive.classList.remove('pointer-events-none', 'opacity-70');
+      elInteractive.classList.remove('pointer-events-none', 'opacity-70', 'answered-compact');
 
       if (type === 'tf3') {
         elInteractive.innerHTML = `
-          <div class="flex flex-col gap-2.5 sm:gap-3 h-full justify-center max-w-2xl mx-auto w-full">
-            <button id="btn-correct" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 to-slate-900 hover:from-emerald-900/90 border-2 border-emerald-500/60 flex items-center justify-between touch-btn">
+          <div class="flex flex-col gap-2.5 sm:gap-3 my-auto max-w-2xl mx-auto w-full">
+            <button id="btn-correct" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-950/90 to-slate-900 hover:from-emerald-900/90 border-2 border-emerald-500/60 flex items-center justify-between gap-2 touch-btn">
               <span class="flex items-center gap-2.5 text-sm sm:text-base font-black text-emerald-300 pointer-events-none">
                 <span class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-sm">⭕</span>
                 完全正確
               </span>
-              <span class="text-xs text-emerald-200/75 pointer-events-none">算則與計算數值皆無誤</span>
+              <span id="tag-tf-correct" class="text-xs text-emerald-200/75 pointer-events-none text-right">算則與計算數值皆無誤</span>
             </button>
-            <button id="btn-rule" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-950/90 to-slate-900 hover:from-rose-900/90 border-2 border-rose-500/60 flex items-center justify-between touch-btn">
+            <button id="btn-rule" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-950/90 to-slate-900 hover:from-rose-900/90 border-2 border-rose-500/60 flex items-center justify-between gap-2 touch-btn">
               <span class="flex items-center gap-2.5 text-sm sm:text-base font-black text-rose-300 pointer-events-none">
                 <span class="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-400/50 flex items-center justify-center text-sm">❌</span>
                 錯在算則符號
               </span>
-              <span class="text-xs text-rose-200/75 pointer-events-none">加減號誤寫或漏乘括號內數字</span>
+              <span id="tag-tf-rule" class="text-xs text-rose-200/75 pointer-events-none text-right">加減號誤寫或漏乘括號內數字</span>
             </button>
-            <button id="btn-calc" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-950/90 to-slate-900 hover:from-amber-900/90 border-2 border-amber-500/60 flex items-center justify-between touch-btn">
+            <button id="btn-calc" class="arcade-btn w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-950/90 to-slate-900 hover:from-amber-900/90 border-2 border-amber-500/60 flex items-center justify-between gap-2 touch-btn">
               <span class="flex items-center gap-2.5 text-sm sm:text-base font-black text-amber-300 pointer-events-none">
                 <span class="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-sm">💡</span>
                 錯在計算數值
               </span>
-              <span class="text-xs text-amber-200/75 pointer-events-none">列式算則對但最後算錯數字</span>
+              <span id="tag-tf-calc" class="text-xs text-amber-200/75 pointer-events-none text-right">列式算則對但最後算錯數字</span>
             </button>
           </div>
         `;
-        document.getElementById('btn-correct').onpointerdown = (e) => { e.preventDefault(); handleAnswer('correct'); };
-        document.getElementById('btn-rule').onpointerdown = (e) => { e.preventDefault(); handleAnswer('rule'); };
-        document.getElementById('btn-calc').onpointerdown = (e) => { e.preventDefault(); handleAnswer('calc'); };
+        document.getElementById('btn-correct').onpointerdown = (e) => { e.preventDefault(); handleTF3Answer('correct'); };
+        document.getElementById('btn-rule').onpointerdown = (e) => { e.preventDefault(); handleTF3Answer('rule'); };
+        document.getElementById('btn-calc').onpointerdown = (e) => { e.preventDefault(); handleTF3Answer('calc'); };
       } else if (type === 'mc') {
-        // 隨機打亂選項順序並追蹤正確索引，讓每次挑戰更有新鮮感！
         const indexedOpts = itemData.options.map((text, idx) => ({
           cleanText: text.replace(/^[A-D]\.\s*/, ''),
           isCorrect: idx === itemData.answer
@@ -1015,11 +1015,11 @@
           btns += `
             <button id="mc-${idx}" data-correct="${opt.isCorrect}" class="arcade-btn w-full text-left px-3.5 py-3 rounded-2xl bg-slate-900/95 hover:bg-slate-800 border-2 border-slate-700/90 hover:border-cyan-400/60 flex items-center justify-between text-xs sm:text-sm font-bold touch-btn">
               <span class="text-slate-100 break-words leading-snug pointer-events-none math-font">${labels[idx]}. ${opt.cleanText}</span>
-              <span class="text-xs font-num font-black px-2 py-0.5 rounded-lg border shrink-0 ml-2 pointer-events-none ${badgeColors[idx]}">${labels[idx]}</span>
+              <span class="mc-badge text-xs font-num font-black px-2 py-0.5 rounded-lg border shrink-0 ml-2 pointer-events-none ${badgeColors[idx]}">${labels[idx]}</span>
             </button>
           `;
         });
-        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 h-full items-center">${btns}</div>`;
+        elInteractive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 my-auto w-full">${btns}</div>`;
         indexedOpts.forEach((opt, idx) => {
           document.getElementById(`mc-${idx}`).onpointerdown = (e) => {
             e.preventDefault();
@@ -1030,7 +1030,7 @@
         let leftCols = '';
         itemData.left.forEach(item => {
           leftCols += `
-            <button id="match-${item.key}" class="arcade-btn w-full flex-1 min-h-[50px] px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-slate-900 to-cyan-950/50 border-2 border-cyan-500/45 flex items-center justify-start text-xs sm:text-sm md:text-base font-bold touch-btn">
+            <button id="match-${item.key}" class="arcade-btn w-full min-h-[52px] px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-slate-900 to-cyan-950/50 border-2 border-cyan-500/45 flex items-center justify-start text-xs sm:text-sm md:text-base font-bold touch-btn">
               <span class="w-full leading-tight break-words pointer-events-none math-font text-cyan-100">${item.label}</span>
             </button>
           `;
@@ -1039,17 +1039,17 @@
         let rightCols = '';
         shuffledRight.forEach(item => {
           rightCols += `
-            <button id="match-${item.key}" class="arcade-btn w-full flex-1 min-h-[50px] px-3.5 py-2.5 rounded-2xl bg-gradient-to-l from-slate-900 to-indigo-950/50 border-2 border-indigo-500/45 flex items-center justify-start text-xs sm:text-sm md:text-base font-bold touch-btn">
+            <button id="match-${item.key}" class="arcade-btn w-full min-h-[52px] px-3.5 py-2.5 rounded-2xl bg-gradient-to-l from-slate-900 to-indigo-950/50 border-2 border-indigo-500/45 flex items-center justify-start text-xs sm:text-sm md:text-base font-bold touch-btn">
               <span class="w-full leading-tight break-words pointer-events-none math-font text-indigo-100">${item.label}</span>
             </button>
           `;
         });
         elInteractive.innerHTML = `
-          <div id="match-wrapper" class="relative w-full h-full flex items-center">
+          <div id="match-wrapper" class="relative w-full my-auto flex items-center py-1">
             <svg id="match-svg" class="absolute inset-0 w-full h-full pointer-events-none z-20"></svg>
-            <div class="grid grid-cols-2 gap-4 sm:gap-8 w-full h-full items-stretch relative z-10">
-              <div class="flex flex-col gap-3 h-full justify-between">${leftCols}</div>
-              <div class="flex flex-col gap-3 h-full justify-between">${rightCols}</div>
+            <div class="grid grid-cols-2 gap-4 sm:gap-8 w-full items-stretch relative z-10">
+              <div class="flex flex-col gap-3 justify-center">${leftCols}</div>
+              <div class="flex flex-col gap-3 justify-center">${rightCols}</div>
             </div>
           </div>
         `;
@@ -1062,21 +1062,58 @@
       }
     }
 
+    function highlightTF3Result(clickedVal) {
+      const qData = QUESTION_BANK[STATE.roundIndex];
+      const correctBtn = document.getElementById(`btn-${qData.answer}`);
+      const correctTag = document.getElementById(`tag-tf-${qData.answer}`);
+      if (correctBtn) {
+        correctBtn.classList.add('border-emerald-400', 'bg-emerald-950/90', 'ring-2', 'ring-emerald-400/60');
+      }
+      if (correctTag) {
+        correctTag.innerHTML = `<span class="px-2 py-0.5 rounded-md bg-emerald-500/30 border border-emerald-400 text-emerald-200 font-black">✅ 正確答案</span>`;
+      }
+
+      if (clickedVal && clickedVal !== qData.answer && clickedVal !== 'timeout') {
+        const wrongBtn = document.getElementById(`btn-${clickedVal}`);
+        const wrongTag = document.getElementById(`tag-tf-${clickedVal}`);
+        if (wrongBtn) {
+          wrongBtn.classList.add('border-rose-500', 'bg-rose-950/90');
+        }
+        if (wrongTag) {
+          wrongTag.innerHTML = `<span class="px-2 py-0.5 rounded-md bg-rose-500/30 border border-rose-400 text-rose-200 font-black">❌ 你的選擇</span>`;
+        }
+      }
+    }
+
+    function handleTF3Answer(val) {
+      if (STATE.answered) return;
+      highlightTF3Result(val);
+      handleAnswer(val);
+    }
+
     function handleMCAnswer(clickedIdx, isCorrect) {
       if (STATE.answered) return;
-      // 高亮正確選項與錯誤選項
       const allBtns = elInteractive.querySelectorAll('button');
       allBtns.forEach((btn, i) => {
+        const badge = btn.querySelector('.mc-badge');
         if (btn.dataset.correct === 'true') {
-          btn.classList.add('border-emerald-400', 'bg-emerald-950/80', 'shadow-[0_0_15px_rgba(52,211,153,0.4)]');
+          btn.classList.add('border-emerald-400', 'bg-emerald-950/90', 'ring-2', 'ring-emerald-400/60', 'shadow-[0_0_15px_rgba(52,211,153,0.4)]');
+          if (badge) {
+            badge.className = 'mc-badge text-xs font-black px-2 py-0.5 rounded-lg border shrink-0 ml-2 pointer-events-none bg-emerald-500/30 text-emerald-200 border-emerald-400';
+            badge.textContent = '✅ 正解';
+          }
         } else if (i === clickedIdx && !isCorrect) {
-          btn.classList.add('border-rose-500', 'bg-rose-950/80');
+          btn.classList.add('border-rose-500', 'bg-rose-950/90');
+          if (badge) {
+            badge.className = 'mc-badge text-xs font-black px-2 py-0.5 rounded-lg border shrink-0 ml-2 pointer-events-none bg-rose-500/30 text-rose-200 border-rose-400';
+            badge.textContent = '❌ 誤選';
+          }
         }
       });
       handleAnswer(isCorrect ? QUESTION_BANK[STATE.roundIndex].answer : -1);
     }
 
-    function handleAnswer(val) {
+    function handleAnswer(val, isTimeout = false) {
       if (STATE.answered) return;
       STATE.answered = true;
       elInteractive.classList.add('pointer-events-none');
@@ -1097,8 +1134,8 @@
         STATE.correctCount++;
         STATE.history[STATE.roundIndex] = 'correct';
 
-        elStatusStamp.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-emerald-950/90 border border-emerald-400 text-emerald-300 font-num shadow-lg';
-        elStatusStamp.textContent = comboBonus > 0 ? `✅ +${earned} (含連擊+${comboBonus})` : `✅ 正確 +${earned}`;
+        elStatusStamp.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-emerald-950/95 border border-emerald-400 text-emerald-300 font-num shadow-lg';
+        elStatusStamp.textContent = comboBonus > 0 ? `✅ +${earned} (連擊+${comboBonus})・自動前進` : `✅ 正確 +${earned}・自動前進`;
         spawnFloatingPopup(STATE.combo >= 2 ? `🔥 ${STATE.combo}連擊! +${earned}` : `✨ +${earned}`, 'text-emerald-300');
 
         updateHUD();
@@ -1111,22 +1148,45 @@
         STATE.hasError = true;
         STATE.history[STATE.roundIndex] = 'wrong';
 
+        // 若超時未作答，也自動標示出正確選項
+        if (isTimeout) {
+          if (qData.type === 'tf3') highlightTF3Result('timeout');
+          else if (qData.type === 'mc') {
+            elInteractive.querySelectorAll('button').forEach(btn => {
+              if (btn.dataset.correct === 'true') {
+                btn.classList.add('border-emerald-400', 'bg-emerald-950/90', 'ring-2', 'ring-emerald-400/60');
+                const badge = btn.querySelector('.mc-badge');
+                if (badge) {
+                  badge.className = 'mc-badge text-xs font-black px-2 py-0.5 rounded-lg border shrink-0 ml-2 pointer-events-none bg-emerald-500/30 text-emerald-200 border-emerald-400';
+                  badge.textContent = '✅ 正解';
+                }
+              }
+            });
+          }
+        }
+
+        // 啟動緊湊選項排版，確保題目 + 選項 + 解答詳解卡片同時完整顯示不重疊
+        elInteractive.classList.add('answered-compact');
         elGamePanel.classList.add('shake-panel');
         if (STATE.timerInterval) clearInterval(STATE.timerInterval);
         elTimerText.textContent = '⏸️ 暫停';
         elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
-        elStatusStamp.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-rose-950/90 border border-rose-500 text-rose-300 font-num shadow-lg';
-        elStatusStamp.textContent = '❌ 錯誤 -50';
-        spawnFloatingPopup('❌ -50', 'text-rose-400');
+        elStatusStamp.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-rose-950/95 border border-rose-500 text-rose-300 font-num shadow-lg';
+        elStatusStamp.textContent = isTimeout ? '⌛ 時間到 -50' : '❌ 錯誤 -50';
+        spawnFloatingPopup(isTimeout ? '⌛ -50' : '❌ -50', 'text-rose-400');
+
+        elCtrlIcon.textContent = isTimeout ? '⌛' : '🚨';
+        elCtrlMsg.textContent = isTimeout ? '時間到・倒數已暫停！請查看觀念解析：' : '作答有誤・倒數已暫停！請查看觀念解析：';
 
         elAnalysisCard.classList.remove('hidden');
         elAnalysisCard.classList.add('flex');
         elAnalysisText.innerHTML = qData.tip;
 
-        elTeacherBar.classList.remove('hidden');
-        elTeacherBar.classList.add('flex');
-        elTeacherBar.style.borderColor = '#ef4444';
-        elCtrlMsg.textContent = '🚨 作答有誤・已暫停！查看下方解析後點擊繼續 ➔';
+        // 若為配對題，重繪光束確保解析卡片展開後連線位置精準對齊
+        if (qData.type === 'match') {
+          requestAnimationFrame(() => redrawAllMatchBeams());
+        }
+
         updateHUD();
         renderStageMap();
       }
@@ -1160,6 +1220,18 @@
       svg.appendChild(line);
     }
 
+    function redrawAllMatchBeams() {
+      const svg = document.getElementById('match-svg');
+      if (!svg) return;
+      svg.innerHTML = '';
+      Object.entries(STATE.selectedMatches).forEach(([lKey, rKey]) => {
+        drawMatchBeam(lKey, rKey, '#34d399');
+      });
+      if (STATE.lastWrongPair) {
+        drawMatchBeam(STATE.lastWrongPair[0], STATE.lastWrongPair[1], '#f43f5e');
+      }
+    }
+
     function handleMatchClick(side, key) {
       if (STATE.answered) return;
       if (!STATE.selectedL && side === 'L') {
@@ -1187,6 +1259,7 @@
         } else {
           const prevL = STATE.selectedL; const prevR = STATE.selectedR;
           STATE.selectedL = null; STATE.selectedR = null;
+          STATE.lastWrongPair = [prevL, prevR];
           drawMatchBeam(prevL, prevR, '#f43f5e');
           shakeMatchBtn(prevL); shakeMatchBtn(prevR);
           handleAnswer(false);
@@ -1224,21 +1297,12 @@
 
     function checkCompletion() {
       if (STATE.timerInterval) clearInterval(STATE.timerInterval);
-      elTeacherBar.classList.remove('hidden');
-      elTeacherBar.classList.add('flex');
-      elTeacherBar.style.borderColor = '#10b981';
-      elCtrlMsg.textContent = '🎉 答題正確！1.4 秒後自動進入下一關...';
-      STATE.autoAdvanceTimer = setTimeout(() => { advanceStep(); }, 1400);
+      STATE.autoAdvanceTimer = setTimeout(() => { advanceStep(); }, 1350);
     }
 
     function handleTimeout() {
-      sound.playWrong();
-      STATE.hasError = true;
       if (STATE.timerInterval) clearInterval(STATE.timerInterval);
-      handleAnswer('timeout');
-      elCtrlMsg.textContent = '⌛ 時間到・已暫停！查看解析後點擊繼續 ➔';
-      elTeacherBar.classList.remove('hidden');
-      elTeacherBar.classList.add('flex');
+      handleAnswer('timeout', true);
     }
 
     function startTimer() {
@@ -1277,12 +1341,15 @@
     }
     window.nextQuestion = nextQuestion;
 
-    document.getElementById('btn-next-question').onpointerdown = () => { advanceStep(); };
+    document.getElementById('btn-next-question').onpointerdown = (e) => {
+      e.preventDefault();
+      advanceStep();
+    };
 
     function advanceStep() {
       if (STATE.autoAdvanceTimer) clearTimeout(STATE.autoAdvanceTimer);
-      elTeacherBar.classList.add('hidden');
-      elTeacherBar.classList.remove('flex');
+      elAnalysisCard.classList.add('hidden');
+      elAnalysisCard.classList.remove('flex');
 
       const currentRoundNum = STATE.roundIndex + 1;
       if (currentRoundNum === 10 && STATE.currentMiniGame < 1) {
@@ -1344,6 +1411,7 @@
 
     window.addEventListener('resize', () => {
       if (mgActive) resizeMiniGameCanvas();
+      else if (QUESTION_BANK[STATE.roundIndex]?.type === 'match') redrawAllMatchBeams();
     });
 
     function openMiniGameUI(title, hint, duration = 22.0) {
@@ -1402,7 +1470,7 @@
       else { STATE.roundIndex++; loadQuestion(STATE.roundIndex); }
     };
 
-    /* -------------------- ① 遊戲一：星際雷射靶場 (升級版) -------------------- */
+    /* -------------------- ① 遊戲一：星際雷射靶場 -------------------- */
     class Shooter {
       constructor(ctx) {
         this.ctx = ctx;
@@ -1493,7 +1561,7 @@
             } else {
               this.combo++;
               if (tg.kind === 'gem' || (this.combo >= 5 && this.feverTimer <= 0)) {
-                this.feverTimer = 240; // 4 秒狂熱
+                this.feverTimer = 240;
                 sound.playFever();
               } else {
                 sound.playCorrect(Math.min(6, this.combo));
@@ -1571,7 +1639,6 @@
           c.translate((Math.random() - 0.5) * this.shake, (Math.random() - 0.5) * this.shake);
         }
 
-        // 深空背景與三條軌道線
         c.fillStyle = this.feverTimer > 0 ? '#161129' : '#050b1a';
         c.fillRect(0, 0, mgW, mgH);
 
@@ -1586,7 +1653,6 @@
           c.beginPath(); c.moveTo(0, mgH * ratio); c.lineTo(mgW, mgH * ratio); c.stroke();
         });
 
-        // 目標與發光外環
         this.targets.forEach(t => {
           c.strokeStyle = t.ring;
           c.lineWidth = 2.5;
@@ -1600,7 +1666,6 @@
           c.fillText(t.emoji, t.x, t.y + 1);
         });
 
-        // 雷射光束
         this.lasers.forEach(l => {
           c.save();
           c.globalAlpha = l.alpha;
@@ -1615,7 +1680,6 @@
           c.restore();
         });
 
-        // 爆炸粒子
         this.particles.forEach(p => {
           c.fillStyle = p.color;
           c.beginPath();
@@ -1623,7 +1687,6 @@
           c.fill();
         });
 
-        // 底部旋轉雷射砲台
         const tx = mgW / 2;
         const ty = mgH - 14;
         const angle = Math.atan2(this.aimY - ty, this.aimX - tx);
@@ -1639,12 +1702,10 @@
         c.lineWidth = 3;
         c.beginPath(); c.arc(tx, ty, 18, Math.PI, 0); c.fill(); c.stroke();
 
-        // 準星
         c.strokeStyle = 'rgba(250, 204, 21, 0.75)';
         c.lineWidth = 2;
         c.beginPath(); c.arc(this.aimX, this.aimY, 14, 0, Math.PI * 2); c.stroke();
 
-        // 浮動得分文字
         this.effects.forEach(ef => {
           c.fillStyle = ef.color;
           c.font = '900 18px "Chakra Petch", sans-serif';
@@ -1674,7 +1735,7 @@
       mgAnimId = requestAnimationFrame(loop);
     }
 
-    /* -------------------- ② 遊戲二：瘋狂打地鼠擂台 (升級版) -------------------- */
+    /* -------------------- ② 遊戲二：瘋狂打地鼠擂台 -------------------- */
     class Whack {
       constructor(ctx) {
         this.ctx = ctx;
@@ -1836,7 +1897,6 @@
           c.translate((Math.random() - 0.5) * this.shake, (Math.random() - 0.5) * this.shake);
         }
 
-        // 草地電玩舞台背景
         const grad = c.createLinearGradient(0, 0, 0, mgH);
         grad.addColorStop(0, this.feverTimer > 0 ? '#291d05' : '#06201c');
         grad.addColorStop(1, '#040d14');
@@ -1847,7 +1907,6 @@
           const hx = hole.rx * mgW;
           const hy = hole.ry * mgH;
 
-          // 地洞後緣
           c.fillStyle = '#020617';
           c.beginPath();
           c.ellipse(hx, hy, 48, 20, 0, 0, Math.PI * 2);
@@ -1870,7 +1929,6 @@
             }
           }
 
-          // 地洞發光前緣
           c.strokeStyle = this.feverTimer > 0 ? '#facc15' : '#10b981';
           c.lineWidth = 3;
           c.beginPath();
@@ -1878,7 +1936,6 @@
           c.stroke();
         });
 
-        // 粒子與敲擊大槌動畫
         this.particles.forEach(p => {
           c.fillStyle = p.color;
           c.beginPath(); c.arc(p.x, p.y, 3.5, 0, Math.PI * 2); c.fill();
@@ -1924,7 +1981,7 @@
       mgAnimId = requestAnimationFrame(loop);
     }
 
-    /* -------------------- ③ 遊戲三：祭典太鼓狂熱夜 (紅咚藍咔色彩統一修正版) -------------------- */
+    /* -------------------- ③ 遊戲三：祭典太鼓狂熱夜 -------------------- */
     class Taiko {
       constructor(ctx) {
         this.ctx = ctx;
@@ -1942,7 +1999,6 @@
       spawn() {
         const roll = Math.random();
         let note;
-        // 統一顏色定義：咚(don)一律為正紅色(#ef4444)、咔(ka)一律為亮藍色(#0ea5e9)，大音符以尺寸與雙白圈區隔
         if (roll < 0.16) {
           note = {
             type: 'don', big: true,
@@ -2002,7 +2058,6 @@
         const trackY = mgH * 0.56;
         const hitColor = isDon ? '#ef4444' : '#38bdf8';
 
-        // 無論是否命中音符，打擊時都產生對應紅/藍擴散波紋
         this.ripples.push({ x: judgeX, y: trackY, r: isDon ? 22 : 34, color: hitColor, alpha: 0.9 });
 
         for (let i = 0; i < this.notes.length; i++) {
@@ -2021,7 +2076,6 @@
               if (this.combo === 8) sound.playFever();
               else sound.playCorrect(Math.min(6, this.combo));
 
-              // 火花與判定文字顏色與該音符（紅咚/藍咔）完全同步
               const sparkPalette = isDon
                 ? ['#ef4444', '#fca5a5', '#ffffff']
                 : ['#0ea5e9', '#7dd3fc', '#ffffff'];
@@ -2096,14 +2150,12 @@
         const judgeX = Math.min(115, mgW * 0.2);
         const trackY = mgH * 0.56;
 
-        // 祭典夜空背景
         const bgGrad = c.createLinearGradient(0, 0, 0, mgH);
         bgGrad.addColorStop(0, isFever ? '#2e0918' : '#080e21');
         bgGrad.addColorStop(1, '#040711');
         c.fillStyle = bgGrad;
         c.fillRect(0, 0, mgW, mgH);
 
-        // 頂部魂之量表 (Soul Gauge)
         const gaugeW = Math.min(340, mgW * 0.6);
         const gx = (mgW - gaugeW) / 2;
         c.fillStyle = '#1e293b';
@@ -2119,7 +2171,6 @@
         c.textAlign = 'left';
         c.fillText(isFever ? '🔥 祭典狂熱 MAX (1.5倍得分)' : `魂之量表 (${this.combo}/8)`, gx, 38);
 
-        // 太鼓軌道
         c.fillStyle = 'rgba(15, 23, 42, 0.92)';
         c.fillRect(0, trackY - 46, mgW, 92);
         c.strokeStyle = isFever ? '#f43f5e' : '#334155';
@@ -2129,8 +2180,6 @@
         c.moveTo(0, trackY + 46); c.lineTo(mgW, trackY + 46);
         c.stroke();
 
-        // 左側視覺化太鼓判定區：外圈＝藍色(咔)、內圈＝紅色(咚)
-        // 1. 外圈藍色鼓邊 (咔)
         c.save();
         if (this.kaFlash > 0) {
           c.shadowColor = '#38bdf8';
@@ -2145,7 +2194,6 @@
         c.stroke();
         c.restore();
 
-        // 2. 內圈紅色鼓面 (咚)
         c.save();
         if (this.donFlash > 0) {
           c.shadowColor = '#ef4444';
@@ -2160,7 +2208,6 @@
         c.stroke();
         c.restore();
 
-        // 鼓面下方色彩標示小標籤
         c.font = 'bold 10px sans-serif';
         c.textAlign = 'center';
         c.fillStyle = '#fca5a5';
@@ -2168,7 +2215,6 @@
         c.fillStyle = '#7dd3fc';
         c.fillText('外藍咔', judgeX + 24, trackY + 58);
 
-        // 打擊擴散波紋
         this.ripples.forEach(rp => {
           c.save();
           c.globalAlpha = rp.alpha;
@@ -2180,7 +2226,6 @@
           c.restore();
         });
 
-        // 音符繪製（純紅咚 / 純藍咔，保持高辨識度）
         this.notes.forEach(n => {
           c.save();
           if (n.big) {
@@ -2195,7 +2240,6 @@
           c.arc(n.x, trackY, n.r, 0, Math.PI * 2);
           c.fill();
 
-          // 純白外框，大音符加畫第二層白內圈
           c.strokeStyle = '#ffffff';
           c.lineWidth = n.big ? 3.5 : 2.5;
           c.stroke();
@@ -2216,7 +2260,6 @@
           c.restore();
         });
 
-        // 粒子與判定文字
         this.particles.forEach(p => {
           c.fillStyle = p.color;
           c.beginPath();
@@ -2244,7 +2287,6 @@
       openMiniGameUI("【第 30 關壓軸祭典】🥁 太鼓達人狂熱夜", "🔴紅音符點【紅色 咚】、🔵藍音符點【藍色 咔】！（電腦可用 F/J 紅咚、D/K 藍咔）");
       taikoObj = new Taiko(ctx);
 
-      // 支援直接點擊畫面上的太鼓（點內圈打紅咚、點外圈打藍咔）
       cvs.onpointerdown = (e) => {
         e.preventDefault();
         const r = cvs.getBoundingClientRect();
