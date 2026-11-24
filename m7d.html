@@ -49,6 +49,35 @@
       color: #f87171 !important;
     }
 
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .analysis-enter {
+      animation: slideUpFade 0.22s ease-out forwards;
+    }
+
+    /* 作答後自動精簡選項高度，避免與上方題目區或下方解析卡片重疊擠壓 */
+    #p1-interactive.answered-compact {
+      flex: 0 1 auto !important;
+      justify-content: flex-start !important;
+    }
+    #p1-interactive.answered-compact > div {
+      height: auto !important;
+      gap: 0.4rem !important;
+    }
+    #p1-interactive.answered-compact button {
+      min-height: 40px !important;
+      padding-top: 0.4rem !important;
+      padding-bottom: 0.4rem !important;
+    }
+
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -161,10 +190,10 @@
   </header>
 
   <!-- ==================== 主要單人闖關舞台 ==================== -->
-  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2.5 sm:p-4 md:p-5 pb-12 sm:pb-14 overflow-hidden">
+  <main id="game-stage" class="flex-1 relative flex flex-col items-center justify-center p-2 sm:p-3.5 md:p-4 pb-14 sm:pb-16 overflow-hidden">
     
     <!-- ==================== 單人挑戰核心面板 ==================== -->
-    <section class="w-full max-w-4xl flex-1 flex flex-col justify-between gap-3 min-h-0 bg-slate-900/75 p-3 sm:p-5 md:p-6 rounded-3xl border-2 border-cyan-500/45 shadow-2xl relative overflow-hidden backdrop-blur-sm">
+    <section class="w-full max-w-4xl flex-1 flex flex-col justify-between gap-2 sm:gap-2.5 min-h-0 bg-slate-900/75 p-3 sm:p-4 md:p-5 rounded-3xl border-2 border-cyan-500/45 shadow-2xl relative overflow-hidden backdrop-blur-sm">
       <!-- 頂部關卡標籤與作答狀態戳記 -->
       <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-cyan-400 shrink-0">
         <div class="flex items-center gap-2">
@@ -174,27 +203,30 @@
         <span id="p1-status-stamp" class="text-xs sm:text-sm font-black px-2.5 py-1 rounded-lg hidden font-num"></span>
       </div>
 
-      <!-- 題目展示卡片 -->
-      <div class="min-h-[145px] max-h-[215px] flex-shrink-0 bg-slate-900/95 rounded-2xl border-2 border-cyan-400/50 p-4 sm:p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
+      <!-- 題目展示卡片（固定於上方，絕不與下方選項或解析卡片重疊） -->
+      <div id="p1-q-card" class="min-h-[112px] sm:min-h-[130px] max-h-[195px] shrink-0 bg-slate-900/95 rounded-2xl border-2 border-cyan-400/50 p-3.5 sm:p-4 flex flex-col justify-between shadow-xl relative overflow-hidden">
         <div id="p1-q-text" class="overflow-y-auto text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed math-font pr-1">
           題目載入中...
         </div>
-        <div class="text-[11px] text-cyan-300 font-mono border-t border-slate-800/80 pt-2 flex justify-between shrink-0">
+        <div class="text-[11px] text-cyan-300 font-mono border-t border-slate-800/80 pt-1.5 mt-1.5 flex justify-between shrink-0">
           <span>技巧：觀察數字關係（湊整十百千・連減補償・分配律・連除合併）</span>
           <span class="text-slate-400 hidden md:inline" id="shortcut-hint">快捷鍵: 1 / 2 / 3</span>
         </div>
       </div>
 
-      <!-- 互動答題區與步驟解析卡片 -->
-      <div class="flex-1 flex flex-col gap-2.5 min-h-0 relative justify-center">
-        <div id="p1-interactive" class="flex-1 flex flex-col justify-center min-h-0 interactive-zone"></div>
+      <!-- 互動答題區與步驟解析卡片（上下分層獨立排版，互不遮蓋） -->
+      <div class="flex-1 flex flex-col gap-2.5 min-h-0 relative justify-between overflow-hidden">
+        <div id="p1-interactive" class="flex-1 flex flex-col justify-center min-h-0 overflow-y-auto pr-0.5 interactive-zone"></div>
 
-        <!-- 答錯／超時深入解析卡片 -->
-        <div id="p1-analysis-card" class="max-h-[96px] sm:max-h-[108px] rounded-2xl bg-cyan-950/95 border-2 border-cyan-400/80 px-3.5 py-2 hidden flex-col justify-start text-cyan-200 shrink-0 shadow-lg overflow-hidden">
-          <div class="text-xs font-black text-amber-300 leading-tight mb-1 flex items-center gap-1 shrink-0">
-            <span id="p1-analysis-title">💡 簡化計算步驟解析：</span>
+        <!-- 答錯／超時深入解析卡片（獨立區塊顯示，字體放大清晰不重疊） -->
+        <div id="p1-analysis-card" class="min-h-[92px] max-h-[195px] rounded-2xl bg-slate-900/95 border-2 border-amber-400/90 px-4 py-2.5 hidden flex-col justify-start text-slate-100 shrink-0 shadow-2xl overflow-hidden analysis-enter">
+          <div class="text-xs sm:text-sm font-black text-amber-300 leading-tight mb-1.5 flex items-center justify-between gap-2 shrink-0 border-b border-amber-500/30 pb-1">
+            <span id="p1-analysis-title" class="flex items-center gap-1.5">💡 簡化計算步驟解析：</span>
+            <button id="btn-analysis-next" type="button" class="px-2.5 py-0.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow active:scale-95 transition-all shrink-0">
+              下一題 ➔
+            </button>
           </div>
-          <div id="p1-analysis-text" class="text-xs sm:text-sm font-medium leading-snug overflow-y-auto flex-1 text-slate-100 pr-1">--</div>
+          <div id="p1-analysis-text" class="text-xs sm:text-sm md:text-base font-medium leading-relaxed overflow-y-auto flex-1 text-slate-100 pr-1">--</div>
         </div>
       </div>
     </section>
@@ -861,7 +893,7 @@
         left: [{ key: "L1", label: "① 125 × 8" }, { key: "L2", label: "② 25 × 4" }],
         right: [{ key: "R1", label: "A. 1000" }, { key: "R2", label: "B. 100" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】125 × 8 ＝ 1000、25 × 4 ＝ 100，是簡化計算中最重要的兩組湊整好朋友！"
+        tip: "【解析】125 × 8 ＝ 1000（① 配 A）、25 × 4 ＝ 100（② 配 B），是簡化計算中最重要的兩組湊整好朋友！"
       },
       {
         round: 22, type: "match", category: "課本 P.102・連減補償配對",
@@ -869,7 +901,7 @@
         left: [{ key: "L1", label: "① 1000 － 299 － 197" }, { key: "L2", label: "② 500 － 99 － 97 － 96" }],
         right: [{ key: "R1", label: "A. 1000 － 300 ＋ 1 － 200 ＋ 3" }, { key: "R2", label: "B. 500 － 100 － 100 － 100 ＋ 8" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】多減 1 和多減 3 要加回 4；三個減數各變成減 100 共多減 8，要加回 8！"
+        tip: "【解析】① 多減 1 和多減 3 要加回（配 A）；② 三個減數各變成減 100 共多減 8，要加回 8（配 B）！"
       },
       {
         round: 23, type: "match", category: "課本 P.103・分配律展開配對",
@@ -877,7 +909,7 @@
         left: [{ key: "L1", label: "① 32 × 99" }, { key: "L2", label: "② 50 × 3002" }],
         right: [{ key: "R1", label: "A. 32 × 100 － 32 × 1" }, { key: "R2", label: "B. 50 × 3000 ＋ 50 × 2" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】99 看成 (100 － 1)，3002 看成 (3000 ＋ 2)，再用分配律展開計算！"
+        tip: "【解析】① 99 看成 (100 － 1) 展開配 A；② 3002 看成 (3000 ＋ 2) 展開配 B！"
       },
       {
         round: 24, type: "match", category: "課本 P.104・相等算式配對",
@@ -885,7 +917,7 @@
         left: [{ key: "L1", label: "① 1289 ＋ 752 － 956 － 289" }, { key: "L2", label: "② 2820 × 19 ÷ 47 ÷ 60" }],
         right: [{ key: "R1", label: "A. 1289 ＋ 752 － (956 ＋ 289)" }, { key: "R2", label: "B. 2820 × 19 ÷ (47 × 60)" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】連減兩數等於減去兩數之和；連除兩數等於除以兩數之積！"
+        tip: "【解析】① 連減兩數等於減去兩數之和（配 A）；② 連除兩數等於除以兩數之積（配 B）！"
       },
       {
         round: 25, type: "match", category: "習作 P.72・加減湊整配對",
@@ -893,7 +925,7 @@
         left: [{ key: "L1", label: "① 9995 ＋ 995 ＋ 95 ＋ 5" }, { key: "L2", label: "② 1196 － 99 － 299 － 398" }],
         right: [{ key: "R1", label: "A. 11090" }, { key: "R2", label: "B. 400" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】① 11110 － 20 ＝ 11090；② 1196 － 800 ＋ 4 ＝ 400！"
+        tip: "【解析】① 11110 － 20 ＝ 11090（配 A）；② 1196 － 800 ＋ 4 ＝ 400（配 B）！"
       },
       {
         round: 26, type: "match", category: "習作 P.73・分配律算式配對",
@@ -901,7 +933,7 @@
         left: [{ key: "L1", label: "① 43 × 98" }, { key: "L2", label: "② 77 × 99" }],
         right: [{ key: "R1", label: "A. 4214" }, { key: "R2", label: "B. 7623" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】① 4300 － 86 ＝ 4214；② 7700 － 77 ＝ 7623！"
+        tip: "【解析】① 4300 － 86 ＝ 4214（配 A）；② 7700 － 77 ＝ 7623（配 B）！"
       },
       {
         round: 27, type: "match", category: "習作 P.73・乘除結合配對",
@@ -909,7 +941,7 @@
         left: [{ key: "L1", label: "① 36 × 25 ÷ 9 × 11" }, { key: "L2", label: "② 125 × 560 × 13 ÷ 125" }],
         right: [{ key: "R1", label: "A. (36 ÷ 9) × 25 × 11" }, { key: "R2", label: "B. (125 ÷ 125) × 560 × 13" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】先將有倍數關係或相同的數字配對相除（36÷9＝4、125÷125＝1），計算更輕鬆！"
+        tip: "【解析】① 先算 36 ÷ 9 ＝ 4（配 A）；② 先算 125 ÷ 125 ＝ 1（配 B），計算更輕鬆！"
       },
       {
         round: 28, type: "match", category: "習作 P.74・綜合篇配對",
@@ -917,7 +949,7 @@
         left: [{ key: "L1", label: "① 543 × 24 － 3 × 24" }, { key: "L2", label: "② 348 × 999" }],
         right: [{ key: "R1", label: "A. 12960" }, { key: "R2", label: "B. 347652" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】① (543 － 3) × 24 ＝ 540 × 24 ＝ 12960；② 348000 － 348 ＝ 347652！"
+        tip: "【解析】① (543 － 3) × 24 ＝ 540 × 24 ＝ 12960（配 A）；② 348000 － 348 ＝ 347652（配 B）！"
       },
       {
         round: 29, type: "match", category: "習作 P.74・連除速算配對",
@@ -925,7 +957,7 @@
         left: [{ key: "L1", label: "① 9900 ÷ 25 ÷ 4 ÷ 9" }, { key: "L2", label: "② 39 × 25 ÷ 13 ÷ 5" }],
         right: [{ key: "R1", label: "A. 11" }, { key: "R2", label: "B. 15" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】① 1100 ÷ 100 ＝ 11；② (39 ÷ 13) × (25 ÷ 5) ＝ 3 × 5 ＝ 15！"
+        tip: "【解析】① 1100 ÷ 100 ＝ 11（配 A）；② (39 ÷ 13) × (25 ÷ 5) ＝ 3 × 5 ＝ 15（配 B）！"
       },
       {
         round: 30, type: "match", category: "習作 P.75・生活應用列式配對",
@@ -933,7 +965,7 @@
         left: [{ key: "L1", label: "① 1把尺7元、8瓶膠水240元，買1把尺和16瓶膠水" }, { key: "L2", label: "② 4個工人每天8小時工作3天，工資共17280元，求每人時薪" }],
         right: [{ key: "R1", label: "A. 7 ＋ 240 × (16 ÷ 8)" }, { key: "R2", label: "B. 17280 ÷ (8 × 3 × 4)" }],
         matches: { "L1": "R1", "L2": "R2" },
-        tip: "【解析】① 16 瓶是 8 瓶的 2 倍，7 ＋ 240 × 2 ＝ 487 元；② 17280 ÷ 96 ＝ 180 元！"
+        tip: "【解析】① 16 瓶是 8 瓶的 2 倍，7 ＋ 240 × 2 ＝ 487 元（配 A）；② 17280 ÷ 96 ＝ 180 元（配 B）！"
       }
     ];
 
@@ -974,6 +1006,7 @@
     const elP1Analysis = document.getElementById('p1-analysis-card');
     const elP1AnalysisTitle = document.getElementById('p1-analysis-title');
     const elP1AnalysisText = document.getElementById('p1-analysis-text');
+    const elBtnAnalysisNext = document.getElementById('btn-analysis-next');
     const elP1Status = document.getElementById('p1-status-stamp');
     const elQCategoryTag = document.getElementById('q-category-tag');
     const elStageTypeBadge = document.getElementById('stage-type-badge');
@@ -984,6 +1017,8 @@
     const elTimerText = document.getElementById('timer-text');
     const elTimerBar = document.getElementById('timer-bar');
     const elTeacherBar = document.getElementById('teacher-control-bar');
+
+    elBtnAnalysisNext.addEventListener('click', advanceToNextStep);
 
     function startGame() {
       try { sound.init(); } catch (e) {}
@@ -1034,6 +1069,7 @@
       elP1Analysis.classList.add('hidden');
       elP1Analysis.classList.remove('flex');
       elP1Status.classList.add('hidden');
+      elP1Interactive.classList.remove('answered-compact');
 
       elTimerBar.className = 'h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 rounded-full w-full transition-all duration-200';
       elRoundIndicator.textContent = `ROUND ${index + 1} / 30`;
@@ -1055,39 +1091,41 @@
         elShortcutHint.textContent = '點擊左右配對卡片進行消除';
       }
 
-      // 載入題目內容
+      // 載入題目內容並重置捲動位置
       elP1QText.innerHTML = qData.text;
+      elP1QText.scrollTop = 0;
 
       // 渲染單人互動答題區域
       renderInteractive(qData.type, qData);
+      elP1Interactive.scrollTop = 0;
 
       startTimer();
     }
 
     function renderInteractive(type, itemData) {
       elP1Interactive.innerHTML = '';
-      elP1Interactive.classList.remove('pointer-events-none', 'opacity-75');
+      elP1Interactive.classList.remove('pointer-events-none', 'opacity-85', 'answered-compact');
 
       if (type === 'tf3') {
         elP1Interactive.innerHTML = `
           <div class="flex flex-col gap-2.5 h-full justify-center">
-            <button id="p1-btn-correct" class="w-full flex-1 min-h-[54px] sm:min-h-[60px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/65 hover:border-emerald-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-lg">
+            <button id="p1-btn-correct" class="w-full flex-1 min-h-[50px] sm:min-h-[56px] rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/65 hover:border-emerald-400 px-4 py-2 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-lg">
               <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-emerald-300 pointer-events-none">
                 <span>⭕</span> <span>完全正確</span>
               </span>
-              <span class="text-xs text-slate-300 pointer-events-none hidden sm:inline">簡化計算規則變形與最終計算結果皆無誤</span>
+              <span class="btn-badge-slot text-xs text-slate-300 pointer-events-none hidden sm:inline">簡化計算規則變形與最終計算結果皆無誤</span>
             </button>
-            <button id="p1-btn-rule" class="w-full flex-1 min-h-[54px] sm:min-h-[60px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/65 hover:border-rose-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-lg">
+            <button id="p1-btn-rule" class="w-full flex-1 min-h-[50px] sm:min-h-[56px] rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/65 hover:border-rose-400 px-4 py-2 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-lg">
               <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-rose-300 pointer-events-none">
                 <span>❌</span> <span>錯在規則變形</span>
               </span>
-              <span class="text-xs text-slate-300 pointer-events-none hidden sm:inline">多減沒補回、分配律漏乘、連除忘記變乘號或亂加括號</span>
+              <span class="btn-badge-slot text-xs text-slate-300 pointer-events-none hidden sm:inline">多減沒補回、分配律漏乘、連除忘記變乘號或亂加括號</span>
             </button>
-            <button id="p1-btn-calc" class="w-full flex-1 min-h-[54px] sm:min-h-[60px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/65 hover:border-amber-400 px-4 py-2.5 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-lg">
+            <button id="p1-btn-calc" class="w-full flex-1 min-h-[50px] sm:min-h-[56px] rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border-2 border-amber-500/65 hover:border-amber-400 px-4 py-2 flex items-center justify-between active:scale-[0.99] transition-all touch-btn shadow-lg">
               <span class="flex items-center gap-2 text-sm sm:text-base md:text-lg font-black text-amber-300 pointer-events-none">
                 <span>💡</span> <span>錯在計算結果</span>
               </span>
-              <span class="text-xs text-slate-300 pointer-events-none hidden sm:inline">簡化算式變形正確，但最後加減乘除計算失誤</span>
+              <span class="btn-badge-slot text-xs text-slate-300 pointer-events-none hidden sm:inline">簡化算式變形正確，但最後加減乘除計算失誤</span>
             </button>
           </div>
         `;
@@ -1099,13 +1137,13 @@
         let btns = '';
         itemData.options.forEach((opt, idx) => {
           btns += `
-            <button id="p1-mc-${idx}" class="w-full h-full min-h-[56px] text-left px-4 py-3 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-between text-sm sm:text-base md:text-lg font-bold shadow-lg hover:bg-slate-800 touch-btn">
+            <button id="p1-mc-${idx}" class="w-full h-full min-h-[52px] text-left px-4 py-2.5 rounded-2xl bg-slate-900 border-2 border-slate-700 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-between text-sm sm:text-base md:text-lg font-bold shadow-lg hover:bg-slate-800 touch-btn">
               <span class="text-slate-100 break-words leading-tight pointer-events-none math-font">${opt}</span>
-              <span class="text-xs font-mono px-2 py-0.5 rounded-lg bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
+              <span class="btn-badge-slot text-xs font-mono px-2 py-0.5 rounded-lg bg-slate-800 text-cyan-400 border border-slate-600 shrink-0 ml-2 pointer-events-none">${['A','B','C','D'][idx]}</span>
             </button>
           `;
         });
-        elP1Interactive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 h-full">${btns}</div>`;
+        elP1Interactive.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 h-full">${btns}</div>`;
         itemData.options.forEach((_, idx) => {
           document.getElementById(`p1-mc-${idx}`).addEventListener('pointerdown', (e) => { e.preventDefault(); handleAnswer(idx); });
         });
@@ -1113,7 +1151,7 @@
         let leftCols = '';
         itemData.left.forEach(item => {
           leftCols += `
-            <button id="p1-match-${item.key}" class="w-full flex-1 min-h-[58px] sm:min-h-[68px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/45 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-lg touch-btn">
+            <button id="p1-match-${item.key}" class="w-full flex-1 min-h-[54px] sm:min-h-[62px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/45 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-lg touch-btn">
               <span class="w-full leading-snug break-words pointer-events-none math-font">${item.label}</span>
             </button>
           `;
@@ -1123,16 +1161,16 @@
         let rightCols = '';
         shuffledRight.forEach(item => {
           rightCols += `
-            <button id="p1-match-${item.key}" class="w-full flex-1 min-h-[58px] sm:min-h-[68px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/45 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-lg touch-btn">
+            <button id="p1-match-${item.key}" class="w-full flex-1 min-h-[54px] sm:min-h-[62px] px-3.5 py-2 rounded-2xl bg-slate-900/95 border-2 border-cyan-500/45 hover:border-cyan-400 active:scale-[0.99] transition-all flex items-center justify-start text-xs sm:text-sm md:text-base font-bold shadow-lg touch-btn">
               <span class="w-full leading-snug break-words pointer-events-none math-font">${item.label}</span>
             </button>
           `;
         });
 
         elP1Interactive.innerHTML = `
-          <div class="grid grid-cols-2 gap-3 h-full items-stretch">
-            <div class="flex flex-col gap-3 h-full justify-between">${leftCols}</div>
-            <div class="flex flex-col gap-3 h-full justify-between">${rightCols}</div>
+          <div class="grid grid-cols-2 gap-2.5 h-full items-stretch">
+            <div class="flex flex-col gap-2.5 h-full justify-between">${leftCols}</div>
+            <div class="flex flex-col gap-2.5 h-full justify-between">${rightCols}</div>
           </div>
         `;
 
@@ -1151,6 +1189,15 @@
       }
     }
 
+    function setBtnBadge(btnEl, text, className) {
+      if (!btnEl) return;
+      const slot = btnEl.querySelector('.btn-badge-slot');
+      if (slot) {
+        slot.className = `btn-badge-slot text-xs font-black px-2 py-0.5 rounded-lg shrink-0 ml-2 pointer-events-none inline-block ${className}`;
+        slot.textContent = text;
+      }
+    }
+
     function handleAnswer(val) {
       if (GAME_STATE.answered) return;
 
@@ -1161,7 +1208,7 @@
       const qData = QUESTION_BANK[GAME_STATE.roundIndex];
       const isMatchType = (qData.type === 'match');
 
-      elP1Interactive.classList.add('pointer-events-none', 'opacity-75');
+      elP1Interactive.classList.add('pointer-events-none');
       elP1Status.classList.remove('hidden');
 
       const isCorrect = isMatchType ? (val === true) : (val === qData.answer);
@@ -1183,10 +1230,16 @@
         // 高亮選中的正確選項
         if (qData.type === 'mc') {
           const correctBtn = document.getElementById(`p1-mc-${val}`);
-          if (correctBtn) correctBtn.classList.add('border-emerald-400', 'bg-emerald-950/70');
+          if (correctBtn) {
+            correctBtn.classList.add('border-emerald-400', 'bg-emerald-950/80');
+            setBtnBadge(correctBtn, '✅ 正確', 'bg-emerald-500 text-slate-950');
+          }
         } else if (qData.type === 'tf3') {
           const correctBtn = document.getElementById(`p1-btn-${val}`);
-          if (correctBtn) correctBtn.classList.add('border-emerald-400', 'bg-emerald-900/60');
+          if (correctBtn) {
+            correctBtn.classList.add('border-emerald-400', 'bg-emerald-900/70');
+            setBtnBadge(correctBtn, '✅ 正確', 'bg-emerald-500 text-slate-950');
+          }
         }
 
         elP1Status.className = streakBonus > 0
@@ -1215,35 +1268,51 @@
         GAME_STATE.score -= 50;
         GAME_STATE.hasError = true;
 
+        // 自動精簡選項區塊高度，為下方解析卡片騰出充裕空間，徹底杜絕互相遮蓋
+        elP1Interactive.classList.add('answered-compact');
+
         // 標示錯誤與正確選項
         if (qData.type === 'mc') {
           if (typeof val === 'number') {
             const wrongBtn = document.getElementById(`p1-mc-${val}`);
-            if (wrongBtn) wrongBtn.classList.add('border-rose-500', 'bg-rose-950/70');
+            if (wrongBtn) {
+              wrongBtn.classList.add('border-rose-500', 'bg-rose-950/80');
+              setBtnBadge(wrongBtn, '❌ 誤選', 'bg-rose-500 text-white');
+            }
           }
           const rightBtn = document.getElementById(`p1-mc-${qData.answer}`);
-          if (rightBtn) rightBtn.classList.add('border-emerald-400', 'bg-emerald-950/60');
+          if (rightBtn) {
+            rightBtn.classList.add('border-emerald-400', 'bg-emerald-950/75');
+            setBtnBadge(rightBtn, '✅ 正解', 'bg-emerald-400 text-slate-950');
+          }
         } else if (qData.type === 'tf3') {
           if (val !== 'timeout') {
             const wrongBtn = document.getElementById(`p1-btn-${val}`);
-            if (wrongBtn) wrongBtn.classList.add('border-rose-500', 'bg-rose-950/70');
+            if (wrongBtn) {
+              wrongBtn.classList.add('border-rose-500', 'bg-rose-950/80');
+              setBtnBadge(wrongBtn, '❌ 誤選', 'bg-rose-500 text-white');
+            }
           }
           const rightBtn = document.getElementById(`p1-btn-${qData.answer}`);
-          if (rightBtn) rightBtn.classList.add('border-emerald-400', 'bg-emerald-950/60');
+          if (rightBtn) {
+            rightBtn.classList.add('border-emerald-400', 'bg-emerald-950/75');
+            setBtnBadge(rightBtn, '✅ 正解', 'bg-emerald-400 text-slate-950');
+          }
         }
 
         elP1Status.className = 'text-xs sm:text-sm font-black px-2.5 py-1 rounded-xl bg-rose-950 border border-rose-500 text-rose-300 font-num';
         elP1Status.textContent = val === 'timeout' ? '⏰ 時間到 -50' : (isMatchType ? '❌ 配對錯誤 -50' : '❌ 答錯 -50');
 
-        // 展開簡化計算步驟解析卡片
+        // 展開簡化計算步驟解析卡片（獨立區塊、高對比、大字體清晰呈現）
         elP1Analysis.classList.remove('hidden');
         elP1Analysis.classList.add('flex');
         elP1AnalysisTitle.textContent = isMatchType ? '💡 配對題簡化計算解析：' : '💡 簡化計算步驟解析：';
         elP1AnalysisText.innerHTML = qData.tip;
+        elP1AnalysisText.scrollTop = 0;
 
         elTimerText.textContent = '⏸️ 暫停';
         elTimerBar.className = 'h-full bg-rose-500 rounded-full w-full';
-        showPauseControls(val === 'timeout' ? '時間到 (-50分)・請看解析' : '作答有誤 (-50分)・請看解析');
+        showPauseControls(val === 'timeout' ? '時間到 (-50分)・請看上方解析' : '作答有誤 (-50分)・請看上方解析');
       }
 
       updateHUD();
@@ -1920,8 +1989,6 @@
 
     /* ==========================================================
        【小遊戲 ③】（第 30 關後）：🥁 單人三色三打擊點太鼓達人
-          - 3 種顏色音符：🔴 紅（咚）、🔵 藍（咔）、🟡 黃（轟）
-          - 3 個獨立打擊點（畫布下方 3 個大鼓點 + 底部 3 顆實體按鈕 + 鍵盤三鍵）
        ========================================================== */
     const TAIKO_TYPES = {
       red:    { label: '咚', name: '紅咚', fill: '#ef4444', ring: '#fecaca', glow: 'rgba(239, 68, 68, 0.35)' },
@@ -2032,7 +2099,6 @@
         const w = rect.width || 720;
         const h = rect.height || 380;
 
-        // 點擊畫布下半部三個對應鼓面（左紅、中藍、右黃）
         if (y >= h * 0.56) {
           const third = w / 3;
           if (x < third) this.hit('red');
@@ -2087,7 +2153,6 @@
         ctx.save();
         ctx.translate(cx, cy);
 
-        // 打擊發光外環
         if (isActive) {
           ctx.fillStyle = info.glow;
           ctx.beginPath();
@@ -2095,13 +2160,11 @@
           ctx.fill();
         }
 
-        // 鼓框
         ctx.fillStyle = '#78350f';
         ctx.beginPath();
         ctx.arc(0, 0, isActive ? 36 : 33, 0, Math.PI * 2);
         ctx.fill();
 
-        // 鼓面顏色
         ctx.fillStyle = info.fill;
         ctx.beginPath();
         ctx.arc(0, 0, isActive ? 30 : 27, 0, Math.PI * 2);
@@ -2111,14 +2174,12 @@
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // 鼓面文字
         ctx.fillStyle = typeKey === 'yellow' ? '#1e293b' : '#ffffff';
         ctx.font = '900 18px "Noto Sans TC", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(info.label, 0, -2);
 
-        // 下方鍵位提示
         ctx.fillStyle = info.ring;
         ctx.font = 'bold 11px "Noto Sans TC", sans-serif';
         ctx.fillText(keyHint, 0, 46);
@@ -2134,14 +2195,12 @@
         const trackY = h * 0.44;
         const hitX = 96;
 
-        // 祭典暖色背景
         const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
         bgGrad.addColorStop(0, '#2a0a0e');
         bgGrad.addColorStop(1, '#120709');
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, w, h);
 
-        // 祭典燈籠裝飾
         const lanternCount = 8;
         for (let i = 0; i < lanternCount; i++) {
           const lx = (w / lanternCount) * (i + 0.5);
@@ -2154,7 +2213,6 @@
           ctx.stroke();
         }
 
-        // 頂部標題與連擊條
         ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
         this.drawRoundRect(16, 36, w - 32, 32, 12);
         ctx.fill();
@@ -2169,7 +2227,6 @@
         ctx.fillStyle = '#fde047';
         ctx.fillText(`🔥 連擊 ${this.combo}`, w - 28, 52);
 
-        // 音符軌道外框
         ctx.fillStyle = '#1e1b18';
         this.drawRoundRect(18, trackY - 38, w - 36, 76, 38);
         ctx.fill();
@@ -2177,7 +2234,6 @@
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // 判定圈（隨當前打擊顏色發光）
         const activeInfo = (this.flashTimer > 0 && this.flashType) ? TAIKO_TYPES[this.flashType] : null;
         if (activeInfo) {
           ctx.fillStyle = activeInfo.glow;
@@ -2197,7 +2253,6 @@
         ctx.arc(hitX, trackY, 26, 0, Math.PI * 2);
         ctx.fill();
 
-        // 繪製三色音符
         this.notes.forEach(n => {
           const info = TAIKO_TYPES[n.type];
           const radius = 23;
@@ -2218,13 +2273,11 @@
           ctx.fillText(info.label, n.x, trackY);
         });
 
-        // 下半部 3 個獨立顏色打擊點
         const padY = trackY + 86;
         this.drawSinglePad(w * 0.22, padY, 'red', '🔴 紅咚 [1 / A]');
         this.drawSinglePad(w * 0.50, padY, 'blue', '🔵 藍咔 [2 / S]');
         this.drawSinglePad(w * 0.78, padY, 'yellow', '🟡 黃轟 [3 / D]');
 
-        // 判定特效文字
         this.effects.forEach(ef => {
           ctx.fillStyle = '#000000';
           ctx.font = '900 19px "Noto Sans TC", sans-serif';
